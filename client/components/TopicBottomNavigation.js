@@ -6,15 +6,14 @@ import IconList from 'material-ui/svg-icons/action/list';
 import IconDescription from 'material-ui/svg-icons/action/description';
 import IconDataUsage from 'material-ui/svg-icons/device/data-usage';
 
+import * as helpers from "../helpers";
+
 const TopicBottomNavigation = React.createClass({
     selectIndex(i) {
         this.props.selectBottomNavIndex(i);
     },
     render() {
-        const {
-            navigation
-        } = this.props;
-        const selectedIndex = navigation.bottomNavSelectedIndex || 0;
+        const selectedIndex = helpers.getBottomNavSelectedIndex(this.props);
         return (
             <Paper zDepth={1}>
                 <BottomNavigation selectedIndex={ selectedIndex }>

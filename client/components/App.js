@@ -5,7 +5,6 @@ import Main from "./Main";
 import * as actionCreators from "../actions/actionCreators";
 
 function mapStateToProps(state) {
-    console.log("state: ", state);
     return {
         sessions: state.sessions,
         topics: state.topics,

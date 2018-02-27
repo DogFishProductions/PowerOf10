@@ -1,6 +1,14 @@
 function postTopics(state = [], action) {
     switch(action.type) {
         case 'ADD_TOPIC':
+            return [
+                ...state,
+                {
+                    code: action.topicId,
+                    title: "",
+                    description: ""
+                }
+            ];
         case 'REMOVE_TOPIC':
         default:
             return state;
@@ -10,10 +18,7 @@ function postTopics(state = [], action) {
 
 export default function topics(state = [], action) {
     if (typeof action.topicId !== 'undefined') {
-        return {
-            ...state,
-            [action.topicId]: postTopics(state[action.topicId], action)
-        }
+        return postTopics(state, action);
     }
     return state;
 }

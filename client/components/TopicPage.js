@@ -10,7 +10,7 @@ const TopicPage = React.createClass({
             <div className="pseudo-phone-main">
                 <TopicAppBar { ...this.props } />
                 <div className="pseudo-phone-list">
-                    <SessionList topicId={topicId} sessions={this.props.sessions}>
+                    <SessionList {...this.props } topicId={topicId}>
                     </SessionList>
                 </div>
             </div>

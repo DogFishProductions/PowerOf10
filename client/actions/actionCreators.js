@@ -1,4 +1,5 @@
 export function addTopic(topicId) {
+    console.log("new topic id: ", topicId);
     return {
         type: "ADD_TOPIC",
         topicId

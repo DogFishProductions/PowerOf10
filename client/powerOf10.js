@@ -20,7 +20,7 @@ const router = (
             <Route path="/" component={ App }>
                 <IndexRoute component={ TopicListPage }></IndexRoute>
                 <Route path="/view/:topicId" component={ TopicPage }></Route>
-                <Route path="/topic" component={ AddTopicPage }></Route>
+                <Route path="/topic/:topicId" component={ AddTopicPage }></Route>
             </Route>
         </Router>
     </Provider>

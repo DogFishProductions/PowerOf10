@@ -8,6 +8,11 @@ import TopicListAppBar from "./TopicListAppBar";
 import TopicList from "./TopicList";
 
 const TopicListPage = React.createClass({
+    handleAddTopicOnClick() {
+        const newTopicId = helpers.randomString(10, "aA#!");
+        this.props.addTopic(newTopicId);
+        this.props.history.push(`/topic/${newTopicId}`);
+    },
     render() {
         return (
             <div className="pseudo-phone-main outer">
@@ -20,7 +25,7 @@ const TopicListPage = React.createClass({
                 <div className="inner">
                     <FloatingActionButton
                         className="floating-button-bottom-right"
-                        onClick={ () => { this.props.addTopic(this.helpers.randomString(10, "aA#!")) } }
+                        onClick={ (e) => this.handleAddTopicOnClick(e) }
                     >
                         <ContentAdd />
                     </FloatingActionButton>
