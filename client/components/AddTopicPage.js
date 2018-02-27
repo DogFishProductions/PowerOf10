@@ -21,30 +21,29 @@ import NotesPage from "./NotesPage";
 const AddTopicPage = React.createClass({
     renderDetailView() {
         const selectedIndex = helpers.getBottomNavSelectedIndex(this.props);
-        const { topicId } = this.props.params;
         switch(selectedIndex) {
             case 0: 
                 return (
                     <div>
-                        <SessionList { ...this.props }  topicId={topicId}/>
+                        <SessionList { ...this.props }/>
                     </div>
                 );
             case 1:
                 return (
                     <div>
-                        <TargetPage { ...this.props }  topicId={topicId}/>
+                        <TargetPage { ...this.props } itemType="topic"/>
                     </div>
                 );
             case 2:
                 return (
                     <div>
-                        <NotesPage { ...this.props }  topicId={topicId}/>
+                        <NotesPage { ...this.props } itemType="topic"/>
                     </div>
                 );
             default:
                 return (
                     <div>
-                        <SessionList { ...this.props }  topicId={topicId}/>
+                        <SessionList { ...this.props }/>
                     </div>
                 );
         }

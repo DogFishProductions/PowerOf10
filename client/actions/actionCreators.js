@@ -1,26 +1,51 @@
+export function createTopic(topicId) {
+    return {
+        type: "CREATE_TOPIC",
+        topicId
+    }
+}
+
+export function updateTopicDescription(topicId, newValue) {
+    return {
+        type: "UPDATE_TOPIC_DESCRIPTION",
+        topicId,
+        newValue
+    }
+}
+
 export function addTopic(topicId) {
-    console.log("new topic id: ", topicId);
     return {
         type: "ADD_TOPIC",
         topicId
     }
 }
 
-export function removeTopic() {
+export function removeTopic(topicId) {
     return {
         type: "REMOVE_TOPIC",
+        topicId
     }
 }
 
-export function addSession() {
+export function updateSessionDescription(sessionId, newValue) {
+    return {
+        type: "UPDATE_TOPIC_DESCRIPTION",
+        sessionId,
+        newValue
+    }
+}
+
+export function addSession(sessionId) {
     return {
         type: "ADD_SESSION",
+        sessionId
     }
 }
 
-export function removeSession() {
+export function removeSession(sessionId) {
     return {
         type: "REMOVE_SESSION",
+        sessionId
     }
 }
 
