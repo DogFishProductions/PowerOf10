@@ -43,13 +43,22 @@ const SessionList = React.createClass({
             </div>
         )
     },
-    render() {
+    renderListItems(defaultText = "Start recording sessions") {
         const sessions = this.props.sessions || [];
-        const topicId = this.props.topicId;
+        const { topicId } = this.props.params;
         const currentSessions = sessions[topicId] || [];
-        return (
-            <List children={ currentSessions.map(this.renderSession)} />
-        )
+        if (currentSessions.length > 0) {
+            return (
+                <List children={ currentSessions.map(this.renderSession)} />
+            );
+        } else {
+            return (
+                <h3>{ defaultText }</h3>
+            );
+        }
+    },
+    render() {
+        return this.renderListItems(this.props.defaultText);
     }
 });
 

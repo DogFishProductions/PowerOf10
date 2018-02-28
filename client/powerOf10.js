@@ -12,7 +12,6 @@ import css from "./styles/style.styl";
 import App from "./components/App";
 import TopicListPage from "./components/TopicListPage";
 import TopicPage from "./components/TopicPage";
-import AddTopicPage from "./components/AddTopicPage";
 
 const router = (
     <Provider store={ store }>
@@ -20,7 +19,7 @@ const router = (
             <Route path="/" component={ App }>
                 <IndexRoute component={ TopicListPage }></IndexRoute>
                 <Route path="/view/:topicId" component={ TopicPage }></Route>
-                <Route path="/topic/:topicId" component={ AddTopicPage }></Route>
+                <Route path="/topic/:topicId" component={ TopicPage }></Route>
             </Route>
         </Router>
     </Provider>

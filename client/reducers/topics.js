@@ -1,4 +1,12 @@
+import * as helpers from "../helpers";
+
 function postTopics(state = [], action) {
+    const {
+        index,
+        selectedItem
+    } = helpers.getSelectedItemAndIndexFromArray(state, "code", action.topicId);
+    const before = state.slice(0, index);   // before the one we are updating
+    const after = state.slice(index + 1);   // after the one we are updating
     switch(action.type) {
         case "CREATE_TOPIC":
             return [
@@ -6,19 +14,51 @@ function postTopics(state = [], action) {
                 {
                     code: action.topicId,
                     title: "New topic",
-                    description: ""
+                    description: "",
+                    isNew: true
                 }
             ];
-        case "UPDATE_TOPIC_DESCRIPTION":
-            const i = state.findIndex((topic) => topic.code === action.topicId);
-            const selectedTopic = state[i];
+        case "UPDATE_TOPIC":
+            console.log("updating topic: ", action.paramName);
+            const updatedValue = {};
+            updatedValue[action.paramName] = action.newValue;
             return [
-                ...state.slice(0, i),   // before the one we are updating
-                { ...state[i], description: action.newValue },
-                ...state.slice(i + 1),  // after the one we are updating
+                ...before,
+                { ...selectedItem, ...updatedValue },
+                ...after
+            ];
+        case "BEGIN_EDIT_TOPIC_TITLE":
+            return [
+                ...before,
+                { ...selectedItem, isEditingTitle: true },
+                ...after
+            ];
+        case "END_EDIT_TOPIC_TITLE":
+            return [
+                ...before,
+                {
+                    description: selectedItem.description,
+                    title: selectedItem.title,
+                    code: selectedItem.code,
+                    isNew: selectedItem.isNew
+                },
+                ...after
             ];
         case "ADD_TOPIC":
+            return [
+                ...before,
+                {
+                    description: selectedItem.description,
+                    title: selectedItem.title,
+                    code: selectedItem.code
+                },
+                ...after
+            ];
         case "REMOVE_TOPIC":
+            return [
+                ...before,
+                ...after
+            ];
         default:
             return state;
     }

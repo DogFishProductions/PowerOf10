@@ -1,51 +1,127 @@
-export function createTopic(topicId) {
-    return {
-        type: "CREATE_TOPIC",
-        topicId
+export function updateItemDescription(type, itemId, newValue) {
+    switch(type) {
+        case "topic":
+            return {
+                type: "UPDATE_TOPIC",
+                topicId: itemId,
+                paramName: "description",
+                newValue
+            }
+        case "session":
+            return {
+                type: "UPDATE_SESSION",
+                sessionId: itemId,
+                paramName: "description",
+                newValue
+            }
+        default:
+            return {}
     }
 }
 
-export function updateTopicDescription(topicId, newValue) {
-    return {
-        type: "UPDATE_TOPIC_DESCRIPTION",
-        topicId,
-        newValue
+export function createItem(type, itemId) {
+    switch(type) {
+        case "topic":
+            return {
+                type: "CREATE_TOPIC",
+                topicId: itemId
+            }
+        case "session":
+            return {
+                type: "CREATE_SESSION",
+                sessionId: itemId
+            }
+        default:
+            return {}
     }
 }
 
-export function addTopic(topicId) {
-    return {
-        type: "ADD_TOPIC",
-        topicId
+export function updateItemTitle(type, itemId, newValue) {
+    switch(type) {
+        case "topic":
+            return {
+                type: "UPDATE_TOPIC",
+                topicId: itemId,
+                paramName: "title",
+                newValue
+            }
+        case "session":
+            return {
+                type: "UPDATE_SESSION",
+                sessionId: itemId,
+                paramName: "title",
+                newValue
+            }
+        default:
+            return {}
     }
 }
 
-export function removeTopic(topicId) {
-    return {
-        type: "REMOVE_TOPIC",
-        topicId
+export function beginEditItemTitle(type, itemId) {
+    switch(type) {
+        case "topic":
+            return {
+                type: "BEGIN_EDIT_TOPIC_TITLE",
+                topicId: itemId
+            }
+        case "session":
+            return {
+                type: "BEGIN_EDIT_SESSION_TITLE",
+                sesionId: itemId
+            }
+        default:
+            return {}
     }
 }
 
-export function updateSessionDescription(sessionId, newValue) {
-    return {
-        type: "UPDATE_TOPIC_DESCRIPTION",
-        sessionId,
-        newValue
+export function endEditItemTitle(type, itemId) {
+    switch(type) {
+        case "topic":
+            return {
+                type: "END_EDIT_TOPIC_TITLE",
+                topicId: itemId
+            }
+        case "session":
+            return {
+                type: "END_EDIT_SESSION_TITLE",
+                sesionId: itemId
+            }
+        default:
+            return {}
     }
 }
 
-export function addSession(sessionId) {
-    return {
-        type: "ADD_SESSION",
-        sessionId
+export function addItem(type, itemId) {
+    switch(type) {
+        case "topic":
+            return {
+                type: "ADD_TOPIC",
+                topicId: itemId
+            }
+        case "session":
+            return {
+                type: "ADD_SESSION",
+                sessionId: itemId
+            }
+        default:
+            return {}
     }
 }
 
-export function removeSession(sessionId) {
-    return {
-        type: "REMOVE_SESSION",
-        sessionId
+export function removeItem(type, itemId) {
+    switch(type) {
+        case "topic":
+            return {
+                type: "REMOVE_TOPIC",
+                topicId: itemId
+            }
+        case "session":
+            return {
+                type: "REMOVE_SESSION",
+                sessionId: itemId
+            }
+        default:
+            return {}
     }
 }
 

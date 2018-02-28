@@ -37,3 +37,43 @@ export function randomString(length, chars) {
 export function getBottomNavSelectedIndex(props) {
     return props.navigation.bottomNavSelectedIndex || 0;
 }
+
+export function getSelectedItemAndIndexFromArray(targetArray = [], paramName, selectionValue) {
+    const index = targetArray.findIndex((item) => item[paramName] === selectionValue);
+    const selectedItem = targetArray[index];
+    return {
+        index,
+        selectedItem
+    }
+}
+
+export function getSelectedItemPropertyFromArray(targetArray = [], paramName, selectionValue, property) {
+    const { selectedItem } = this.getSelectedItemAndIndexFromArray(targetArray, paramName, selectionValue);
+    return selectedItem ? selectedItem[property] : undefined;
+}
+
+export function getLocalProperties(props = {}) {
+    const {
+        topicId,
+        sessionId
+    } = props.params;
+    const localProps = {
+        type: "topic",
+        targetArray: props.topics,
+        selectionValue: topicId
+    };
+    if (sessionId) {
+        localProps[type] = "session",
+        localProps[targetArray] = props.sessions;
+        localProps[selectionValue] = sessionId;
+    }
+    return localProps;
+}
+
+export function dispatchAction(props = {}, actionName, ...args) {
+    const {
+        type,
+        selectionValue
+    } = this.getLocalProperties(props);
+    props[actionName](type, selectionValue, ...args);
+}

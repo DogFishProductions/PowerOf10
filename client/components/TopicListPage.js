@@ -10,7 +10,7 @@ import TopicList from "./TopicList";
 const TopicListPage = React.createClass({
     handleAddTopicOnClick() {
         const topicId = helpers.randomString(10, "aA#!");
-        this.props.createTopic(topicId);
+        this.props.createItem("topic", topicId);
         this.props.selectBottomNavIndex(2);
         this.props.history.push(`/topic/${ topicId}`);
     },

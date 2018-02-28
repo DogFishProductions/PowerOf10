@@ -2,6 +2,8 @@ import React from "react";
 
 import TextField from 'material-ui/TextField';
 
+import * as helpers from "../helpers";
+
 const style = {
     width: "328px",
     margin: "0 auto"
@@ -9,39 +11,21 @@ const style = {
 
 const NotesPage = React.createClass({
     handleOnChange(e, newValue) {
-        const {
-            itemType
-        } = this.props;
-        const {
-            topicId,
-            itemId
-        } = this.props.params;
-        switch(itemType) {
-            case "topic":
-                return this.props.updateTopicDescription(topicId, newValue);
-            case "session":
-                return this.props.updateSessionDescription(sessionId, newValue);
-            default:
-                return;
-        }
+        const localProps = helpers.getLocalProperties(this.props);
+        return this.props.updateItemDescription(
+            localProps.type,
+            localProps.selectionValue,
+            newValue,
+        );
     },
     getItemDescription() {
-        const {
-            topicId,
-            sessionId
-        } = this.props.params;
-        let i;
-        let item = { description: "" };
-        if (topicId) {
-            i = this.props.topics.findIndex((topic) => topic.code === topicId);
-            // get us the item
-            item = this.props.topics[i];
-        } else if (sessionId) {
-            i = this.props.sessions.findIndex((session) => session.code === sessionId);
-            // get us the item
-            item = this.props.sessions[i];
-        }
-        return item.description;
+        const localProps = helpers.getLocalProperties(this.props);
+        return helpers.getSelectedItemPropertyFromArray(
+            localProps.targetArray,
+            "code",
+            localProps.selectionValue,
+            "description",
+        );
     },
     render() {
         return (
