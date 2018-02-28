@@ -2,23 +2,24 @@ import React from 'react';
 import { Router, Redirect } from "react-router";
 
 import Avatar from 'material-ui/Avatar';
-import {
-    deepOrange300,
-    purple500,
-} from 'material-ui/styles/colors';
-
-const avatarStyle = {
-    textAlign: "center",
-    fontSize: 10
-};
-
-import { durationToStackedString } from "../helpers";
 import { List, ListItem } from 'material-ui/List';
 import { red500 } from 'material-ui/styles/colors';
 import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
 import ImageTimer from 'material-ui/svg-icons/image/timer';
 import ImageTimerOff from 'material-ui/svg-icons/image/timer-off';
+import {
+    deepOrange300,
+    purple500,
+} from 'material-ui/styles/colors';
+
+import { durationToStackedString } from "../helpers";
+
+const avatarStyle = {
+    textAlign: "center",
+    fontSize: 10
+};
+
 
 const TopicList = React.createClass({
     renderTimerOffButton() {

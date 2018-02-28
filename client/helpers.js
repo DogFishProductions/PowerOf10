@@ -1,3 +1,4 @@
+import React from "react";
 import * as moment from "moment";
 
 const durationFromArrayOfSessions = (sessions = []) => {
@@ -11,14 +12,31 @@ const durationFromArrayOfSessions = (sessions = []) => {
     );
 }
 
+export function getTopicSessions(props) {
+    const sessions = props.sessions || [];
+    const { topicId } = props.params;
+    return sessions[topicId] || [];
+}
+
 export function durationToString(sessions = []) {
     const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
     return `${duration.hours()}h ${duration.minutes()}m`;
 }
 
+export function durationToHumanizedString(sessions = []) {
+    const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
+    return `${duration.humanize()}`;
+}
+
 export function durationToStackedString(sessions = []) {
     const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
-    return `${duration.hours()}h\r\n${duration.minutes()}m`;
+    return (
+        <span>
+            { `${duration.hours()}h `}
+            <br />
+            { `${duration.minutes()}m` }
+        </span>
+    );
 }
 
 export function randomString(length, chars) {
@@ -48,7 +66,7 @@ export function getSelectedItemAndIndexFromArray(targetArray = [], paramName, se
 }
 
 export function getSelectedItemPropertyFromArray(targetArray = [], paramName, selectionValue, property) {
-    const { selectedItem } = this.getSelectedItemAndIndexFromArray(targetArray, paramName, selectionValue);
+    const { selectedItem } = getSelectedItemAndIndexFromArray(targetArray, paramName, selectionValue);
     return selectedItem ? selectedItem[property] : undefined;
 }
 
@@ -74,7 +92,7 @@ export function dispatchAction(props = {}, actionName, ...args) {
     const {
         type,
         selectionValue
-    } = this.getLocalProperties(props);
+    } = getLocalProperties(props);
     props[actionName](type, selectionValue, ...args);
 }
 
@@ -82,11 +100,11 @@ export function getSelectedItem(props, selectionProperty) {
     const {
         targetArray,
         selectionValue
-    } = this.getLocalProperties(props);
+    } = getLocalProperties(props);
     const {
         index,
         selectedItem
-    } = this.getSelectedItemAndIndexFromArray(
+    } = getSelectedItemAndIndexFromArray(
         targetArray,
         selectionProperty,
         selectionValue,

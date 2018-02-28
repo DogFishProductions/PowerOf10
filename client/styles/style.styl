@@ -13,15 +13,34 @@ body
     width 360px
     min-height 546px
     max-height 546px
-    overflow scroll
+    overflow-x hidden
+    overflow-y scroll
+    
+.pseudo-phone-list-no-scroll
+    background offwhite
+    width 360px
+    min-height 546px
+    max-height 546px
+    overflow hidden
 
 div.outer
 {
     position relative
 }
+
 div.inner
 {
     position absolute
+}
+
+.sessionList
+{
+    position absolute
+    top 120px
+    left 0px
+    width 360px
+    max-height 386px
+    overflow scroll
 }
 
 .floating-button-bottom-right {

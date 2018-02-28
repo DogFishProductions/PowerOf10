@@ -8,36 +8,36 @@ import NavigationMoreVert from 'material-ui/svg-icons/navigation/more-vert';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 
-import * as helpers from "../helpers";
+import { dispatchAction, getSelectedItem, getLocalProperties } from "../helpers";
 
-const NewItemAppBar = React.createClass({
+const ItemAppBar = React.createClass({
     redirectHome() {
         this.props.history.push("/");
     },
     handleOnTitleClick(e) {
-        helpers.dispatchAction(this.props, "beginEditItemTitle");
+        dispatchAction(this.props, "beginEditItemTitle");
     },
     handleOnLeftIconButtonClick(e) {
-        const selectedItem = helpers.getSelectedItem(this.props, "code");
+        const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItem.isNew) {
-            helpers.dispatchAction(this.props, "removeItem");
+            dispatchAction(this.props, "removeItem");
         }
         this.redirectHome();
     },
     handleOnRightIconButtonClick(e) {
-        helpers.dispatchAction(this.props, "addItem");
+        dispatchAction(this.props, "addItem");
         this.redirectHome();
     },
     handleTitleOnChange(e, newValue) {
-        return helpers.dispatchAction(this.props, "updateItemTitle", newValue);
+        return dispatchAction(this.props, "updateItemTitle", newValue);
     },
     renderTitle() {
         const {
             type,
             targetArray,
             selectionValue
-        } = helpers.getLocalProperties(this.props);
-        const selectedItem = helpers.getSelectedItem(this.props, "code");
+        } = getLocalProperties(this.props);
+        const selectedItem = getSelectedItem(this.props, "code");
         const title = selectedItem.title || `New ${ type }`;
         if (selectedItem.isEditingTitle) {
             if (selectedItem.isNew) {
@@ -62,7 +62,7 @@ const NewItemAppBar = React.createClass({
         }
     },
     renderIconElementLeft() {
-        const selectedItem = helpers.getSelectedItem(this.props, "code");
+        const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItem.isNew) {
             return (
                 <IconButton><NavigationClose /></IconButton>
@@ -74,7 +74,7 @@ const NewItemAppBar = React.createClass({
         }
     },
     renderIconElementRight() {
-        const selectedItem = helpers.getSelectedItem(this.props, "code");
+        const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItem.isNew) {
             return (
                 <FlatButton label="Save" />
@@ -86,7 +86,7 @@ const NewItemAppBar = React.createClass({
         }
     },
     renderAppBar() {
-        const selectedItem = helpers.getSelectedItem(this.props, "code");
+        const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItem.isEditingTitle) {
             return (
                 <AppBar
@@ -115,4 +115,4 @@ const NewItemAppBar = React.createClass({
     }
 });
 
-export default NewItemAppBar;
+export default ItemAppBar;
