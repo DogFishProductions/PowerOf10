@@ -19,7 +19,6 @@ function postTopics(state = [], action) {
                 }
             ];
         case "UPDATE_TOPIC":
-            console.log("updating topic: ", action.paramName);
             const updatedValue = {};
             updatedValue[action.paramName] = action.newValue;
             return [

@@ -11,7 +11,6 @@ const fabStyle = {
 
 import * as helpers from "../helpers";
 import NewItemAppBar from "./NewItemAppBar";
-import TopicAppBar from "./TopicAppBar";
 import TopicList from "./TopicList";
 import TopicBottomNavigation from "./TopicBottomNavigation";
 
@@ -21,12 +20,7 @@ import NotesPage from "./NotesPage";
 
 const TopicPage = React.createClass({
     getSelectedTopic() {
-        const { topicId } = this.props.params;
-        const {
-            index,
-            selectedItem
-        } = helpers.getSelectedItemAndIndexFromArray(this.props.topics, "code", topicId);
-        return selectedItem || { isNew: true };
+        return helpers.getSelectedItem(this.props, "code") || { isNew: true };
     },
     renderDetailView() {
         const selectedIndex = helpers.getBottomNavSelectedIndex(this.props);
@@ -61,17 +55,10 @@ const TopicPage = React.createClass({
     handleDivOnClick(e) {
         helpers.dispatchAction(this.props, "endEditItemTitle");
     },
-    renderAppBar() {
-        if (this.getSelectedTopic().isNew) {
-            return <NewItemAppBar { ...this.props } />
-        } else {
-            return <TopicAppBar { ...this.props } />
-        }
-    },
     render() {
         return (
             <div className="pseudo-phone-main outer">
-                { this.renderAppBar() }
+                <NewItemAppBar { ...this.props } />
                 <div className="pseudo-phone-list inner" onClick={ (e) => this.handleDivOnClick(e) }>
                     { this.renderDetailView() }
                 </div>

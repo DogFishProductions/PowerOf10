@@ -77,3 +77,19 @@ export function dispatchAction(props = {}, actionName, ...args) {
     } = this.getLocalProperties(props);
     props[actionName](type, selectionValue, ...args);
 }
+
+export function getSelectedItem(props, selectionProperty) {
+    const {
+        targetArray,
+        selectionValue
+    } = this.getLocalProperties(props);
+    const {
+        index,
+        selectedItem
+    } = this.getSelectedItemAndIndexFromArray(
+        targetArray,
+        selectionProperty,
+        selectionValue,
+    );
+    return selectedItem;
+}

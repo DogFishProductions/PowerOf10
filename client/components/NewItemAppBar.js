@@ -3,6 +3,8 @@ import AppBar from 'material-ui/AppBar';
 
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
+import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
+import NavigationMoreVert from 'material-ui/svg-icons/navigation/more-vert';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 
@@ -12,30 +14,14 @@ const NewItemAppBar = React.createClass({
     redirectHome() {
         this.props.history.push("/");
     },
-    getSelectedItem() {
-        const {
-            targetArray,
-            selectionValue
-        } = helpers.getLocalProperties(this.props);
-        const {
-            index,
-            selectedItem
-        } = helpers.getSelectedItemAndIndexFromArray(
-            targetArray,
-            "code",
-            selectionValue,
-        );
-        return selectedItem;
-    },
-    dispatchAction(props, actionName, ...args) {
-        const localProps = helpers.getLocalProperties(props);
-        props[actionName](localProps.type, localProps.selectionValue, ...args);
-    },
     handleOnTitleClick(e) {
         helpers.dispatchAction(this.props, "beginEditItemTitle");
     },
     handleOnLeftIconButtonClick(e) {
-        helpers.dispatchAction(this.props, "removeItem");
+        const selectedItem = helpers.getSelectedItem(this.props, "code");
+        if (selectedItem.isNew) {
+            helpers.dispatchAction(this.props, "removeItem");
+        }
         this.redirectHome();
     },
     handleOnRightIconButtonClick(e) {
@@ -51,29 +37,63 @@ const NewItemAppBar = React.createClass({
             targetArray,
             selectionValue
         } = helpers.getLocalProperties(this.props);
-        const selectedItem = this.getSelectedItem();
+        const selectedItem = helpers.getSelectedItem(this.props, "code");
         const title = selectedItem.title || `New ${ type }`;
-        if (selectedItem && selectedItem.isEditingTitle) {
-            return (
-                <TextField
-                    id="text-field-default"
-                    defaultValue={ title }
-                    onChange={ (e, newValue) => this.handleTitleOnChange(e, newValue) }
-                />
-            )
+        if (selectedItem.isEditingTitle) {
+            if (selectedItem.isNew) {
+                return (
+                    <TextField
+                        id="text-field-default"
+                        hintText={ title }
+                        onChange={ (e, newValue) => this.handleTitleOnChange(e, newValue) }
+                    />
+                )
+            } else {
+                return (
+                    <TextField
+                        id="text-field-default"
+                        defaultValue={ title }
+                        onChange={ (e, newValue) => this.handleTitleOnChange(e, newValue) }
+                    />
+                )
+            }
         } else {
             return title;
         }
     },
+    renderIconElementLeft() {
+        const selectedItem = helpers.getSelectedItem(this.props, "code");
+        if (selectedItem.isNew) {
+            return (
+                <IconButton><NavigationClose /></IconButton>
+            );
+        } else {
+            return (
+                <IconButton><NavigationArrowBack /></IconButton>
+            );
+        }
+    },
+    renderIconElementRight() {
+        const selectedItem = helpers.getSelectedItem(this.props, "code");
+        if (selectedItem.isNew) {
+            return (
+                <FlatButton label="Save" />
+            );
+        } else {
+            return (
+                <IconButton><NavigationMoreVert /></IconButton>
+            );
+        }
+    },
     renderAppBar() {
-        const selectedItem = this.getSelectedItem();
-        if (selectedItem && selectedItem.isEditingTitle) {
+        const selectedItem = helpers.getSelectedItem(this.props, "code");
+        if (selectedItem.isEditingTitle) {
             return (
                 <AppBar
                     title={ this.renderTitle() }
-                    iconElementLeft={ <IconButton><NavigationClose /></IconButton> }
+                    iconElementLeft={ this.renderIconElementLeft() }
                     onLeftIconButtonClick={ (e) => this.handleOnLeftIconButtonClick(e) }
-                    iconElementRight={<FlatButton label="Save" />}
+                    iconElementRight={ this.renderIconElementRight() }
                     onRightIconButtonClick={ (e) => this.handleOnRightIconButtonClick(e) }
                 />
             );
@@ -82,9 +102,9 @@ const NewItemAppBar = React.createClass({
                 <AppBar
                     title={ this.renderTitle() }
                     onTitleClick={ (e) => this.handleOnTitleClick(e) }
-                    iconElementLeft={ <IconButton><NavigationClose /></IconButton> }
+                    iconElementLeft={ this.renderIconElementLeft() }
                     onLeftIconButtonClick={ (e) => this.handleOnLeftIconButtonClick(e) }
-                    iconElementRight={<FlatButton label="Save" />}
+                    iconElementRight={ this.renderIconElementRight() }
                     onRightIconButtonClick={ (e) => this.handleOnRightIconButtonClick(e) }
                 />
             );
