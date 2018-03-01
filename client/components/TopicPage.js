@@ -1,7 +1,5 @@
 import React from "react";
 
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 import TextField from 'material-ui/TextField';
 
 const fabStyle = {
@@ -18,9 +16,8 @@ const timeSpentStyle = {
 
 import { getBottomNavSelectedIndex, getSelectedItem, dispatchAction, durationToString, getTopicSessions } from "../helpers";
 import ItemAppBar from "./ItemAppBar";
-import TopicList from "./TopicList";
 import TopicBottomNavigation from "./TopicBottomNavigation";
-import SessionList from "./SessionList";
+// import SessionList from "./SessionList";
 import TargetPage from "./TargetPage";
 import NotesPage from "./NotesPage";
 
@@ -33,6 +30,17 @@ const TopicPage = React.createClass({
         const defaultSessionListText = this.getSelectedTopic().isNew ? "Save topic to start recording sessions" : "Start recording sessions";
         switch(selectedIndex) {
             case 0:
+                // return (
+                //     <div>
+                //         <TextField
+                //             floatingLabelText="Time Spent"
+                //             disabled={ true }
+                //             style={ timeSpentStyle }
+                //             value={ durationToString(getTopicSessions(this.props)) }
+                //         />
+                //         <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
+                //     </div>
+                // );
                 return (
                     <div>
                         <TextField
@@ -41,7 +49,6 @@ const TopicPage = React.createClass({
                             style={ timeSpentStyle }
                             value={ durationToString(getTopicSessions(this.props)) }
                         />
-                        <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
                     </div>
                 );
             case 1:
@@ -57,25 +64,49 @@ const TopicPage = React.createClass({
                     </div>
                 );
             default:
+                // return (
+                //     <div>
+                //         <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
+                //     </div>
+                // );
                 return (
                     <div>
-                        <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
+                        <TextField
+                            floatingLabelText="Time Spent"
+                            disabled={ true }
+                            style={ timeSpentStyle }
+                            value={ durationToString(getTopicSessions(this.props)) }
+                        />
                     </div>
                 );
         }
     },
     handleDivOnClick(e) {
+        console.log("here")
         dispatchAction(this.props, "endEditItemTitle");
     },
     render() {
+        // return (
+        //     <div className="pseudo-phone-main outer">
+        //         <ItemAppBar { ...this.props } />
+        //         <div className="pseudo-phone-list-no-scroll inner" onClick={ (e) => this.handleDivOnClick(e) }>
+        //             { this.renderDetailView() }
+        //         </div>
+        //         <div className="inner">
+        //             <div className="bottom-nav" onClick={ (e) => this.handleDivOnClick(e) }>
+        //                 <TopicBottomNavigation { ...this.props } />
+        //             </div>
+        //         </div>
+        //     </div>
+        // )
         return (
             <div className="pseudo-phone-main outer">
                 <ItemAppBar { ...this.props } />
-                <div className="pseudo-phone-list-no-scroll inner" onClick={ (e) => this.handleDivOnClick(e) }>
+                <div className="pseudo-phone-list-no-scroll inner" onClick={ this.handleDivOnClick }>
                     { this.renderDetailView() }
                 </div>
                 <div className="inner">
-                    <div className="bottom-nav" onClick={ (e) => this.handleDivOnClick(e) }>
+                    <div className="bottom-nav" onClick={ this.handleDivOnClick }>
                         <TopicBottomNavigation { ...this.props } />
                     </div>
                 </div>

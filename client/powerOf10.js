@@ -18,11 +18,11 @@ const router = (
         <Router history={ history }>
             <Route path="/" component={ App }>
                 <IndexRoute component={ TopicListPage }></IndexRoute>
-                <Route path="/view/:topicId" component={ TopicPage }></Route>
                 <Route path="/topic/:topicId" component={ TopicPage }></Route>
             </Route>
         </Router>
     </Provider>
 );
+
 
 render(router, document.getElementById('root'));

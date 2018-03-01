@@ -109,5 +109,5 @@ export function getSelectedItem(props, selectionProperty) {
         selectionProperty,
         selectionValue,
     );
-    return selectedItem;
+    return selectedItem || { isNew: true };
 }

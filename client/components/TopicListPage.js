@@ -1,14 +1,15 @@
 import React from "react";
 
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
+import AddIcon from "material-ui-icons/Add";
+import Button from 'material-ui/Button';
 
 import * as helpers from "../helpers";
+// import { FloatingAddButton } from "./Buttons";
 import TopicListAppBar from "./TopicListAppBar";
 import TopicList from "./TopicList";
 
 const TopicListPage = React.createClass({
-    handleAddTopicOnClick() {
+    handleAddTopicOnClick(e) {
         const topicId = helpers.randomString(10, "aA#!");
         this.props.createItem("topic", topicId);
         this.props.selectBottomNavIndex(2);
@@ -24,16 +25,19 @@ const TopicListPage = React.createClass({
                     </div>
                 </div>
                 <div className="inner">
-                    <FloatingActionButton
-                        className="floating-button-bottom-right"
-                        onClick={ (e) => this.handleAddTopicOnClick(e) }
-                    >
-                        <ContentAdd />
-                    </FloatingActionButton>
+                    <div className="floating-button-bottom-right">
+                        <Button
+                            variant="fab"
+                            color="primary"
+                            onClick={ this.handleAddTopicOnClick }>
+                            <AddIcon />
+                        </Button>
+                    </div>
                 </div>
             </div>
         )
     }
 })
+
 
 export default TopicListPage;

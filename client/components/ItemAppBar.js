@@ -1,14 +1,30 @@
 import React from 'react';
-import AppBar from 'material-ui/AppBar';
 
+import { withStyles } from "material-ui/styles";
+import AppBar from "material-ui/AppBar";
+import Toolbar from "material-ui/Toolbar";
+import Typography from "material-ui/Typography";
 import IconButton from 'material-ui/IconButton';
-import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
-import NavigationMoreVert from 'material-ui/svg-icons/navigation/more-vert';
-import FlatButton from 'material-ui/FlatButton';
+import MenuIcon from 'material-ui-icons/Menu';
 import TextField from 'material-ui/TextField';
+import CloseIcon from 'material-ui-icons/Close';
+import ArrowBackIcon from 'material-ui-icons/ArrowBack';
+import MoreVertIcon from 'material-ui-icons/MoreVert';
 
 import { dispatchAction, getSelectedItem, getLocalProperties } from "../helpers";
+
+const styles = {
+  root: {
+    flexGrow: 1,
+  },
+  flex: {
+    flex: 1,
+  },
+  menuButton: {
+    marginLeft: -12,
+    marginRight: 20,
+  },
+};
 
 const ItemAppBar = React.createClass({
     redirectHome() {
@@ -21,6 +37,8 @@ const ItemAppBar = React.createClass({
         const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItem.isNew) {
             dispatchAction(this.props, "removeItem");
+        } else if (selectedItem.isEditingTitle) {
+            dispatchAction(this.props, "endEditItemTitle");
         }
         this.redirectHome();
     },
@@ -28,10 +46,11 @@ const ItemAppBar = React.createClass({
         dispatchAction(this.props, "addItem");
         this.redirectHome();
     },
-    handleTitleOnChange(e, newValue) {
-        return dispatchAction(this.props, "updateItemTitle", newValue);
+    handleTitleOnChange(e) {
+        return dispatchAction(this.props, "updateItemTitle", e.target.value);
     },
     renderTitle() {
+        const { classes } = this.props;
         const {
             type,
             targetArray,
@@ -43,17 +62,19 @@ const ItemAppBar = React.createClass({
             if (selectedItem.isNew) {
                 return (
                     <TextField
-                        id="text-field-default"
-                        hintText={ title }
-                        onChange={ (e, newValue) => this.handleTitleOnChange(e, newValue) }
+                        className={classes.textField}
+                        fullWidth={ true }
+                        placeholder={ title }
+                        onChange={ this.handleTitleOnChange }
                     />
                 )
             } else {
                 return (
                     <TextField
-                        id="text-field-default"
+                        className={classes.flex}
+                        fullWidth={ true }
                         defaultValue={ title }
-                        onChange={ (e, newValue) => this.handleTitleOnChange(e, newValue) }
+                        onChange={ this.handleTitleOnChange }
                     />
                 )
             }
@@ -65,11 +86,11 @@ const ItemAppBar = React.createClass({
         const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItem.isNew) {
             return (
-                <IconButton><NavigationClose /></IconButton>
+                <CloseIcon />
             );
         } else {
             return (
-                <IconButton><NavigationArrowBack /></IconButton>
+                <ArrowBackIcon />
             );
         }
     },
@@ -77,36 +98,80 @@ const ItemAppBar = React.createClass({
         const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItem.isNew) {
             return (
-                <FlatButton label="Save" />
+                <Typography
+                    variant="button"
+                    color="inherit">
+                    Save
+                </Typography>
             );
         } else {
             return (
-                <IconButton><NavigationMoreVert /></IconButton>
+                <MoreVertIcon />
             );
         }
     },
     renderAppBar() {
+        const { classes } = this.props;
         const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItem.isEditingTitle) {
             return (
-                <AppBar
-                    title={ this.renderTitle() }
-                    iconElementLeft={ this.renderIconElementLeft() }
-                    onLeftIconButtonClick={ (e) => this.handleOnLeftIconButtonClick(e) }
-                    iconElementRight={ this.renderIconElementRight() }
-                    onRightIconButtonClick={ (e) => this.handleOnRightIconButtonClick(e) }
-                />
+                <div
+                    className={classes.root}>
+                    <AppBar
+                        position="static"
+                        color="primary">
+                        <Toolbar>
+                            <IconButton
+                                onClick={ this.handleOnLeftIconButtonClick }
+                                className={classes.menuButton}
+                                color="inherit">
+                                { this.renderIconElementLeft() }
+                            </IconButton>
+                            <Typography
+                                variant="title"
+                                color="inherit">
+                                { this.renderTitle() }
+                            </Typography>
+                            <IconButton
+                                className={classes.menuButton}
+                                onClick={ this.handleOnRightIconButtonClick }
+                                color="inherit">
+                                { this.renderIconElementRight() }
+                            </IconButton>
+                        </Toolbar>
+                    </AppBar>
+                </div>
             );
         } else {
             return (
-                <AppBar
-                    title={ this.renderTitle() }
-                    onTitleClick={ (e) => this.handleOnTitleClick(e) }
-                    iconElementLeft={ this.renderIconElementLeft() }
-                    onLeftIconButtonClick={ (e) => this.handleOnLeftIconButtonClick(e) }
-                    iconElementRight={ this.renderIconElementRight() }
-                    onRightIconButtonClick={ (e) => this.handleOnRightIconButtonClick(e) }
-                />
+                <div
+                    className={classes.root}>
+                    <AppBar
+                        position="static"
+                        color="primary">
+                        <Toolbar>
+                            <IconButton
+                                onClick={ this.handleOnLeftIconButtonClick }
+                                className={classes.menuButton}
+                                color="inherit">
+                                { this.renderIconElementLeft() }
+                            </IconButton>
+                            <Typography
+                                onClick={ this.handleOnTitleClick }
+                                variant="title"
+                                color="inherit"
+                                className={classes.flex}>
+                                { this.renderTitle() }
+                            </Typography>
+                            <IconButton
+                                className={classes.menuButton}
+                                onClick={ this.handleOnRightIconButtonClick }
+                                color="inherit">
+                                { this.renderIconElementRight() }
+                            </IconButton>
+                        </Toolbar>
+                    </AppBar>
+                </div>
             );
         }
     },
@@ -115,4 +180,9 @@ const ItemAppBar = React.createClass({
     }
 });
 
-export default ItemAppBar;
+ItemAppBar.propTypes = {
+    classes: React.PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(ItemAppBar);
+

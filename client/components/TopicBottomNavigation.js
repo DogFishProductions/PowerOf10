@@ -1,41 +1,47 @@
-import React, { Component } from "react";
+import React from "react";
 
-import { BottomNavigation, BottomNavigationItem } from 'material-ui/BottomNavigation';
-import Paper from 'material-ui/Paper';
-import IconList from 'material-ui/svg-icons/action/list';
-import IconDescription from 'material-ui/svg-icons/action/description';
-import IconDataUsage from 'material-ui/svg-icons/device/data-usage';
+import { withStyles } from 'material-ui/styles';
+import BottomNavigation, { BottomNavigationAction } from 'material-ui/BottomNavigation';
+import ListIcon from 'material-ui-icons/List';
+import DataUsageIcon from 'material-ui-icons/DataUsage';
+import DescriptionIcon from 'material-ui-icons/Description';
 
 import * as helpers from "../helpers";
 
-const TopicBottomNavigation = React.createClass({
-    selectIndex(i) {
+const styles = {};
+
+const TopicBottomNavigation = React.createClass ({
+    selectIndex(e, i) {
         this.props.selectBottomNavIndex(i);
     },
     render() {
+        const { classes } = this.props;
         const selectedIndex = helpers.getBottomNavSelectedIndex(this.props);
         return (
-            <Paper zDepth={1}>
-                <BottomNavigation selectedIndex={ selectedIndex }>
-                    <BottomNavigationItem
-                        label="Sessions"
-                        icon={ <IconList /> }
-                        onClick={ () => this.selectIndex(0) }
-                    />
-                    <BottomNavigationItem
-                        label="Target"
-                        icon={ <IconDataUsage /> }
-                        onClick={ () => this.selectIndex(1) }
-                    />
-                    <BottomNavigationItem
-                        label="Notes"
-                        icon={ <IconDescription /> }
-                        onClick={ () => this.selectIndex(2) }
-                    />
-                </BottomNavigation>
-            </Paper>
-    );
-  }
+            <BottomNavigation
+                value={ selectedIndex }
+                onChange={ this.selectIndex }
+                showLabels
+                className={ classes.root }>
+                <BottomNavigationAction
+                    label="Sessions"
+                    icon={ <ListIcon /> }
+                />
+                <BottomNavigationAction
+                    label="Target"
+                    icon={ <DataUsageIcon /> }
+                />
+                <BottomNavigationAction
+                    label="Notes"
+                    icon={ <DescriptionIcon /> }
+                />
+            </BottomNavigation>
+        );
+    }
 });
 
-export default TopicBottomNavigation;
+TopicBottomNavigation.propTypes = {
+  classes: React.PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(TopicBottomNavigation);

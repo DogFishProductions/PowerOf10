@@ -33,6 +33,7 @@ function postTopics(state = [], action) {
                 ...after
             ];
         case "END_EDIT_TOPIC_TITLE":
+            console.log(selectedItem);
             return [
                 ...before,
                 {
