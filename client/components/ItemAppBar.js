@@ -28,26 +28,33 @@ const styles = {
 
 const ItemAppBar = React.createClass({
     redirectHome() {
-        this.props.history.push("/");
+        this.props.history.goBack();
     },
     handleOnTitleClick(e) {
-        dispatchAction(this.props, "beginEditItemTitle");
+        dispatchAction(this.props, "updateItemProperty", "isEditingTitle", true);
     },
     handleOnLeftIconButtonClick(e) {
         const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItem.isNew) {
             dispatchAction(this.props, "removeItem");
         } else if (selectedItem.isEditingTitle) {
-            dispatchAction(this.props, "endEditItemTitle");
+            dispatchAction(this.props, "updateItemProperty", "isEditingTitle", false);
         }
         this.redirectHome();
     },
     handleOnRightIconButtonClick(e) {
+        const selectedItem = getSelectedItem(this.props, "code");
+        if (selectedItem.isNew) {
+            dispatchAction(this.props, "updateItemProperty", "isNew", false);
+        }
+        if (selectedItem.isEditingTitle) {
+            dispatchAction(this.props, "updateItemProperty", "isEditingTitle", false);
+        }
         dispatchAction(this.props, "addItem");
         this.redirectHome();
     },
     handleTitleOnChange(e) {
-        return dispatchAction(this.props, "updateItemTitle", e.target.value);
+        dispatchAction(this.props, "updateItemProperty", "title", e.target.value);
     },
     renderTitle() {
         const { classes } = this.props;

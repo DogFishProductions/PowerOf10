@@ -1,6 +1,10 @@
 import React from "react";
 
 import TextField from 'material-ui/TextField';
+import TimerIcon from 'material-ui-icons/Timer';
+import TimerOffIcon from 'material-ui-icons/TimerOff';
+import AddIcon from "material-ui-icons/Add";
+import Button from 'material-ui/Button';
 
 const fabStyle = {
     position: "absolute",
@@ -10,14 +14,14 @@ const fabStyle = {
 const timeSpentStyle = {
     position: "absolute",
     left: "-128px",
-    margin: "0 50%",
+    margin: "8px 50%",
     width: "256px"
 }
 
-import { getBottomNavSelectedIndex, getSelectedItem, dispatchAction, durationToString, getTopicSessions } from "../helpers";
+import { getBottomNavSelectedIndex, getSelectedItem, dispatchAction, durationToHumanizedString, getTopicSessions, randomString } from "../helpers";
 import ItemAppBar from "./ItemAppBar";
-import TopicBottomNavigation from "./TopicBottomNavigation";
-// import SessionList from "./SessionList";
+import ItemBottomNavigation from "./ItemBottomNavigation";
+import SessionList from "./SessionList";
 import TargetPage from "./TargetPage";
 import NotesPage from "./NotesPage";
 
@@ -25,30 +29,29 @@ const TopicPage = React.createClass({
     getSelectedTopic() {
         return getSelectedItem(this.props, "code") || { isNew: true };
     },
+    handleStartSessionOnClick(e) {
+        const sessionId = randomString(10, "aA#!");
+        const { topicId } = this.props.params;
+        this.props.createItem("session", sessionId);
+        this.props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
+    },
+    handleAddSessionOnClick(e) {
+        // do something
+    },
     renderDetailView() {
         const selectedIndex = getBottomNavSelectedIndex(this.props);
         const defaultSessionListText = this.getSelectedTopic().isNew ? "Save topic to start recording sessions" : "Start recording sessions";
         switch(selectedIndex) {
             case 0:
-                // return (
-                //     <div>
-                //         <TextField
-                //             floatingLabelText="Time Spent"
-                //             disabled={ true }
-                //             style={ timeSpentStyle }
-                //             value={ durationToString(getTopicSessions(this.props)) }
-                //         />
-                //         <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
-                //     </div>
-                // );
                 return (
                     <div>
                         <TextField
-                            floatingLabelText="Time Spent"
+                            label="Total Time Spent"
                             disabled={ true }
                             style={ timeSpentStyle }
-                            value={ durationToString(getTopicSessions(this.props)) }
+                            defaultValue={ durationToHumanizedString(getTopicSessions(this.props)) }
                         />
+                        <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
                     </div>
                 );
             case 1:
@@ -64,41 +67,17 @@ const TopicPage = React.createClass({
                     </div>
                 );
             default:
-                // return (
-                //     <div>
-                //         <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
-                //     </div>
-                // );
                 return (
                     <div>
-                        <TextField
-                            floatingLabelText="Time Spent"
-                            disabled={ true }
-                            style={ timeSpentStyle }
-                            value={ durationToString(getTopicSessions(this.props)) }
-                        />
+                        <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
                     </div>
                 );
         }
     },
     handleDivOnClick(e) {
-        console.log("here")
-        dispatchAction(this.props, "endEditItemTitle");
+        dispatchAction(this.props, "updateItemProperty", "isEditingTitle", false);
     },
     render() {
-        // return (
-        //     <div className="pseudo-phone-main outer">
-        //         <ItemAppBar { ...this.props } />
-        //         <div className="pseudo-phone-list-no-scroll inner" onClick={ (e) => this.handleDivOnClick(e) }>
-        //             { this.renderDetailView() }
-        //         </div>
-        //         <div className="inner">
-        //             <div className="bottom-nav" onClick={ (e) => this.handleDivOnClick(e) }>
-        //                 <TopicBottomNavigation { ...this.props } />
-        //             </div>
-        //         </div>
-        //     </div>
-        // )
         return (
             <div className="pseudo-phone-main outer">
                 <ItemAppBar { ...this.props } />
@@ -106,8 +85,26 @@ const TopicPage = React.createClass({
                     { this.renderDetailView() }
                 </div>
                 <div className="inner">
+                    <div className="floating-button-bottom-right">
+                        <Button
+                            variant="fab"
+                            color="primary"
+                            style={ { top: "-128px" } }
+                            onClick={ this.handleAddSessionOnClick }>
+                            <AddIcon />
+                        </Button>
+                    </div>
+                    <div className="floating-button-bottom-right">
+                        <Button
+                            variant="fab"
+                            color="primary"
+                            style={ { top: "-56px" } }
+                            onClick={ this.handleStartSessionOnClick }>
+                            <TimerIcon />
+                        </Button>
+                    </div>
                     <div className="bottom-nav" onClick={ this.handleDivOnClick }>
-                        <TopicBottomNavigation { ...this.props } />
+                        <ItemBottomNavigation { ...this.props } />
                     </div>
                 </div>
             </div>

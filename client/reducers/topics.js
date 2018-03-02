@@ -1,6 +1,8 @@
+import * as _ from "lodash";
+
 import * as helpers from "../helpers";
 
-function postTopics(state = [], action) {
+const postTopic = (state = [], action) => {
     const {
         index,
         selectedItem
@@ -20,37 +22,22 @@ function postTopics(state = [], action) {
             ];
         case "UPDATE_TOPIC":
             const updatedValue = {};
-            updatedValue[action.paramName] = action.newValue;
-            return [
-                ...before,
-                { ...selectedItem, ...updatedValue },
-                ...after
-            ];
-        case "BEGIN_EDIT_TOPIC_TITLE":
-            return [
-                ...before,
-                { ...selectedItem, isEditingTitle: true },
-                ...after
-            ];
-        case "END_EDIT_TOPIC_TITLE":
-            console.log(selectedItem);
+            updatedValue[action.propName] = action.newValue;
             return [
                 ...before,
                 {
-                    description: selectedItem.description,
-                    title: selectedItem.title,
-                    code: selectedItem.code,
-                    isNew: selectedItem.isNew
+                    ...selectedItem,
+                    ...updatedValue,
                 },
                 ...after
             ];
         case "ADD_TOPIC":
+            // booleans are only used to indicate active editing - false values do not need to be saved
+            const updatedSelectedItem = _.pickBy(selectedItem, (prop) => (prop !== false));
             return [
                 ...before,
                 {
-                    description: selectedItem.description,
-                    title: selectedItem.title,
-                    code: selectedItem.code
+                    ...updatedSelectedItem,
                 },
                 ...after
             ];
@@ -65,9 +52,11 @@ function postTopics(state = [], action) {
     return state;
 }
 
-export default function topics(state = [], action) {
+const topics = (state = [], action) => {
     if (typeof action.topicId !== "undefined") {
-        return postTopics(state, action);
+        return postTopic(state, action);
     }
     return state;
 }
+
+export default topics;

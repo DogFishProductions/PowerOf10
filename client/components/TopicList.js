@@ -1,14 +1,12 @@
 import React from "react";
 import { Router, Redirect } from "react-router";
+import * as _ from "lodash";
 
 import Avatar from "material-ui/Avatar";
 import deepOrange from "material-ui/colors/deepOrange";
 import red from "material-ui/colors/red";
 import List, { ListItem, ListItemSecondaryAction, ListItemIcon, ListItemText } from 'material-ui/List';
-
-import IconButton from 'material-ui/IconButton';
-import TimerIcon from 'material-ui-icons/Timer';
-
+import Typography from "material-ui/Typography";
 import Divider from "material-ui/Divider";
 
 import { IconTimerButton, IconTimerOffButton } from "./Buttons";
@@ -54,7 +52,7 @@ const TopicList = React.createClass({
                     </Avatar>
                     <ListItemText
                         primary={ topic.title }
-                        secondary={ topic.description }
+                        secondary={ _.truncate(topic.description, { length: 100 }) }
                     />
                     <ListItemSecondaryAction>
                         { this.renderTimerButton(true) }

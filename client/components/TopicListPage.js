@@ -4,7 +4,6 @@ import AddIcon from "material-ui-icons/Add";
 import Button from 'material-ui/Button';
 
 import * as helpers from "../helpers";
-// import { FloatingAddButton } from "./Buttons";
 import TopicListAppBar from "./TopicListAppBar";
 import TopicList from "./TopicList";
 
@@ -12,8 +11,7 @@ const TopicListPage = React.createClass({
     handleAddTopicOnClick(e) {
         const topicId = helpers.randomString(10, "aA#!");
         this.props.createItem("topic", topicId);
-        this.props.selectBottomNavIndex(2);
-        this.props.history.push(`/topic/${ topicId}`);
+        this.props.history.push(`/topic/${ topicId }`);
     },
     render() {
         return (

@@ -1,34 +1,39 @@
 import React from "react";
-import * as moment from "moment";
+import moment from "moment";
 
 const durationFromArrayOfSessions = (sessions = []) => {
     return sessions.reduce(
         (duration, session) => {
             const from = session.from || 0;
-            const to = session.to || 0;
+            const to = session.to || Date.now();
             return duration + (to - from);
         },
         0,
     );
 }
 
-export function getTopicSessions(props) {
+export const getTopicSessions = (props) => {
     const sessions = props.sessions || [];
     const { topicId } = props.params;
     return sessions[topicId] || [];
 }
 
-export function durationToString(sessions = []) {
+export const durationToString = (sessions = []) => {
     const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
     return `${duration.hours()}h ${duration.minutes()}m`;
 }
 
-export function durationToHumanizedString(sessions = []) {
+export const durationToLongString = (sessions = []) => {
     const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
-    return `${duration.humanize()}`;
+    return `${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
 }
 
-export function durationToStackedString(sessions = []) {
+export const durationToHumanizedString = (sessions = []) => {
+    const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
+    return (duration.milliseconds() === 0) ? "0h 0m" : duration.humanize();
+}
+
+export const durationToStackedString = (sessions = []) => {
     const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
     return (
         <span>
@@ -39,7 +44,20 @@ export function durationToStackedString(sessions = []) {
     );
 }
 
-export function randomString(length, chars) {
+export const momentToDatetimeString = (session, prop) => {
+    return moment(session[prop]).calendar(null, { sameElse: "dddd, MMMM Do YYYY, h:mm" });
+}
+
+export const momentToDateString = (session, prop) => {
+    console.log(moment(session[prop]).format("YYYY-MM-DD"))
+    return moment(session[prop]).format("YYYY-MM-DD");
+}
+
+export const momentToTimeString = (session, prop) => {
+    return `${moment(session[prop]).format("HH:mm")}`;
+}
+
+export const randomString = (length, chars) => {
     var mask = "";
     if (chars.indexOf("a") > -1) mask += "abcdefghijklmnopqrstuvwxyz";
     if (chars.indexOf("A") > -1) mask += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -52,11 +70,11 @@ export function randomString(length, chars) {
     return result;
 }
 
-export function getBottomNavSelectedIndex(props) {
+export const getBottomNavSelectedIndex = (props) => {
     return props.navigation.bottomNavSelectedIndex || 0;
 }
 
-export function getSelectedItemAndIndexFromArray(targetArray = [], paramName, selectionValue) {
+export const getSelectedItemAndIndexFromArray = (targetArray = [], paramName, selectionValue) => {
     const index = targetArray.findIndex((item) => item[paramName] === selectionValue);
     const selectedItem = targetArray[index];
     return {
@@ -65,12 +83,12 @@ export function getSelectedItemAndIndexFromArray(targetArray = [], paramName, se
     }
 }
 
-export function getSelectedItemPropertyFromArray(targetArray = [], paramName, selectionValue, property) {
+export const getSelectedItemPropertyFromArray = (targetArray = [], paramName, selectionValue, property) => {
     const { selectedItem } = getSelectedItemAndIndexFromArray(targetArray, paramName, selectionValue);
     return selectedItem ? selectedItem[property] : undefined;
 }
 
-export function getLocalProperties(props = {}) {
+export const getLocalProperties = (props = {}) => {
     const {
         topicId,
         sessionId
@@ -81,14 +99,14 @@ export function getLocalProperties(props = {}) {
         selectionValue: topicId
     };
     if (sessionId) {
-        localProps[type] = "session",
-        localProps[targetArray] = props.sessions;
-        localProps[selectionValue] = sessionId;
+        localProps["type"] = "session",
+        localProps["targetArray"] = props.sessions[topicId];
+        localProps["selectionValue"] = sessionId;
     }
     return localProps;
 }
 
-export function dispatchAction(props = {}, actionName, ...args) {
+export const dispatchAction = (props = {}, actionName, ...args) => {
     const {
         type,
         selectionValue
@@ -96,7 +114,7 @@ export function dispatchAction(props = {}, actionName, ...args) {
     props[actionName](type, selectionValue, ...args);
 }
 
-export function getSelectedItem(props, selectionProperty) {
+export const getSelectedItem = (props, selectionProperty) => {
     const {
         targetArray,
         selectionValue

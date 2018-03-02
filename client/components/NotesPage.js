@@ -1,40 +1,31 @@
 import React from "react";
 
+import { withStyles } from 'material-ui/styles';
 import TextField from 'material-ui/TextField';
 
-import * as helpers from "../helpers";
+import { getSelectedItem, dispatchAction } from "../helpers";
 
 const notesStyle = {
     width: "328px",
-    margin: "0 auto"
+    margin: "8px auto"
 }
 
 const NotesPage = React.createClass({
     handleOnChange(e) {
-        const localProps = helpers.getLocalProperties(this.props);
-        return this.props.updateItemDescription(
-            localProps.type,
-            localProps.selectionValue,
-            e.target.value,
-        );
+        dispatchAction(this.props, "updateItemProperty", "description", e.target.value);
     },
     getItemDescription() {
-        const localProps = helpers.getLocalProperties(this.props);
-        return helpers.getSelectedItemPropertyFromArray(
-            localProps.targetArray,
-            "code",
-            localProps.selectionValue,
-            "description",
-        );
+        const selectedItem = getSelectedItem(this.props, "code");
+        return selectedItem.description;
     },
     render() {
         return (
             <div style={ notesStyle }>
                 <TextField
+                    style={ notesStyle }
                     placeholder="Describe your new topic"
                     label="Description"
-                    style={ notesStyle }
-                    multiLine
+                    multiline
                     rows="2"
                     rowsMax="15"
                     onChange={ this.handleOnChange }

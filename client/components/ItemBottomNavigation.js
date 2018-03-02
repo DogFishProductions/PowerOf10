@@ -5,14 +5,36 @@ import BottomNavigation, { BottomNavigationAction } from 'material-ui/BottomNavi
 import ListIcon from 'material-ui-icons/List';
 import DataUsageIcon from 'material-ui-icons/DataUsage';
 import DescriptionIcon from 'material-ui-icons/Description';
+import TimelapseIcon from 'material-ui-icons/Timelapse';
 
 import * as helpers from "../helpers";
 
 const styles = {};
 
-const TopicBottomNavigation = React.createClass ({
+const ItemBottomNavigation = React.createClass ({
     selectIndex(e, i) {
         this.props.selectBottomNavIndex(i);
+    },
+    renderLeftIcon() {
+        const {
+            topicId,
+            sessionId
+        } = this.props.params;
+        if (topicId && !sessionId) {
+            return (
+                <BottomNavigationAction
+                    label="Sessions"
+                    icon={ <ListIcon /> }
+                />
+            );
+        } else {
+            return (
+                <BottomNavigationAction
+                    label="Duration"
+                    icon={ <TimelapseIcon /> }
+                />
+            );
+        }
     },
     render() {
         const { classes } = this.props;
@@ -23,11 +45,9 @@ const TopicBottomNavigation = React.createClass ({
                 onChange={ this.selectIndex }
                 showLabels
                 className={ classes.root }>
+                { this.renderLeftIcon() }
                 <BottomNavigationAction
-                    label="Sessions"
-                    icon={ <ListIcon /> }
-                />
-                <BottomNavigationAction
+                    disabled={ true }
                     label="Target"
                     icon={ <DataUsageIcon /> }
                 />
@@ -40,8 +60,8 @@ const TopicBottomNavigation = React.createClass ({
     }
 });
 
-TopicBottomNavigation.propTypes = {
+ItemBottomNavigation.propTypes = {
   classes: React.PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(TopicBottomNavigation);
+export default withStyles(styles)(ItemBottomNavigation);
