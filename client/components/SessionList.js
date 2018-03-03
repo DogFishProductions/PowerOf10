@@ -4,11 +4,30 @@ import * as moment from 'moment';
 import List, { ListItem, ListItemSecondaryAction, ListItemIcon, ListItemText, ListSubheader } from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import Checkbox from 'material-ui/Checkbox';
+import IconButton from 'material-ui/IconButton';
+import TimerIcon from 'material-ui-icons/Timer';
+import TimerOffIcon from 'material-ui-icons/TimerOff';
 
 import { momentToDatetimeString, durationToString, getTopicSessions } from "../helpers";
 
 const defaultTextStyle = {
     marginLeft: "16px",
+}
+
+const styles = {
+    icon: {
+        fontSize: 25
+    },
+}
+
+const compareSession = (a, b) => {
+    if (a.from < b.from) {
+        return 1;
+    }
+    if (a.from > b.from) {
+        return -1;
+    }
+    return 0;
 }
 
 const SessionList = React.createClass({
@@ -18,12 +37,62 @@ const SessionList = React.createClass({
     handleCheckboxOnClick(e, checked) {
         // do something
     },
+    handleTimerOffButtonOnClick(e, sessionId) {
+        const { topicId } = this.props.params;
+        // don't use handler dispatchAction as session id is not in URL
+        this.props.updateItemProperty("session", sessionId, "isRunning", false, topicId);
+        // remove the unnecessary boolean property
+        this.props.addItem("session", sessionId, topicId);
+    },
     renderSessionDuration(session) {
         return (
             <span>{ durationToString([session], "humanized") }</span>
         );
     },
+    renderTimerOffButton(sessionId) {
+        return (
+            <IconButton
+                onClick={ (e) => this.handleTimerOffButtonOnClick(e, sessionId)}
+            >
+                <TimerOffIcon
+                    style={ styles.icon }
+                />
+            </IconButton>
+        )
+    },
+    renderTimerButton(enabled) {
+        return (
+            <IconButton
+                disabled={ !enabled }
+            >
+                <TimerIcon
+                    style={ styles.icon }
+                />
+            </IconButton>
+        )
+    },
     renderSession(session, i) {
+        if (session.isRunning) {
+            return (
+            <div key={i}>
+                <ListItem
+                    onClick={ (e) => this.handlePrimaryOnClick(e, session) }
+                >  
+                    <Checkbox
+                        onChange={ this.handleCheckboxOnClick }
+                    />
+                    <ListItemText
+                        primary={ momentToDatetimeString(session, "from") }
+                        secondary={ durationToString([session], "long") }
+                    />
+                    <ListItemSecondaryAction>
+                        { this.renderTimerOffButton(session.code) }
+                    </ListItemSecondaryAction>
+                </ListItem>
+                <Divider />
+            </div>
+        );
+        }
         return (
             <div key={i}>
                 <ListItem
@@ -50,7 +119,7 @@ const SessionList = React.createClass({
                         className="sessionList"
                         subheader={ <ListSubheader>Sessions</ListSubheader> }
                     >
-                        { currentSessions.map(this.renderSession)}
+                        { currentSessions.sort(compareSession).map(this.renderSession)}
                     </List>
                 </div>
             );

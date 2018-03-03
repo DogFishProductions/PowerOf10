@@ -31,6 +31,7 @@ import NotesPage from "./NotesPage";
 const TopicPage = React.createClass({
     componentWillUnmount() {
         clearInterval(calcCurrentDuration);
+        calcCurrentDuration = null;
     },
     getSelectedTopic() {
         return getSelectedItem(this.props, "code") || { isNew: true };
@@ -97,7 +98,6 @@ const TopicPage = React.createClass({
                         </div>
                     );
                 }
-                console.log(getTopicSessions(this.props))
                 return (
                     <div>
                         <TextField
@@ -146,6 +146,7 @@ const TopicPage = React.createClass({
             return (<TimerOffIcon />);
         }
         clearInterval(calcCurrentDuration);
+        calcCurrentDuration = null;
         return (<TimerIcon />);
     },
     render() {

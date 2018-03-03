@@ -8,8 +8,10 @@ import red from "material-ui/colors/red";
 import List, { ListItem, ListItemSecondaryAction, ListItemIcon, ListItemText } from 'material-ui/List';
 import Typography from "material-ui/Typography";
 import Divider from "material-ui/Divider";
+import IconButton from 'material-ui/IconButton';
+import TimerIcon from 'material-ui-icons/Timer';
+import TimerOffIcon from 'material-ui-icons/TimerOff';
 
-import { IconTimerButton, IconTimerOffButton } from "./Buttons";
 import { durationToString } from "../helpers";
 
 const styles = {
@@ -20,8 +22,8 @@ const styles = {
         color: "#fff",
         backgroundColor: deepOrange[500],
     },
-    iconButton: {
-        fontSize: 20,
+    icon: {
+        fontSize: 25
     },
 };
 
@@ -31,12 +33,22 @@ const TopicList = React.createClass({
     },
     renderTimerOffButton() {
         return (
-            <IconTimerOffButton />
+            <IconButton>
+                <TimerOffIcon
+                    style={ styles.icon }
+                />
+            </IconButton>
         )
     },
     renderTimerButton(enabled) {
         return (
-            <IconTimerButton disabled={ !enabled } />
+            <IconButton
+                disabled={ !enabled }
+            >
+                <TimerIcon
+                    style={ styles.icon }
+                />
+            </IconButton>
         )
     },
     renderTopic(topic, i) {
@@ -55,7 +67,7 @@ const TopicList = React.createClass({
                         secondary={ _.truncate(topic.description, { length: 100 }) }
                     />
                     <ListItemSecondaryAction>
-                        { this.renderTimerButton(true) }
+                        { this.renderTimerButton(false) }
                     </ListItemSecondaryAction>
                 </ListItem>
                 <Divider />

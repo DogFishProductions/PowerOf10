@@ -24,7 +24,7 @@ export const durationToString = (sessions = [], type) => {
         case "long":
             return `${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
         case "humanized":
-            return (duration.milliseconds() === 0) ? "0h 0m" : duration.humanize();
+            return (duration.milliseconds() < 400) ? "0h 0m" : duration.humanize();
         case "stacked":
             return (
                 <span>

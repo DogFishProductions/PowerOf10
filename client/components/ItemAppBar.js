@@ -31,7 +31,10 @@ const ItemAppBar = React.createClass({
         this.props.history.goBack();
     },
     handleOnTitleClick(e) {
-        dispatchAction(this.props, "updateItemProperty", "isEditingTitle", true);
+        const { sessionId } = this.props.params;
+        if (!sessionId) {
+            dispatchAction(this.props, "updateItemProperty", "isEditingTitle", true);
+        }
     },
     handleOnLeftIconButtonClick(e) {
         const selectedItem = getSelectedItem(this.props, "code");
@@ -64,7 +67,8 @@ const ItemAppBar = React.createClass({
             selectionValue
         } = getLocalProperties(this.props);
         const selectedItem = getSelectedItem(this.props, "code");
-        const title = selectedItem.title || `New ${ type }`;
+        const defaultTitle = selectedItem.isNew ? `New ${ type }` : `Edit ${ type }`;
+        const title = selectedItem.title || defaultTitle;
         if (selectedItem.isEditingTitle) {
             if (selectedItem.isNew) {
                 return (

@@ -15,9 +15,9 @@ const postSession = (state = [], action) => {
                 ...state,
                 {
                     code: action.sessionId,
-                    title: "New session",
                     description: "",
                     from: Date.now(),
+                    to: Date.now(),
                     isNew: true
                 }
             ];
@@ -35,7 +35,6 @@ const postSession = (state = [], action) => {
         case "ADD_SESSION":
             // booleans are only used to indicate active editing - false values do not need to be saved
             const updatedSelectedItem = _.pickBy(selectedItem, (prop) => (prop !== false));
-            console.log("adding session: ", updatedSelectedItem);
             return [
                 ...before,
                 {
@@ -56,7 +55,6 @@ const postSession = (state = [], action) => {
 
 const sessions = (state = [], action) => {
     if (typeof action.sessionId !== "undefined") {
-        console.log("topicId: ", action.topicId);
         return {
           // take the current state
           ...state,

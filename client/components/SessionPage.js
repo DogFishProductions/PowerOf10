@@ -1,6 +1,9 @@
 import React from "react";
 
 import TextField from 'material-ui/TextField';
+import Button from 'material-ui/Button';
+import TimerIcon from 'material-ui-icons/Timer';
+import TimerOffIcon from 'material-ui-icons/TimerOff';
 
 const fabStyle = {
     position: "absolute",
@@ -29,6 +32,26 @@ const TopicPage = React.createClass({
     },
     getSelectedSession() {
         return getSelectedItem(this.props, "code") || { isNew: true };
+    },
+    selectedSessionIsRunning() {
+        const selectedSession = this.getSelectedSession();
+        return selectedSession.isRunning;
+    },
+    handleStartSessionOnClick(e) {
+        if (this.selectedSessionIsRunning()) {
+            // UPDATE FROM AND TO TO BE DATE.NOW() ##################################
+            dispatchAction(this.props, "updateItemProperty", "isRunning", false);
+            clearInterval(calcCurrentDuration);
+            calcCurrentDuration = null;
+        } else {
+            dispatchAction(this.props, "updateItemProperty", "isRunning", true);
+        }
+    },
+    renderStartSessionIcon() {
+        if (this.selectedSessionIsRunning()) {
+            return (<TimerOffIcon />);
+        }
+        return (<TimerIcon />);
     },
     renderDetailView() {
         const selectedIndex = getBottomNavSelectedIndex(this.props);
@@ -96,14 +119,30 @@ const TopicPage = React.createClass({
                 );
         }
     },
-    render() {
+    renderFloatingStartSessionButton() {
         const selectedSession = this.getSelectedSession();
-        console.log("dur: ", calcCurrentDuration);
-        if ((selectedSession.isNew || selectedSession.isRunning) && !calcCurrentDuration) {   
+        if (selectedSession.isNew ||
+            (selectedSession.to === selectedSession.from) ||
+            selectedSession.isRunning) { 
+            return (
+                <div className="floating-button-bottom-right">
+                    <Button
+                        variant="fab"
+                        color="primary"
+                        style={ { top: "-56px" } }
+                        onClick={ this.handleStartSessionOnClick }>
+                        { this.renderStartSessionIcon() }
+                    </Button>
+                </div>
+            ) 
+        }
+        return;
+    },
+    render() {
+        if (this.selectedSessionIsRunning() && !calcCurrentDuration) {   
             calcCurrentDuration = setInterval(
                 () => {
                     dispatchAction(this.props, "updateItemProperty", "to", Date.now());
-                    console.log(durationToString([this.getSelectedSession()], "long"));
                 },
                 900,
             );
@@ -115,6 +154,7 @@ const TopicPage = React.createClass({
                     { this.renderDetailView() }
                 </div>
                 <div className="inner">
+                    { this.renderFloatingStartSessionButton() }
                     <div className="bottom-nav">
                         <ItemBottomNavigation { ...this.props } />
                     </div>

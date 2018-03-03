@@ -13,16 +13,20 @@ import MoreVertIcon from 'material-ui-icons/MoreVert';
 
 const styles = {
     timer: {
-        fontSize: 20,
-    },
+        fontSize: 30
+    }
 }
 
 // Icon buttons
 const iconTimerButton = (props) => {
     const { classes } = props;
     return (
-        <IconButton className={classes.button}>
-            <TimerIcon className={classes.timer} />
+        <IconButton
+            className={classes.button}
+        >
+            <TimerIcon
+                className={classes.timer}
+            />
         </IconButton>
     );
 }
@@ -36,8 +40,12 @@ export const IconTimerButton = withStyles(styles)(iconTimerButton);
 const iconTimerOffButton = (props) => {
     const { classes } = props;
     return (
-        <IconButton className={classes.button}>
-            <TimerOffIcon className={classes.timer} />
+        <IconButton
+            className={classes.button}
+        >
+            <TimerOffIcon
+                className={classes.timer}
+            />
         </IconButton>
     );
 }
