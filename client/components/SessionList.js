@@ -5,7 +5,7 @@ import List, { ListItem, ListItemSecondaryAction, ListItemIcon, ListItemText, Li
 import Divider from 'material-ui/Divider';
 import Checkbox from 'material-ui/Checkbox';
 
-import { momentToDatetimeString, durationToString, durationToHumanizedString, getTopicSessions } from "../helpers";
+import { momentToDatetimeString, durationToString, getTopicSessions } from "../helpers";
 
 const defaultTextStyle = {
     marginLeft: "16px",
@@ -20,7 +20,7 @@ const SessionList = React.createClass({
     },
     renderSessionDuration(session) {
         return (
-            <span>{ durationToHumanizedString([session]) }</span>
+            <span>{ durationToString([session], "humanized") }</span>
         );
     },
     renderSession(session, i) {
@@ -34,7 +34,7 @@ const SessionList = React.createClass({
                     />
                     <ListItemText
                         primary={ momentToDatetimeString(session, "from") }
-                        secondary={ durationToHumanizedString([session]) }
+                        secondary={ durationToString([session], "humanized") }
                     />
                 </ListItem>
                 <Divider />

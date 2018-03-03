@@ -10,7 +10,7 @@ import Typography from "material-ui/Typography";
 import Divider from "material-ui/Divider";
 
 import { IconTimerButton, IconTimerOffButton } from "./Buttons";
-import { durationToStackedString } from "../helpers";
+import { durationToString } from "../helpers";
 
 const styles = {
     orangeAvatar: {
@@ -48,7 +48,7 @@ const TopicList = React.createClass({
                     <Avatar
                         style={ styles.orangeAvatar }
                     >
-                        { durationToStackedString(this.props.sessions[topic.code]) }
+                        { durationToString(this.props.sessions[topic.code], "stacked") }
                     </Avatar>
                     <ListItemText
                         primary={ topic.title }

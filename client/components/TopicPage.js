@@ -1,4 +1,5 @@
 import React from "react";
+import * as _ from "lodash";
 
 import TextField from 'material-ui/TextField';
 import TimerIcon from 'material-ui-icons/Timer';
@@ -18,7 +19,9 @@ const timeSpentStyle = {
     width: "256px"
 }
 
-import { getBottomNavSelectedIndex, getSelectedItem, dispatchAction, durationToHumanizedString, getTopicSessions, randomString } from "../helpers";
+let calcCurrentDuration;
+
+import { getBottomNavSelectedIndex, getSelectedItem, dispatchAction, durationToString, getTopicSessions, randomString } from "../helpers";
 import ItemAppBar from "./ItemAppBar";
 import ItemBottomNavigation from "./ItemBottomNavigation";
 import SessionList from "./SessionList";
@@ -26,30 +29,82 @@ import TargetPage from "./TargetPage";
 import NotesPage from "./NotesPage";
 
 const TopicPage = React.createClass({
+    componentWillUnmount() {
+        clearInterval(calcCurrentDuration);
+    },
     getSelectedTopic() {
         return getSelectedItem(this.props, "code") || { isNew: true };
     },
-    handleStartSessionOnClick(e) {
+    getNewSessionId() {
         const sessionId = randomString(10, "aA#!");
         const { topicId } = this.props.params;
-        this.props.createItem("session", sessionId);
-        this.props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
+        // don't use handler dispatchAction as session id is not in URL yet
+        this.props.createItem("session", sessionId, topicId);
+        return {
+            sessionId,
+            topicId,
+        };
+    },
+    getRunningSessionIndex() {
+        const { topicId } = this.props.params;
+        const sessions = this.props.sessions[topicId] || [];
+        return _.findIndex(sessions, (s) => s.isRunning);
+    },
+    handleStartSessionOnClick(e) {
+        const runningSessionIndex = this.getRunningSessionIndex();
+        if (runningSessionIndex >= 0) {   
+            const { topicId } = this.props.params;
+            const runningSession = this.props.sessions[topicId][runningSessionIndex];
+            // don't use handler dispatchAction as session id is not in URL
+            this.props.updateItemProperty("session", runningSession.code, "isRunning", false, topicId);
+            this.props.addItem("session", runningSession.code, topicId);
+        } else {
+            const {
+                sessionId,
+                topicId,
+            } = this.getNewSessionId();
+            // don't use handler dispatchAction as session id is not in URL
+            this.props.updateItemProperty("session", sessionId, "isRunning", true, topicId);
+            this.props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
+        }
     },
     handleAddSessionOnClick(e) {
-        // do something
+        const {
+            sessionId,
+            topicId,
+        } = this.getNewSessionId();
+        this.props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
+    },
+    handleDivOnClick(e) {
+        dispatchAction(this.props, "updateItemProperty", "isEditingTitle", false);
     },
     renderDetailView() {
         const selectedIndex = getBottomNavSelectedIndex(this.props);
         const defaultSessionListText = this.getSelectedTopic().isNew ? "Save topic to start recording sessions" : "Start recording sessions";
         switch(selectedIndex) {
             case 0:
+                const runningSessionIndex = this.getRunningSessionIndex();
+                if (runningSessionIndex >= 0) {
+                    return (
+                        <div>
+                            <TextField
+                                label="Total Time Spent"
+                                disabled={ true }
+                                style={ timeSpentStyle }
+                                value={ durationToString(getTopicSessions(this.props), "long") }
+                            />
+                            <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
+                        </div>
+                    );
+                }
+                console.log(getTopicSessions(this.props))
                 return (
                     <div>
                         <TextField
                             label="Total Time Spent"
                             disabled={ true }
                             style={ timeSpentStyle }
-                            defaultValue={ durationToHumanizedString(getTopicSessions(this.props)) }
+                            value={ durationToString(getTopicSessions(this.props), "humanized") }
                         />
                         <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
                     </div>
@@ -74,8 +129,24 @@ const TopicPage = React.createClass({
                 );
         }
     },
-    handleDivOnClick(e) {
-        dispatchAction(this.props, "updateItemProperty", "isEditingTitle", false);
+    renderStartSessionIcon() {
+        const runningSessionIndex = this.getRunningSessionIndex();
+        if (runningSessionIndex >= 0) {
+            if (!calcCurrentDuration) {    
+                const { topicId } = this.props.params;
+                const runningSession = this.props.sessions[topicId][runningSessionIndex];
+                calcCurrentDuration = setInterval(
+                    () => {
+                        // don't use handler dispatchAction as session id is not in URL
+                        this.props.updateItemProperty("session", runningSession.code, "to", Date.now(), topicId);
+                    },
+                    900,
+                );
+            }
+            return (<TimerOffIcon />);
+        }
+        clearInterval(calcCurrentDuration);
+        return (<TimerIcon />);
     },
     render() {
         return (
@@ -100,7 +171,7 @@ const TopicPage = React.createClass({
                             color="primary"
                             style={ { top: "-56px" } }
                             onClick={ this.handleStartSessionOnClick }>
-                            <TimerIcon />
+                            { this.renderStartSessionIcon() }
                         </Button>
                     </div>
                     <div className="bottom-nav" onClick={ this.handleDivOnClick }>

@@ -14,7 +14,7 @@ const timeSpentStyle = {
     width: "256px"
 }
 
-import { getBottomNavSelectedIndex, getSelectedItem, dispatchAction, durationToLongString, momentToDateString, momentToTimeString } from "../helpers";
+import { getBottomNavSelectedIndex, getSelectedItem, dispatchAction, durationToString, momentToDateString, momentToTimeString } from "../helpers";
 import ItemAppBar from "./ItemAppBar";
 import ItemBottomNavigation from "./ItemBottomNavigation";
 import TargetPage from "./TargetPage";
@@ -25,6 +25,7 @@ let calcCurrentDuration;
 const TopicPage = React.createClass({
     componentWillUnmount() {
         clearInterval(calcCurrentDuration);
+        calcCurrentDuration = null;
     },
     getSelectedSession() {
         return getSelectedItem(this.props, "code") || { isNew: true };
@@ -39,7 +40,7 @@ const TopicPage = React.createClass({
                             label="Time Spent"
                             disabled={ true }
                             style={ timeSpentStyle }
-                            value={ durationToLongString([this.getSelectedSession()]) }
+                            value={ durationToString([this.getSelectedSession()], "long") }
                         />
                         <TextField
                             label="From"
@@ -97,11 +98,12 @@ const TopicPage = React.createClass({
     },
     render() {
         const selectedSession = this.getSelectedSession();
-        if (selectedSession.isNew && !calcCurrentDuration) {   
+        console.log("dur: ", calcCurrentDuration);
+        if ((selectedSession.isNew || selectedSession.isRunning) && !calcCurrentDuration) {   
             calcCurrentDuration = setInterval(
                 () => {
                     dispatchAction(this.props, "updateItemProperty", "to", Date.now());
-                    console.log(durationToLongString([this.getSelectedSession()]));
+                    console.log(durationToString([this.getSelectedSession()], "long"));
                 },
                 900,
             );

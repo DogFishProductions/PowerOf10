@@ -1,4 +1,4 @@
-export function updateItemProperty(type, itemId, propName, newValue) {
+export function updateItemProperty(type, itemId, propName, newValue, topicId) {
     switch(type) {
         case "topic":
             return {
@@ -11,6 +11,7 @@ export function updateItemProperty(type, itemId, propName, newValue) {
             return {
                 type: "UPDATE_SESSION",
                 sessionId: itemId,
+                topicId,
                 propName,
                 newValue
             }
@@ -19,7 +20,7 @@ export function updateItemProperty(type, itemId, propName, newValue) {
     }
 }
 
-export function createItem(type, itemId) {
+export function createItem(type, itemId, topicId) {
     switch(type) {
         case "topic":
             return {
@@ -29,14 +30,15 @@ export function createItem(type, itemId) {
         case "session":
             return {
                 type: "CREATE_SESSION",
-                sessionId: itemId
+                sessionId: itemId,
+                topicId
             }
         default:
             return {}
     }
 }
 
-export function addItem(type, itemId) {
+export function addItem(type, itemId, topicId) {
     switch(type) {
         case "topic":
             return {
@@ -46,14 +48,15 @@ export function addItem(type, itemId) {
         case "session":
             return {
                 type: "ADD_SESSION",
-                sessionId: itemId
+                sessionId: itemId,
+                topicId
             }
         default:
             return {}
     }
 }
 
-export function removeItem(type, itemId) {
+export function removeItem(type, itemId, topicId) {
     switch(type) {
         case "topic":
             return {
@@ -63,7 +66,8 @@ export function removeItem(type, itemId) {
         case "session":
             return {
                 type: "REMOVE_SESSION",
-                sessionId: itemId
+                sessionId: itemId,
+                topicId
             }
         default:
             return {}

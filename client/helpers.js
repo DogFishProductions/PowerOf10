@@ -18,30 +18,24 @@ export const getTopicSessions = (props) => {
     return sessions[topicId] || [];
 }
 
-export const durationToString = (sessions = []) => {
+export const durationToString = (sessions = [], type) => {
     const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
-    return `${duration.hours()}h ${duration.minutes()}m`;
-}
-
-export const durationToLongString = (sessions = []) => {
-    const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
-    return `${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
-}
-
-export const durationToHumanizedString = (sessions = []) => {
-    const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
-    return (duration.milliseconds() === 0) ? "0h 0m" : duration.humanize();
-}
-
-export const durationToStackedString = (sessions = []) => {
-    const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
-    return (
-        <span>
-            { `${duration.hours()}h `}
-            <br />
-            { `${duration.minutes()}m` }
-        </span>
-    );
+    switch(type) {
+        case "long":
+            return `${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
+        case "humanized":
+            return (duration.milliseconds() === 0) ? "0h 0m" : duration.humanize();
+        case "stacked":
+            return (
+                <span>
+                    { `${duration.hours()}h `}
+                    <br />
+                    { `${duration.minutes()}m` }
+                </span>
+            );
+        default:
+            return `${duration.hours()}h ${duration.minutes()}m`;
+    }
 }
 
 export const momentToDatetimeString = (session, prop) => {
@@ -49,7 +43,6 @@ export const momentToDatetimeString = (session, prop) => {
 }
 
 export const momentToDateString = (session, prop) => {
-    console.log(moment(session[prop]).format("YYYY-MM-DD"))
     return moment(session[prop]).format("YYYY-MM-DD");
 }
 
@@ -102,6 +95,7 @@ export const getLocalProperties = (props = {}) => {
         localProps["type"] = "session",
         localProps["targetArray"] = props.sessions[topicId];
         localProps["selectionValue"] = sessionId;
+        localProps["topicId"] = topicId;
     }
     return localProps;
 }
@@ -109,9 +103,10 @@ export const getLocalProperties = (props = {}) => {
 export const dispatchAction = (props = {}, actionName, ...args) => {
     const {
         type,
-        selectionValue
+        selectionValue,
+        topicId
     } = getLocalProperties(props);
-    props[actionName](type, selectionValue, ...args);
+    props[actionName](type, selectionValue, ...[...args, topicId]);
 }
 
 export const getSelectedItem = (props, selectionProperty) => {
