@@ -7,6 +7,7 @@ import Checkbox from 'material-ui/Checkbox';
 import IconButton from 'material-ui/IconButton';
 import TimerIcon from 'material-ui-icons/Timer';
 import TimerOffIcon from 'material-ui-icons/TimerOff';
+import orange from 'material-ui/colors/orange';
 
 import { momentToDatetimeString, durationToString, getTopicSessions } from "../helpers";
 
@@ -35,6 +36,7 @@ const SessionList = React.createClass({
         this.props.history.push(`/topic/${this.props.params.topicId}/session/${session.code}`);
     },
     handleCheckboxOnClick(e, checked) {
+        console.log("hi")
         // do something
     },
     handleTimerOffButtonOnClick(e, sessionId) {
@@ -75,13 +77,13 @@ const SessionList = React.createClass({
         if (session.isRunning) {
             return (
             <div key={i}>
-                <ListItem
-                    onClick={ (e) => this.handlePrimaryOnClick(e, session) }
-                >  
+                <ListItem>
                     <Checkbox
+                        checked={ true }
                         onChange={ this.handleCheckboxOnClick }
                     />
                     <ListItemText
+                        onClick={ (e) => this.handlePrimaryOnClick(e, session) }
                         primary={ momentToDatetimeString(session, "from") }
                         secondary={ durationToString([session], "long") }
                     />
@@ -95,13 +97,12 @@ const SessionList = React.createClass({
         }
         return (
             <div key={i}>
-                <ListItem
-                    onClick={ (e) => this.handlePrimaryOnClick(e, session) }
-                >  
+                <ListItem>
                     <Checkbox
                         onChange={ this.handleCheckboxOnClick }
                     />
                     <ListItemText
+                        onClick={ (e) => this.handlePrimaryOnClick(e, session) }
                         primary={ momentToDatetimeString(session, "from") }
                         secondary={ durationToString([session], "humanized") }
                     />
@@ -116,7 +117,7 @@ const SessionList = React.createClass({
             return (
                 <div>
                     <List
-                        subheader={ <ListSubheader style={ { backgroundColor: "orange" } }>Sessions</ListSubheader> }
+                        subheader={ <ListSubheader style={ { backgroundColor: "#FF9800" } }>Sessions</ListSubheader> }
                     >
                         { currentSessions.sort(compareSession).map(this.renderSession)}
                     </List>
@@ -125,7 +126,7 @@ const SessionList = React.createClass({
         } else {
             return (
                 <List
-                    subheader={ <ListSubheader style={ { backgroundColor: "orange" } }>Sessions</ListSubheader> }
+                    subheader={ <ListSubheader style={ { backgroundColor: "#FF9800" } }>Sessions</ListSubheader> }
                 >
                     <span style={ defaultTextStyle }>{ defaultText }</span>
                 </List>

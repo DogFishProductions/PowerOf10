@@ -9,7 +9,11 @@ import TimelapseIcon from 'material-ui-icons/Timelapse';
 
 import * as helpers from "../helpers";
 
-const styles = {};
+const styles = theme => ({
+    root: {
+        background: "#EEEEEE"
+    }
+});
 
 const ItemBottomNavigation = React.createClass ({
     selectIndex(e, i) {

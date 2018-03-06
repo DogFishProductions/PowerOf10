@@ -9,7 +9,7 @@ import MenuIcon from 'material-ui-icons/Menu';
 import TextField from 'material-ui/TextField';
 import CloseIcon from 'material-ui-icons/Close';
 import ArrowBackIcon from 'material-ui-icons/ArrowBack';
-import MoreVertIcon from 'material-ui-icons/MoreVert';
+import DeleteIcon from 'material-ui-icons/Delete';
 
 import { dispatchAction, getSelectedItem, getLocalProperties } from "../helpers";
 
@@ -22,7 +22,6 @@ const styles = {
   },
   menuButton: {
     marginLeft: -12,
-    marginRight: 20,
   },
 };
 
@@ -49,12 +48,13 @@ const ItemAppBar = React.createClass({
         const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItem.isNew) {
             dispatchAction(this.props, "updateItemProperty", "isNew", false);
+            dispatchAction(this.props, "addItem");
+            this.redirectHome();
         }
         if (selectedItem.isEditingTitle) {
             dispatchAction(this.props, "updateItemProperty", "isEditingTitle", false);
+            dispatchAction(this.props, "addItem");
         }
-        dispatchAction(this.props, "addItem");
-        this.redirectHome();
     },
     handleTitleOnChange(e) {
         dispatchAction(this.props, "updateItemProperty", "title", e.target.value);
@@ -115,11 +115,10 @@ const ItemAppBar = React.createClass({
                     Save
                 </Typography>
             );
-        } else {
-            return (
-                <MoreVertIcon />
-            );
         }
+        return (
+            <DeleteIcon />
+        );
     },
     renderAppBar() {
         const { classes } = this.props;
