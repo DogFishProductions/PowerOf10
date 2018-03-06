@@ -53,6 +53,7 @@ const TopicPage = React.createClass({
     getNewSessionId() {
         const sessionId = randomString(10, "aA#!");
         const { topicId } = this.props.params;
+        const start = Date.now();
         // don't use handler dispatchAction as session id is not in URL yet
         this.props.createItem("session", sessionId, topicId);
         return {
@@ -70,9 +71,10 @@ const TopicPage = React.createClass({
         if (runningSessionIndex >= 0) {   
             const { topicId } = this.props.params;
             const runningSession = this.props.sessions[topicId][runningSessionIndex];
+            const sessionId = runningSession.code;
             // don't use handler dispatchAction as session id is not in URL
-            this.props.updateItemProperty("session", runningSession.code, "isRunning", false, topicId);
-            this.props.addItem("session", runningSession.code, topicId);
+            this.props.updateItemProperty("session", sessionId, "isRunning", false, topicId);
+            this.props.addItem("session", sessionId, topicId);
         } else {
             const {
                 sessionId,

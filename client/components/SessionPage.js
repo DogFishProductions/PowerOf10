@@ -16,6 +16,10 @@ const gridStyle = {
     margin: "8px 16px 0px 16px",
     width: "328px",
 }
+let fromHelperText = ""
+let fromIsError = false;
+let toHelperText = ""
+let toIsError = false;
 
 import {
     getBottomNavSelectedIndex,
@@ -38,6 +42,7 @@ const TopicPage = React.createClass({
     componentWillUnmount() {
         clearInterval(calcCurrentDuration);
         calcCurrentDuration = null;
+        this.resetErrorState();
     },
     getSelectedSession() {
         return getSelectedItem(this.props, "code") || { isNew: true };
@@ -54,27 +59,41 @@ const TopicPage = React.createClass({
     getToTime() {
         return momentToTimeString(this.getSelectedSession(), "to");
     },
-    canSetDateTime(dateTimes) {
-        const {
-            fromDate = this.getFromDate(),
-            fromTime = this.getFromTime(),
-            toDate = this.getToDate(),
-            toTime = this.getToTime(),
-        } = dateTimes;
-        const fromIsInPast = momentIsInThePast(`${fromDate}, ${fromTime}`);
-        const toIsInPast = momentIsInThePast(`${toDate}, ${toTime}`);
-        const fromIsBeforeTo = momentFromIsBeforeTo(`${fromDate}, ${fromTime}`, `${toDate}, ${toTime}`);
-        return fromIsInPast && toIsInPast && fromIsBeforeTo;
+    resetErrorState() {
+        fromHelperText = "";
+        fromIsError = false;
+        toHelperText = "";
+        toIsError = false;
+    },
+    canSetDateTime(targetId, fromDateTimeString, toDateTimeString) {
+        const fromIsInPast = momentIsInThePast(fromDateTimeString);
+        const toIsInPast = momentIsInThePast(toDateTimeString);
+        const fromIsBeforeTo = momentFromIsBeforeTo(fromDateTimeString, toDateTimeString);
         if (!fromIsInPast) {
-            // display from is in the past error
+            fromHelperText = "Must be in the past";
+            fromIsError = true;
             return false;
         }
         if (!toIsInPast) {
-            // display from to is in past error
+            toHelperText = "Must be in the past";
+            toIsError = true;
             return false;
         }
         if (!fromIsBeforeTo) {
-            // display from is before to error
+            switch(targetId) {
+                case "fromDate":
+                case "fromTime":
+                    fromHelperText = "Must be before 'To'";
+                    fromIsError = true;
+                    break;
+                case "toDate":
+                case "toTime":
+                    toHelperText = "Must be after 'From'";
+                    toIsError = true;
+                    break;
+                default:
+                    this.forceUpdate();
+            }
             return false;
         }
         return true;
@@ -89,22 +108,116 @@ const TopicPage = React.createClass({
             clearInterval(calcCurrentDuration);
             calcCurrentDuration = null;
         } else {
-            dispatchAction(this.props, "updateItemProperty", "from", Date.now());
             dispatchAction(this.props, "updateItemProperty", "to", Date.now());
             dispatchAction(this.props, "updateItemProperty", "isRunning", true);
         }
     },
     handleDateTimeOnChange(e) {
-        console.log(e.target.id);
+        const target = e.target;
+        const prop = target.id;
+        const newValue = target.value
         const arg = {};
-        arg[e.target.id] = e.target.value;
-        console.log("result: ", this.canSetDateTime(arg));
+        arg[prop] = newValue;
+        const {
+            fromDate = this.getFromDate(),
+            fromTime = this.getFromTime(),
+            toDate = this.getToDate(),
+            toTime = this.getToTime(),
+        } = arg;
+        const fromDateTimeString = `${fromDate}, ${fromTime}`;
+        const toDateTimeString = `${toDate}, ${toTime}`;
+        if (this.canSetDateTime(target.id, fromDateTimeString, toDateTimeString)) {
+            this.resetErrorState();
+            switch(prop) {
+                case "fromDate":
+                case "fromTime":
+                    return dispatchAction(this.props, "updateItemProperty", "from", Date.parse(fromDateTimeString));
+                case "toDate":
+                case "toTime":
+                    return dispatchAction(this.props, "updateItemProperty", "to", Date.parse(toDateTimeString));
+                default:
+                    return;
+            }
+        }
+        this.forceUpdate();
     },
     renderStartSessionIcon() {
         if (this.selectedSessionIsRunning()) {
             return (<TimerOffIcon />);
         }
         return (<TimerIcon />);
+    },
+    renderToDateTime() {
+        if (this.selectedSessionIsRunning()) {
+            return (
+                <Grid
+                    container
+                    spacing={ 24 }
+                    style={ gridStyle }
+                >
+                    <Grid item xs={ 8 }>
+                        <TextField
+                            id="toDate"
+                            helperText={ toHelperText }
+                            error={ toIsError }
+                            label="To"
+                            type="date"
+                            value={ this.getToDate() }
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs>
+                        <TextField
+                            id="toTime"
+                            error={ toIsError }
+                            label="To"
+                            type="time"
+                            value={ this.getToTime() }
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        />
+                    </Grid>
+                </Grid>
+            );
+        }
+        return (
+            <Grid
+                container
+                spacing={ 24 }
+                style={ gridStyle }
+            >
+                <Grid item xs={ 8 }>
+                    <TextField
+                        id="toDate"
+                        helperText={ toHelperText }
+                        error={ toIsError }
+                        onChange={ this.handleDateTimeOnChange }
+                        label="To"
+                        type="date"
+                        defaultValue={ this.getToDate() }
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                    />
+                </Grid>
+                <Grid item xs>
+                    <TextField
+                        id="toTime"
+                        error={ toIsError }
+                        onChange={ this.handleDateTimeOnChange }
+                        label="To"
+                        type="time"
+                        defaultValue={ this.getToTime() }
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                    />
+                </Grid>
+            </Grid>
+        );
     },
     renderDetailView() {
         const selectedIndex = getBottomNavSelectedIndex(this.props);
@@ -134,6 +247,8 @@ const TopicPage = React.createClass({
                             <Grid item xs={ 8 }>
                                 <TextField
                                     id="fromDate"
+                                    helperText={ fromHelperText }
+                                    error={ fromIsError }
                                     onChange={ this.handleDateTimeOnChange }
                                     label="From"
                                     type="date"
@@ -146,6 +261,7 @@ const TopicPage = React.createClass({
                             <Grid item xs>
                                 <TextField
                                     id="fromTime"
+                                    error={ fromIsError }
                                     onChange={ this.handleDateTimeOnChange }
                                     label="From"
                                     type="time"
@@ -156,37 +272,7 @@ const TopicPage = React.createClass({
                                 />
                             </Grid>
                         </Grid>
-                        <Grid
-                            container
-                            spacing={ 24 }
-                            style={ gridStyle }
-                        >
-                            <Grid item xs={ 8 }>
-                                <TextField
-                                    id="toDate"
-                                    onChange={ this.handleDateTimeOnChange }
-                                    label="To"
-                                    type="date"
-                                    defaultValue={ this.getToDate() }
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs>
-                                <TextField
-                                    id="toTime"
-                                    onChange={ this.handleDateTimeOnChange }
-                                    label="To"
-                                    type="time"
-                                    defaultValue={ this.getToTime() }
-                                    disabled={ this.selectedSessionIsRunning() }
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                            </Grid>
-                        </Grid>
+                        { this.renderToDateTime() }
                     </div>
                 );
             case 1:

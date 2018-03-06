@@ -5,7 +5,7 @@ const durationFromArrayOfSessions = (sessions = []) => {
     return sessions.reduce(
         (duration, session) => {
             const from = session.from || 0;
-            const to = session.to || Date.now();
+            const to = session.to || 0;
             return duration + (to - from);
         },
         0,
@@ -20,17 +20,20 @@ export const getTopicSessions = (props) => {
 
 export const durationToString = (sessions = [], type) => {
     const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
+    const hours = Math.trunc(duration.asHours());
+    const mins = duration.minutes();
+    const secs = duration.seconds();
     switch(type) {
         case "long":
-            return `${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
+            return `${hours}h ${mins}m ${secs}s`;
         case "humanized":
             return (duration.asMilliseconds() < 400) ? "0h 0m" : duration.humanize();
         case "stacked":
             return (
                 <span>
-                    { `${duration.hours()}h `}
+                    { `${hours}h `}
                     <br />
-                    { `${duration.minutes()}m` }
+                    { `${mins}m` }
                 </span>
             );
         default:

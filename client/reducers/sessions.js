@@ -11,13 +11,14 @@ const postSession = (state = [], action) => {
     const after = state.slice(index + 1);   // after the one we are updating
     switch(action.type) {
         case "CREATE_SESSION":
+            const now = Date.now();
             return [
                 ...state,
                 {
                     code: action.sessionId,
                     description: "",
-                    from: Date.now(),
-                    to: Date.now(),
+                    from: now,
+                    to: now,
                     isNew: true
                 }
             ];
