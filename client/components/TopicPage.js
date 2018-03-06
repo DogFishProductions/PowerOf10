@@ -6,22 +6,36 @@ import TimerIcon from 'material-ui-icons/Timer';
 import TimerOffIcon from 'material-ui-icons/TimerOff';
 import AddIcon from "material-ui-icons/Add";
 import Button from 'material-ui/Button';
+import Grid from 'material-ui/Grid';
 
 const fabStyle = {
     position: "absolute",
     top: "450px",
     left: "285px"
 };
-const timeSpentStyle = {
-    position: "absolute",
-    left: "-128px",
-    margin: "8px 50%",
-    width: "256px"
+const gridStyle = {
+    flexGrow: "1",
+    margin: "8px 16px 0px 16px",
+    width: "328px",
+}
+const bottomGridStyle = {
+    ...gridStyle,
+    margin: "8px 0px 56px 0px",
+    overflow: "auto",
+    width: "360px",
+    maxHeight: "416px"
 }
 
 let calcCurrentDuration;
 
-import { getBottomNavSelectedIndex, getSelectedItem, dispatchAction, durationToString, getTopicSessions, randomString } from "../helpers";
+import {
+    getBottomNavSelectedIndex,
+    getSelectedItem,
+    dispatchAction,
+    durationToString,
+    getTopicSessions,
+    randomString
+} from "../helpers";
 import ItemAppBar from "./ItemAppBar";
 import ItemBottomNavigation from "./ItemBottomNavigation";
 import SessionList from "./SessionList";
@@ -88,25 +102,57 @@ const TopicPage = React.createClass({
                 if (runningSessionIndex >= 0) {
                     return (
                         <div>
-                            <TextField
-                                label="Total Time Spent"
-                                disabled={ true }
-                                style={ timeSpentStyle }
-                                value={ durationToString(getTopicSessions(this.props), "long") }
-                            />
-                            <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
+                            <Grid
+                                container
+                                spacing={ 24 }
+                                style={ gridStyle }
+                            >
+                                <Grid item xs>
+                                    <TextField
+                                        label="Total Time Spent"
+                                        fullWidth={ true }
+                                        disabled={ true }
+                                        value={ durationToString(getTopicSessions(this.props), "long") }
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Grid
+                                container
+                                spacing={ 24 }
+                                style={ bottomGridStyle }
+                            >
+                                <Grid item xs>
+                                    <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
+                                </Grid>
+                            </Grid>
                         </div>
                     );
                 }
                 return (
                     <div>
-                        <TextField
-                            label="Total Time Spent"
-                            disabled={ true }
-                            style={ timeSpentStyle }
-                            value={ durationToString(getTopicSessions(this.props), "humanized") }
-                        />
-                        <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
+                        <Grid
+                            container
+                            spacing={ 24 }
+                            style={ gridStyle }
+                        >
+                            <Grid item xs>
+                                <TextField
+                                    label="Total Time Spent"
+                                    disabled={ true }
+                                    fullWidth={ true }
+                                    value={ durationToString(getTopicSessions(this.props), "humanized") }
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            spacing={ 24 }
+                            style={ bottomGridStyle }
+                        >
+                            <Grid item xs>
+                                <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
+                            </Grid>
+                        </Grid>
                     </div>
                 );
             case 1:

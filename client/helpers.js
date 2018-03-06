@@ -24,7 +24,7 @@ export const durationToString = (sessions = [], type) => {
         case "long":
             return `${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
         case "humanized":
-            return (duration.milliseconds() < 400) ? "0h 0m" : duration.humanize();
+            return (duration.asMilliseconds() < 400) ? "0h 0m" : duration.humanize();
         case "stacked":
             return (
                 <span>
@@ -48,6 +48,14 @@ export const momentToDateString = (session, prop) => {
 
 export const momentToTimeString = (session, prop) => {
     return `${moment(session[prop]).format("HH:mm")}`;
+}
+
+export const momentIsInThePast = (dateTimeString) => {
+    return (moment() - moment(dateTimeString, "YYYY-MM-DD, HH:mm")) >= 0.0;
+}
+
+export const momentFromIsBeforeTo = (fromDateTimeString, toDateTimeString) => {
+    return (moment(toDateTimeString, "YYYY-MM-DD, HH:mm") - moment(fromDateTimeString, "YYYY-MM-DD, HH:mm")) >= 0.0;
 }
 
 export const randomString = (length, chars) => {

@@ -116,8 +116,7 @@ const SessionList = React.createClass({
             return (
                 <div>
                     <List
-                        className="sessionList"
-                        subheader={ <ListSubheader>Sessions</ListSubheader> }
+                        subheader={ <ListSubheader style={ { backgroundColor: "orange" } }>Sessions</ListSubheader> }
                     >
                         { currentSessions.sort(compareSession).map(this.renderSession)}
                     </List>
@@ -126,8 +125,7 @@ const SessionList = React.createClass({
         } else {
             return (
                 <List
-                    className="sessionList"
-                    subheader={ <ListSubheader>Sessions</ListSubheader> }
+                    subheader={ <ListSubheader style={ { backgroundColor: "orange" } }>Sessions</ListSubheader> }
                 >
                     <span style={ defaultTextStyle }>{ defaultText }</span>
                 </List>

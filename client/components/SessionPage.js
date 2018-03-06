@@ -4,20 +4,29 @@ import TextField from 'material-ui/TextField';
 import Button from 'material-ui/Button';
 import TimerIcon from 'material-ui-icons/Timer';
 import TimerOffIcon from 'material-ui-icons/TimerOff';
+import Grid from 'material-ui/Grid';
 
 const fabStyle = {
     position: "absolute",
     top: "450px",
     left: "285px"
 };
-const timeSpentStyle = {
-    position: "absolute",
-    left: "-128px",
-    margin: "8px 50%",
-    width: "256px"
+const gridStyle = {
+    flexGrow: "1",
+    margin: "8px 16px 0px 16px",
+    width: "328px",
 }
 
-import { getBottomNavSelectedIndex, getSelectedItem, dispatchAction, durationToString, momentToDateString, momentToTimeString } from "../helpers";
+import {
+    getBottomNavSelectedIndex,
+    getSelectedItem,
+    dispatchAction,
+    durationToString,
+    momentToDateString,
+    momentToTimeString,
+    momentIsInThePast,
+    momentFromIsBeforeTo,
+} from "../helpers";
 import ItemAppBar from "./ItemAppBar";
 import ItemBottomNavigation from "./ItemBottomNavigation";
 import TargetPage from "./TargetPage";
@@ -33,19 +42,63 @@ const TopicPage = React.createClass({
     getSelectedSession() {
         return getSelectedItem(this.props, "code") || { isNew: true };
     },
+    getFromDate() {
+        return momentToDateString(this.getSelectedSession(), "from");
+    },
+    getFromTime() {
+        return momentToTimeString(this.getSelectedSession(), "from");
+    },
+    getToDate() {
+        return momentToDateString(this.getSelectedSession(), "to");
+    },
+    getToTime() {
+        return momentToTimeString(this.getSelectedSession(), "to");
+    },
+    canSetDateTime(dateTimes) {
+        const {
+            fromDate = this.getFromDate(),
+            fromTime = this.getFromTime(),
+            toDate = this.getToDate(),
+            toTime = this.getToTime(),
+        } = dateTimes;
+        const fromIsInPast = momentIsInThePast(`${fromDate}, ${fromTime}`);
+        const toIsInPast = momentIsInThePast(`${toDate}, ${toTime}`);
+        const fromIsBeforeTo = momentFromIsBeforeTo(`${fromDate}, ${fromTime}`, `${toDate}, ${toTime}`);
+        return fromIsInPast && toIsInPast && fromIsBeforeTo;
+        if (!fromIsInPast) {
+            // display from is in the past error
+            return false;
+        }
+        if (!toIsInPast) {
+            // display from to is in past error
+            return false;
+        }
+        if (!fromIsBeforeTo) {
+            // display from is before to error
+            return false;
+        }
+        return true;
+    },
     selectedSessionIsRunning() {
         const selectedSession = this.getSelectedSession();
         return selectedSession.isRunning;
     },
     handleStartSessionOnClick(e) {
         if (this.selectedSessionIsRunning()) {
-            // UPDATE FROM AND TO TO BE DATE.NOW() ##################################
             dispatchAction(this.props, "updateItemProperty", "isRunning", false);
             clearInterval(calcCurrentDuration);
             calcCurrentDuration = null;
         } else {
+            dispatchAction(this.props, "updateItemProperty", "from", Date.now());
+            dispatchAction(this.props, "updateItemProperty", "to", Date.now());
             dispatchAction(this.props, "updateItemProperty", "isRunning", true);
         }
+    },
+    handleDateTimeOnChange(e) {
+        console.log(e.target.id);
+        const arg = {};
+        arg[e.target.id] = e.target.value;
+        console.log("result: ", this.canSetDateTime(arg));
     },
     renderStartSessionIcon() {
         if (this.selectedSessionIsRunning()) {
@@ -59,44 +112,81 @@ const TopicPage = React.createClass({
             case 0:
                 return (
                     <div>
-                        <TextField
-                            label="Time Spent"
-                            disabled={ true }
-                            style={ timeSpentStyle }
-                            value={ durationToString([this.getSelectedSession()], "long") }
-                        />
-                        <TextField
-                            label="From"
-                            type="date"
-                            defaultValue={ momentToDateString(this.getSelectedSession(), "from") }
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                        <TextField
-                            label="From"
-                            type="time"
-                            defaultValue={ momentToTimeString(this.getSelectedSession(), "from") }
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                        <TextField
-                            label="To"
-                            type="date"
-                            defaultValue={ momentToDateString(this.getSelectedSession(), "to") }
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                        <TextField
-                            label="To"
-                            type="time"
-                            defaultValue={ momentToTimeString(this.getSelectedSession(), "to") }
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
+                        <Grid
+                            container
+                            spacing={ 24 }
+                            style={ gridStyle }
+                        >
+                            <Grid item xs>
+                                <TextField
+                                    label="Time Spent"
+                                    disabled={ true }
+                                    fullWidth={ true }
+                                    value={ durationToString([this.getSelectedSession()], "long") }
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            spacing={ 24 }
+                            style={ gridStyle }
+                        >
+                            <Grid item xs={ 8 }>
+                                <TextField
+                                    id="fromDate"
+                                    onChange={ this.handleDateTimeOnChange }
+                                    label="From"
+                                    type="date"
+                                    defaultValue={ this.getFromDate() }
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs>
+                                <TextField
+                                    id="fromTime"
+                                    onChange={ this.handleDateTimeOnChange }
+                                    label="From"
+                                    type="time"
+                                    defaultValue={ this.getFromTime() }
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            spacing={ 24 }
+                            style={ gridStyle }
+                        >
+                            <Grid item xs={ 8 }>
+                                <TextField
+                                    id="toDate"
+                                    onChange={ this.handleDateTimeOnChange }
+                                    label="To"
+                                    type="date"
+                                    defaultValue={ this.getToDate() }
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs>
+                                <TextField
+                                    id="toTime"
+                                    onChange={ this.handleDateTimeOnChange }
+                                    label="To"
+                                    type="time"
+                                    defaultValue={ this.getToTime() }
+                                    disabled={ this.selectedSessionIsRunning() }
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                />
+                            </Grid>
+                        </Grid>
                     </div>
                 );
             case 1:
@@ -139,7 +229,7 @@ const TopicPage = React.createClass({
         return;
     },
     render() {
-        if (this.selectedSessionIsRunning() && !calcCurrentDuration) {   
+        if (this.selectedSessionIsRunning() && !calcCurrentDuration) {
             calcCurrentDuration = setInterval(
                 () => {
                     dispatchAction(this.props, "updateItemProperty", "to", Date.now());
