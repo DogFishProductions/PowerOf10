@@ -25,9 +25,15 @@ const styles = {
   },
 };
 
+let deleteRequested = false;
+
 const ItemAppBar = React.createClass({
+    componentWillUnmount() {
+        deleteRequested = false;
+    },
     redirectHome() {
         this.props.history.goBack();
+        deleteRequested = false;
     },
     handleOnTitleClick(e) {
         const { sessionId } = this.props.params;
@@ -50,11 +56,19 @@ const ItemAppBar = React.createClass({
             dispatchAction(this.props, "updateItemProperty", "isNew", false);
             dispatchAction(this.props, "addItem");
             this.redirectHome();
-        }
-        if (selectedItem.isEditingTitle) {
+        } else if (selectedItem.isEditingTitle) {
             dispatchAction(this.props, "updateItemProperty", "isEditingTitle", false);
             dispatchAction(this.props, "addItem");
+        } else {
+            deleteRequested = true;
+            this.forceUpdate();
         }
+    },
+    handleOnRightCancelButtonClick(e) {
+        deleteRequested = false;
+        this.forceUpdate();
+    },
+    handleOnRightDeleteButtonClick(e) {
     },
     handleTitleOnChange(e) {
         dispatchAction(this.props, "updateItemProperty", "title", e.target.value);
@@ -106,19 +120,58 @@ const ItemAppBar = React.createClass({
         }
     },
     renderIconElementRight() {
+        const { classes } = this.props;
         const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItem.isNew) {
             return (
-                <Typography
-                    variant="button"
+                <IconButton
+                    className={classes.menuButton}
+                    onClick={ this.handleOnRightIconButtonClick }
                     color="inherit">
-                    Save
-                </Typography>
+                    <Typography
+                        variant="button"
+                        color="inherit">
+                        Save
+                    </Typography>
+                </IconButton>
+            );
+        } else if (deleteRequested) {
+            return (
+                <span>
+                    <IconButton
+                        onClick={ this.handleOnRightCancelButtonClick }
+                        color="inherit"
+                    >
+                        <Typography
+                            variant="button"
+                            color="inherit">
+                            Cancel
+                        </Typography>
+                    </IconButton>
+                        |
+                    <IconButton
+                        onClick={ this.handleOnRightDeleteButtonClick }
+                        color="inherit"
+                        disabled={ true }
+                    >
+                        <Typography
+                            variant="button"
+                            color="inherit">
+                            Delete
+                        </Typography>
+                    </IconButton>
+                </span>
+            );
+        } else {
+            return (
+                <IconButton
+                    className={classes.menuButton}
+                    onClick={ this.handleOnRightIconButtonClick }
+                    color="inherit">
+                    <DeleteIcon />
+                </IconButton>
             );
         }
-        return (
-            <DeleteIcon />
-        );
     },
     renderAppBar() {
         const { classes } = this.props;
@@ -142,12 +195,7 @@ const ItemAppBar = React.createClass({
                                 color="inherit">
                                 { this.renderTitle() }
                             </Typography>
-                            <IconButton
-                                className={classes.menuButton}
-                                onClick={ this.handleOnRightIconButtonClick }
-                                color="inherit">
-                                { this.renderIconElementRight() }
-                            </IconButton>
+                            { this.renderIconElementRight() }
                         </Toolbar>
                     </AppBar>
                 </div>
@@ -173,12 +221,7 @@ const ItemAppBar = React.createClass({
                                 className={classes.flex}>
                                 { this.renderTitle() }
                             </Typography>
-                            <IconButton
-                                className={classes.menuButton}
-                                onClick={ this.handleOnRightIconButtonClick }
-                                color="inherit">
-                                { this.renderIconElementRight() }
-                            </IconButton>
+                            { this.renderIconElementRight() }
                         </Toolbar>
                     </AppBar>
                 </div>
