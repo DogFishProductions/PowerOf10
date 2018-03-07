@@ -11,7 +11,6 @@ export default function supervisor(state = {}, action) {
                 deleteRequested: action.option
             };
         case "SELECT_FOR_DELETION":
-            console.log("hi")
             return {
                 ...state,
                 selectForDeletion: action.option

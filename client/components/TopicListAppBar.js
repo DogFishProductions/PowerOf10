@@ -22,7 +22,6 @@ const styles = {
 
 class TopicListAppBar extends React.Component {
     handleOnRightIconButtonClick(e) {
-        console.log("hi")
     }
 
     render() {

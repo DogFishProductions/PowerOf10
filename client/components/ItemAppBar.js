@@ -172,14 +172,18 @@ const ItemAppBar = React.createClass({
                 </span>
             );
         } else {
-            return (
-                <IconButton
-                    className={classes.menuButton}
-                    onClick={ this.handleOnRightIconButtonClick }
-                    color="inherit">
-                    <DeleteIcon />
-                </IconButton>
-            );
+            const { topicId } = this.props.params;
+            const sessions = this.props.sessions[topicId] || [];
+            if (sessions.length > 0) {
+                return (
+                    <IconButton
+                        className={classes.menuButton}
+                        onClick={ this.handleOnRightIconButtonClick }
+                        color="inherit">
+                        <DeleteIcon />
+                    </IconButton>
+                );
+            }
         }
     },
     renderAppBar() {

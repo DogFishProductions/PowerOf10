@@ -1,14 +1,14 @@
 import React from 'react';
 import { withStyles } from 'material-ui/styles';
 import Drawer from 'material-ui/Drawer';
-import List from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import Typography from "material-ui/Typography";
 import Checkbox from 'material-ui/Checkbox';
+import { FormGroup, FormControlLabel } from 'material-ui/Form';
 
 import dispatchAction from "../helpers";
 
-const styles = {
+const styles = theme => ({
     root: {
       flexGrow: 1,
       menuButton: {
@@ -20,65 +20,51 @@ const styles = {
     },
     drawerPaper: {
         width: "360px",
-        marginTop: "56px"
-    },
-    myTypo: {
-        margin: "8px 16px",
-        color: "black",
-        float: "right"
+        marginTop: "56px",
+        backgroundColor: "white"
     },
     checkbox: {
-        float: "right"
-    }
-};
+        marginLeft: "16px",
+    },
+});
 
 class TopDrawer extends React.Component {
-  render() {
-    const {
-        classes,
-        supervisor,
-    } = this.props;
+    render() {
+        const {
+            classes,
+            supervisor,
+        } = this.props;
 
-    const handleCheckboxOnClick = (e) => {
+        const handleCheckboxOnClick = (e) => {
+        };
 
-    };
+        const drawerOptions = (
+            <FormGroup> 
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            className={ classes.checkbox }
+                            onChange={ handleCheckboxOnClick }
+                        />
+                    }
+                    label="Select All"
+                />
+            </FormGroup>
+        );
 
-    const drawerOptions = (
-        <div>
-            <Typography
-                className={ classes.myTypo }
-                color="inherit"
+        return (
+            <Drawer
+                classes={{
+                    paper: classes.drawerPaper,
+                }}
+                variant="persistent"
+                anchor="top"
+                open={ supervisor.selectForDeletion }
             >
-                    Select All
-            </Typography>
-            <Checkbox
-                className={ classes.checkbox }
-                checked={ true }
-                onChange={ handleCheckboxOnClick }
-            />
-        </div>
-    );
-
-    return (
-      <div>
-        <Drawer
-            classes={{
-                paper: classes.drawerPaper,
-            }}
-            variant="persistent"
-            anchor="top"
-            open={ supervisor.selectForDeletion }
-        >
-          <div
-            tabIndex={0}
-            role="button"
-          >
-            { drawerOptions }
-          </div>
-        </Drawer>
-      </div>
-    );
-  }
+                { drawerOptions }
+            </Drawer>
+        );
+    }
 }
 
 TopDrawer.propTypes = {

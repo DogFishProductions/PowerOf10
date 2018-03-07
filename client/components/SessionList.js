@@ -8,6 +8,7 @@ import IconButton from 'material-ui/IconButton';
 import TimerIcon from 'material-ui-icons/Timer';
 import TimerOffIcon from 'material-ui-icons/TimerOff';
 import orange from 'material-ui/colors/orange';
+import Slide from 'material-ui/transitions/Slide';
 
 import { momentToDatetimeString, durationToString, getTopicSessions } from "../helpers";
 
@@ -36,7 +37,6 @@ const SessionList = React.createClass({
         this.props.history.push(`/topic/${this.props.params.topicId}/session/${session.code}`);
     },
     handleCheckboxOnClick(e, checked) {
-        console.log("hi")
         // do something
     },
     handleTimerOffButtonOnClick(e, sessionId) {
@@ -74,14 +74,20 @@ const SessionList = React.createClass({
         )
     },
     renderSession(session, i) {
+        const supervisor = this.props.supervisor;
         if (session.isRunning) {
             return (
             <div key={i}>
                 <ListItem>
-                    <Checkbox
-                        checked={ true }
-                        onChange={ this.handleCheckboxOnClick }
-                    />
+                    <Slide
+                        direction="left"
+                        in={ supervisor.selectAllForDeletion }
+                    >
+                        <Checkbox
+                            checked={ true }
+                            onChange={ this.handleCheckboxOnClick }
+                        />
+                    </Slide>
                     <ListItemText
                         onClick={ (e) => this.handlePrimaryOnClick(e, session) }
                         primary={ momentToDatetimeString(session, "from") }
@@ -98,9 +104,14 @@ const SessionList = React.createClass({
         return (
             <div key={i}>
                 <ListItem>
-                    <Checkbox
-                        onChange={ this.handleCheckboxOnClick }
-                    />
+                    <Slide
+                        direction="left"
+                        in={ supervisor.selectAllForDeletion }
+                    >
+                        <Checkbox
+                            onChange={ this.handleCheckboxOnClick }
+                        />
+                    </Slide>
                     <ListItemText
                         onClick={ (e) => this.handlePrimaryOnClick(e, session) }
                         primary={ momentToDatetimeString(session, "from") }
