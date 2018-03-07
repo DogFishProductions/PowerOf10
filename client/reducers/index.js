@@ -3,10 +3,10 @@ import { routerReducer } from 'react-router-redux';
 
 import sessions from './sessions';
 import topics from './topics';
-import navigation from './navigation';
+import supervisor from './supervisor';
 
 const rootReducer = combineReducers({
-    navigation,
+    supervisor,
     sessions,
     topics,
     routing: routerReducer

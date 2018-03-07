@@ -12,6 +12,7 @@ import ArrowBackIcon from 'material-ui-icons/ArrowBack';
 import DeleteIcon from 'material-ui-icons/Delete';
 
 import { dispatchAction, getSelectedItem, getLocalProperties } from "../helpers";
+import TopDrawer from "./TopDrawer";
 
 const styles = {
   root: {
@@ -25,15 +26,15 @@ const styles = {
   },
 };
 
-let deleteRequested = false;
-
 const ItemAppBar = React.createClass({
     componentWillUnmount() {
-        deleteRequested = false;
+        this.props.deleteRequested(false);
+        this.props.selectForDeletion(false);
     },
     redirectHome() {
         this.props.history.goBack();
-        deleteRequested = false;
+        this.props.deleteRequested(false);
+        this.props.selectForDeletion(false);
     },
     handleOnTitleClick(e) {
         const { sessionId } = this.props.params;
@@ -60,15 +61,19 @@ const ItemAppBar = React.createClass({
             dispatchAction(this.props, "updateItemProperty", "isEditingTitle", false);
             dispatchAction(this.props, "addItem");
         } else {
-            deleteRequested = true;
-            this.forceUpdate();
+            this.props.deleteRequested(true);
+            this.props.selectForDeletion(true);
         }
     },
     handleOnRightCancelButtonClick(e) {
-        deleteRequested = false;
+        this.props.deleteRequested(false);
+        this.props.selectForDeletion(false);
         this.forceUpdate();
     },
     handleOnRightDeleteButtonClick(e) {
+        this.props.deleteRequested(false);
+        this.props.selectForDeletion(false);
+        this.forceUpdate();
     },
     handleTitleOnChange(e) {
         dispatchAction(this.props, "updateItemProperty", "title", e.target.value);
@@ -120,7 +125,10 @@ const ItemAppBar = React.createClass({
         }
     },
     renderIconElementRight() {
-        const { classes } = this.props;
+        const {
+            classes,
+            supervisor,
+        } = this.props;
         const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItem.isNew) {
             return (
@@ -135,7 +143,7 @@ const ItemAppBar = React.createClass({
                     </Typography>
                 </IconButton>
             );
-        } else if (deleteRequested) {
+        } else if (supervisor.deleteRequested) {
             return (
                 <span>
                     <IconButton
@@ -160,6 +168,7 @@ const ItemAppBar = React.createClass({
                             Delete
                         </Typography>
                     </IconButton>
+                    <TopDrawer { ...this.props } />
                 </span>
             );
         } else {
@@ -238,4 +247,3 @@ ItemAppBar.propTypes = {
 };
 
 export default withStyles(styles)(ItemAppBar);
-

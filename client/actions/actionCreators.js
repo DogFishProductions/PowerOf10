@@ -80,3 +80,17 @@ export function selectBottomNavIndex(index) {
         index
     }
 }
+
+export function deleteRequested(option) {
+    return {
+        type: "DELETE_REQUESTED",
+        option
+    }
+}
+
+export function selectForDeletion(option) {
+    return {
+        type: "SELECT_FOR_DELETION",
+        option
+    }
+}

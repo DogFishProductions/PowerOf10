@@ -75,7 +75,7 @@ export const randomString = (length, chars) => {
 }
 
 export const getBottomNavSelectedIndex = (props) => {
-    return props.navigation.bottomNavSelectedIndex || 0;
+    return props.supervisor.bottomNavSelectedIndex || 0;
 }
 
 export const getSelectedItemAndIndexFromArray = (targetArray = [], paramName, selectionValue) => {

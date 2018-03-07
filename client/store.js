@@ -9,7 +9,9 @@ import sessions from "./data/sessions";
 const defaultState = {
     sessions,
     topics,
-    navigation: {}
+    supervisor: {
+        deleteRequested: false
+    }
 };
 
 const enhancers = compose(
