@@ -36,6 +36,17 @@ const ItemAppBar = React.createClass({
         this.props.deleteRequested(false);
         this.props.displaySelectForDeletion(false);
     },
+    manageItemsMarkedForDeletion(manager) {
+        const {
+            deleteRequested,
+            displaySelectForDeletion,
+            supervisor,
+        } = this.props;
+        deleteRequested(false);
+        displaySelectForDeletion(false);
+        const toDelete = supervisor.toDelete || [];
+        toDelete.map(manager);
+    },
     handleOnTitleClick(e) {
         const { sessionId } = this.props.params;
         if (!sessionId) {
@@ -67,37 +78,24 @@ const ItemAppBar = React.createClass({
     },
     handleOnRightCancelButtonClick(e) {
         const {
-            deleteRequested,
-            displaySelectForDeletion,
             deselectForDeletion,
-            supervisor,
             params,
         } = this.props;
-        deleteRequested(false);
-        displaySelectForDeletion(false);
-        const toDelete = supervisor.toDelete || [];
-        const topicId = params.topicId;
-        toDelete.map((item) => {
+        this.manageItemsMarkedForDeletion((sessionId) => {
             // don't use handler dispatchAction as session id is not in URL
-            deselectForDeletion("session", item.sessionId, topicId);
-        });
+            deselectForDeletion("session", sessionId);
+        })
     },
     handleOnRightDeleteButtonClick(e) {
         const {
-            deleteRequested,
-            displaySelectForDeletion,
             removeItem,
-            supervisor,
             params,
         } = this.props;
-        deleteRequested(false);
-        displaySelectForDeletion(false);
-        const toDelete = supervisor.toDelete || [];
         const topicId = params.topicId;
-        toDelete.map((item) => {
+        this.manageItemsMarkedForDeletion((sessionId) => {
             // don't use handler dispatchAction as session id is not in URL
-            removeItem("session", item.sessionId, topicId);
-        });
+            removeItem("session", sessionId, topicId);
+        })
     },
     handleTitleOnChange(e) {
         dispatchAction(this.props, "updateItemProperty", "title", e.target.value);

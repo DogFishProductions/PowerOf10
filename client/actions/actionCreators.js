@@ -1,4 +1,4 @@
-export function updateItemProperty(type, itemId, propName, newValue, topicId) {
+export const updateItemProperty = (type, itemId, propName, newValue, topicId) => {
     switch(type) {
         case "topic":
             return {
@@ -20,7 +20,7 @@ export function updateItemProperty(type, itemId, propName, newValue, topicId) {
     }
 }
 
-export function createItem(type, itemId, topicId) {
+export const createItem = (type, itemId, topicId) => {
     switch(type) {
         case "topic":
             return {
@@ -38,7 +38,7 @@ export function createItem(type, itemId, topicId) {
     }
 }
 
-export function addItem(type, itemId, topicId) {
+export const addItem = (type, itemId, topicId) => {
     switch(type) {
         case "topic":
             return {
@@ -56,11 +56,7 @@ export function addItem(type, itemId, topicId) {
     }
 }
 
-export function removeItem(type, itemId, topicId) {
-    console.log("removing item");
-    console.log(type);
-    console.log(itemId);
-    console.log(topicId);
+export const removeItem = (type, itemId, topicId) => {
     switch(type) {
         case "topic":
             return {
@@ -71,74 +67,91 @@ export function removeItem(type, itemId, topicId) {
             return {
                 type: "REMOVE_SESSION",
                 sessionId: itemId,
-                topicId
+                topicId,
             }
         default:
             return {}
     }
 }
 
-export function selectBottomNavIndex(index) {
+export const selectBottomNavIndex = (index) => {
     return {
         type: "SELECT_BOTTOM_NAV_INDEX",
-        index
+        index,
     }
 }
 
-export function deleteRequested(option) {
+export const deleteRequested = (option) => {
     return {
         type: "DELETE_REQUESTED",
-        option
+        option,
     }
 }
 
-export function displaySelectForDeletion(option) {
+export const displaySelectForDeletion = (option) => {
     return {
         type: "DISPLAY_SELECT_FOR_DELETION",
-        option
+        option,
     }
 }
 
-export function selectAllForDeletion(option) {
+export const selectAllForDeletion = (type, items, topicId) => {
+    switch(type) {
+        case "session":
+            return {
+                type: "SELECT_ALL_SESSIONS_FOR_DELETION",
+                sessions: items,
+                topicId,
+            }
+        default:
+            return {}
+    }
+}
+
+export const deselectAllForDeletion = () => {
     return {
-        type: "SELECT_ALL_FOR_DELETION",
-        option
+        type: "DESELECT_ALL_FOR_DELETION",
     }
 }
 
-export function selectForDeletion(type, itemId, topicId) {
+export const selectForDeletion = (type, itemId) => {
     switch(type) {
         case "topic":
             return {
                 type: "SELECT_TOPIC_FOR_DELETION",
-                topicId: itemId
+                topicId: itemId,
             }
         case "session":
-            console.log("selecting session for deletion");
             return {
                 type: "SELECT_SESSION_FOR_DELETION",
                 sessionId: itemId,
-                topicId
             }
         default:
             return {}
     }
 }
 
-export function deselectForDeletion(type, itemId, topicId) {
+export const deselectForDeletion = (type, itemId) => {
     switch(type) {
         case "topic":
             return {
                 type: "DESELECT_TOPIC_FOR_DELETION",
-                topicId: itemId
+                topicId: itemId,
             }
         case "session":
             return {
                 type: "DESELECT_SESSION_FOR_DELETION",
                 sessionId: itemId,
-                topicId
             }
         default:
             return {}
+    }
+}
+
+export const markItemAsNew = (option, itemId) => {
+    return {
+        type: "MARK_ITEM_AS_NEW",
+        option,
+        itemId,
     }
 }

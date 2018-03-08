@@ -3,18 +3,17 @@ import * as _ from "lodash";
 const postSupervisor = (state = {}, action) => {
     const {
         sessionId,
-        topicId,
     } = action;
     const sessionsForDeletion = state.toDelete || [];
     switch(action.type) {
         case "SELECT_SESSION_FOR_DELETION":
             return {
                 ...state,
-                toDelete: _.concat(sessionsForDeletion, [{ sessionId, topicId }]),
+                toDelete: _.uniq(_.concat(sessionsForDeletion, [sessionId])),
             };
         case "DESELECT_SESSION_FOR_DELETION":
             const index = _.findIndex(sessionsForDeletion, (item) => {
-                return ((item.sessionId === sessionId) && (item.topicId === topicId));
+                return (item === sessionId);
             });
             const before = sessionsForDeletion.slice(0, index);   // before the one we are removing
             const after = sessionsForDeletion.slice(index + 1);   // after the one we are removing
@@ -25,13 +24,25 @@ const postSupervisor = (state = {}, action) => {
                     ...after,
                 ],
             };
+        case "SELECT_ALL_SESSIONS_FOR_DELETION":
+            const selectedSessions = action.sessions[action.topicId];
+            return {
+                ...state,
+                selectAllForDeletion: true,
+                toDelete: _.uniq(_.concat(sessionsForDeletion, selectedSessions.map((session) => session.code))),
+            };
+        case "MARK_ITEM_AS_NEW":
+            return {
+                ...state,
+                isNew: action.itemId,
+            };
         default:
             return state;
     }
 }
 
-export default function supervisor(state = {}, action) {
-    if (typeof action.topicId !== "undefined") {
+const supervisor = (state = {}, action) => {
+    if ((typeof action.topicId !== "undefined") || (typeof action.sessionId !== "undefined")) {
         return postSupervisor(state, action);
     }
     switch(action.type) {
@@ -50,13 +61,16 @@ export default function supervisor(state = {}, action) {
                 ...state,
                 displaySelectForDeletion: action.option
             };
-        case "SELECT_ALL_FOR_DELETION":
+        case "DESELECT_ALL_FOR_DELETION":
             return {
                 ...state,
-                selectAllForDeletion: action.option
+                selectAllForDeletion: false,
+                toDelete: [],
             };
         default:
             return state;
     }
     return state;
 }
+
+export default supervisor;

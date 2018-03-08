@@ -34,7 +34,11 @@ class TopDrawer extends React.Component {
         } = this.props;
 
         const handleCheckboxOnClick = (e) => {
-            this.props.selectAllForDeletion(e.target.checked);
+            if (e.target.checked) {
+                this.props.selectAllForDeletion("session", this.props.sessions, this.props.params.topicId);
+            } else {
+                this.props.deselectAllForDeletion();
+            }
         };
 
         const drawerOptions = (

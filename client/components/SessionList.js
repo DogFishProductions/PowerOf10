@@ -38,8 +38,8 @@ const SessionList = React.createClass({
         const { supervisor } = this.props;
         const index = _.findIndex(
             supervisor.toDelete,
-            (item) => {
-                const result = ((item.sessionId === session.code) && (item.topicId === this.props.params.topicId));
+            (sessionId) => {
+                const result = (sessionId === session.code);
                 return result;
             },
         );
@@ -51,9 +51,9 @@ const SessionList = React.createClass({
     handleCheckboxOnClick(e) {
         const target = e.target;
         if (target.checked) {
-            this.props.selectForDeletion("session", target.value, this.props.params.topicId);
+            this.props.selectForDeletion("session", target.value);
         } else {
-            this.props.deselectForDeletion("session", target.value, this.props.params.topicId);
+            this.props.deselectForDeletion("session", target.value);
         }
     },
     handleTimerOffButtonOnClick(e, sessionId) {
@@ -91,7 +91,7 @@ const SessionList = React.createClass({
         )
     },
     renderSession(session, i) {
-        const supervisor = this.props.supervisor;
+        const { supervisor } = this.props;
         return (
             <div key={i}>
                 <ListItem>
