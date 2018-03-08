@@ -57,6 +57,10 @@ export function addItem(type, itemId, topicId) {
 }
 
 export function removeItem(type, itemId, topicId) {
+    console.log("removing item");
+    console.log(type);
+    console.log(itemId);
+    console.log(topicId);
     switch(type) {
         case "topic":
             return {
@@ -88,9 +92,53 @@ export function deleteRequested(option) {
     }
 }
 
-export function selectForDeletion(option) {
+export function displaySelectForDeletion(option) {
     return {
-        type: "SELECT_FOR_DELETION",
+        type: "DISPLAY_SELECT_FOR_DELETION",
         option
+    }
+}
+
+export function selectAllForDeletion(option) {
+    return {
+        type: "SELECT_ALL_FOR_DELETION",
+        option
+    }
+}
+
+export function selectForDeletion(type, itemId, topicId) {
+    switch(type) {
+        case "topic":
+            return {
+                type: "SELECT_TOPIC_FOR_DELETION",
+                topicId: itemId
+            }
+        case "session":
+            console.log("selecting session for deletion");
+            return {
+                type: "SELECT_SESSION_FOR_DELETION",
+                sessionId: itemId,
+                topicId
+            }
+        default:
+            return {}
+    }
+}
+
+export function deselectForDeletion(type, itemId, topicId) {
+    switch(type) {
+        case "topic":
+            return {
+                type: "DESELECT_TOPIC_FOR_DELETION",
+                topicId: itemId
+            }
+        case "session":
+            return {
+                type: "DESELECT_SESSION_FOR_DELETION",
+                sessionId: itemId,
+                topicId
+            }
+        default:
+            return {}
     }
 }

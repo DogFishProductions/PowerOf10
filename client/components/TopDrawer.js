@@ -11,10 +11,8 @@ import dispatchAction from "../helpers";
 const styles = theme => ({
     root: {
       flexGrow: 1,
-      menuButton: {
-          color: "primary"
-      }
     },
+    menuButton: {},
     flex: {
         flex: 1,
     },
@@ -36,6 +34,7 @@ class TopDrawer extends React.Component {
         } = this.props;
 
         const handleCheckboxOnClick = (e) => {
+            this.props.selectAllForDeletion(e.target.checked);
         };
 
         const drawerOptions = (
@@ -59,7 +58,7 @@ class TopDrawer extends React.Component {
                 }}
                 variant="persistent"
                 anchor="top"
-                open={ supervisor.selectForDeletion }
+                open={ supervisor.displaySelectForDeletion }
             >
                 { drawerOptions }
             </Drawer>

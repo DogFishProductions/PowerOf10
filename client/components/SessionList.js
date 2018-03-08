@@ -1,5 +1,6 @@
 import React from 'react';
 import * as moment from 'moment';
+import * as _ from "lodash";
 
 import List, { ListItem, ListItemSecondaryAction, ListItemIcon, ListItemText, ListSubheader } from 'material-ui/List';
 import Divider from 'material-ui/Divider';
@@ -33,11 +34,27 @@ const compareSession = (a, b) => {
 }
 
 const SessionList = React.createClass({
+    isSelectedForDeletion(session) {
+        const { supervisor } = this.props;
+        const index = _.findIndex(
+            supervisor.toDelete,
+            (item) => {
+                const result = ((item.sessionId === session.code) && (item.topicId === this.props.params.topicId));
+                return result;
+            },
+        );
+        return (index >= 0);
+    },
     handlePrimaryOnClick(e, session) {
         this.props.history.push(`/topic/${this.props.params.topicId}/session/${session.code}`);
     },
-    handleCheckboxOnClick(e, checked) {
-        // do something
+    handleCheckboxOnClick(e) {
+        const target = e.target;
+        if (target.checked) {
+            this.props.selectForDeletion("session", target.value, this.props.params.topicId);
+        } else {
+            this.props.deselectForDeletion("session", target.value, this.props.params.topicId);
+        }
     },
     handleTimerOffButtonOnClick(e, sessionId) {
         const { topicId } = this.props.params;
@@ -75,48 +92,31 @@ const SessionList = React.createClass({
     },
     renderSession(session, i) {
         const supervisor = this.props.supervisor;
-        if (session.isRunning) {
-            return (
+        return (
             <div key={i}>
                 <ListItem>
                     <Slide
-                        direction="left"
-                        in={ supervisor.selectAllForDeletion }
+                        direction="right"
+                        in={ supervisor.displaySelectForDeletion }
                     >
-                        <Checkbox
-                            checked={ true }
-                            onChange={ this.handleCheckboxOnClick }
-                        />
+                        <ListItemIcon>
+                            <Checkbox
+                                checked={ this.isSelectedForDeletion(session) }
+                                onChange={ this.handleCheckboxOnClick }
+                                value={ session.code }
+                            />
+                        </ListItemIcon>
                     </Slide>
                     <ListItemText
                         onClick={ (e) => this.handlePrimaryOnClick(e, session) }
                         primary={ momentToDatetimeString(session, "from") }
                         secondary={ durationToString([session], "long") }
                     />
-                    <ListItemSecondaryAction>
-                        { this.renderTimerOffButton(session.code) }
-                    </ListItemSecondaryAction>
-                </ListItem>
-                <Divider />
-            </div>
-        );
-        }
-        return (
-            <div key={i}>
-                <ListItem>
-                    <Slide
-                        direction="left"
-                        in={ supervisor.selectAllForDeletion }
-                    >
-                        <Checkbox
-                            onChange={ this.handleCheckboxOnClick }
-                        />
-                    </Slide>
-                    <ListItemText
-                        onClick={ (e) => this.handlePrimaryOnClick(e, session) }
-                        primary={ momentToDatetimeString(session, "from") }
-                        secondary={ durationToString([session], "humanized") }
-                    />
+                    { session.isRunning && (
+                        <ListItemSecondaryAction>
+                            { this.renderTimerOffButton(session.code) }
+                        </ListItemSecondaryAction>
+                    ) }
                 </ListItem>
                 <Divider />
             </div>

@@ -29,12 +29,12 @@ const styles = {
 const ItemAppBar = React.createClass({
     componentWillUnmount() {
         this.props.deleteRequested(false);
-        this.props.selectForDeletion(false);
+        this.props.displaySelectForDeletion(false);
     },
     redirectHome() {
         this.props.history.goBack();
         this.props.deleteRequested(false);
-        this.props.selectForDeletion(false);
+        this.props.displaySelectForDeletion(false);
     },
     handleOnTitleClick(e) {
         const { sessionId } = this.props.params;
@@ -62,18 +62,42 @@ const ItemAppBar = React.createClass({
             dispatchAction(this.props, "addItem");
         } else {
             this.props.deleteRequested(true);
-            this.props.selectForDeletion(true);
+            this.props.displaySelectForDeletion(true);
         }
     },
     handleOnRightCancelButtonClick(e) {
-        this.props.deleteRequested(false);
-        this.props.selectForDeletion(false);
-        this.forceUpdate();
+        const {
+            deleteRequested,
+            displaySelectForDeletion,
+            deselectForDeletion,
+            supervisor,
+            params,
+        } = this.props;
+        deleteRequested(false);
+        displaySelectForDeletion(false);
+        const toDelete = supervisor.toDelete || [];
+        const topicId = params.topicId;
+        toDelete.map((item) => {
+            // don't use handler dispatchAction as session id is not in URL
+            deselectForDeletion("session", item.sessionId, topicId);
+        });
     },
     handleOnRightDeleteButtonClick(e) {
-        this.props.deleteRequested(false);
-        this.props.selectForDeletion(false);
-        this.forceUpdate();
+        const {
+            deleteRequested,
+            displaySelectForDeletion,
+            removeItem,
+            supervisor,
+            params,
+        } = this.props;
+        deleteRequested(false);
+        displaySelectForDeletion(false);
+        const toDelete = supervisor.toDelete || [];
+        const topicId = params.topicId;
+        toDelete.map((item) => {
+            // don't use handler dispatchAction as session id is not in URL
+            removeItem("session", item.sessionId, topicId);
+        });
     },
     handleTitleOnChange(e) {
         dispatchAction(this.props, "updateItemProperty", "title", e.target.value);
@@ -130,6 +154,7 @@ const ItemAppBar = React.createClass({
             supervisor,
         } = this.props;
         const selectedItem = getSelectedItem(this.props, "code");
+        const toDelete = supervisor.toDelete || [];
         if (selectedItem.isNew) {
             return (
                 <IconButton
@@ -160,7 +185,7 @@ const ItemAppBar = React.createClass({
                     <IconButton
                         onClick={ this.handleOnRightDeleteButtonClick }
                         color="inherit"
-                        disabled={ true }
+                        disabled={ toDelete.length <= 0 }
                     >
                         <Typography
                             variant="button"
@@ -189,57 +214,35 @@ const ItemAppBar = React.createClass({
     renderAppBar() {
         const { classes } = this.props;
         const selectedItem = getSelectedItem(this.props, "code");
-        if (selectedItem.isEditingTitle) {
-            return (
-                <div
-                    className={classes.root}>
-                    <AppBar
-                        position="static"
-                        color="primary">
-                        <Toolbar>
-                            <IconButton
-                                onClick={ this.handleOnLeftIconButtonClick }
-                                className={classes.menuButton}
-                                color="inherit">
-                                { this.renderIconElementLeft() }
-                            </IconButton>
-                            <Typography
-                                variant="title"
-                                color="inherit">
-                                { this.renderTitle() }
-                            </Typography>
-                            { this.renderIconElementRight() }
-                        </Toolbar>
-                    </AppBar>
-                </div>
-            );
-        } else {
-            return (
-                <div
-                    className={classes.root}>
-                    <AppBar
-                        position="static"
-                        color="primary">
-                        <Toolbar>
-                            <IconButton
-                                onClick={ this.handleOnLeftIconButtonClick }
-                                className={classes.menuButton}
-                                color="inherit">
-                                { this.renderIconElementLeft() }
-                            </IconButton>
-                            <Typography
-                                onClick={ this.handleOnTitleClick }
-                                variant="title"
-                                color="inherit"
-                                className={classes.flex}>
-                                { this.renderTitle() }
-                            </Typography>
-                            { this.renderIconElementRight() }
-                        </Toolbar>
-                    </AppBar>
-                </div>
-            );
-        }
+        return (
+            <div
+                className={classes.root}>
+                <AppBar
+                    position="static"
+                    color="primary">
+                    <Toolbar>
+                        <IconButton
+                            onClick={ this.handleOnLeftIconButtonClick }
+                            className={classes.menuButton}
+                            color="inherit">
+                            { this.renderIconElementLeft() }
+                        </IconButton>
+                        <Typography
+                            onClick={ (e) => {
+                                if (!selectedItem.isEditingTitle) {
+                                    this.handleOnTitleClick(e);
+                                }
+                            } }
+                            variant="title"
+                            color="inherit"
+                            className={classes.flex}>
+                            { this.renderTitle() }
+                        </Typography>
+                        { this.renderIconElementRight() }
+                    </Toolbar>
+                </AppBar>
+            </div>
+        );
     },
     render() {
         return this.renderAppBar();
