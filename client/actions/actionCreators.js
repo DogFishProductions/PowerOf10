@@ -115,6 +115,8 @@ export const deselectAllForDeletion = () => {
 }
 
 export const selectForDeletion = (type, itemId) => {
+    console.log(type)
+    console.log(itemId)
     switch(type) {
         case "topic":
             return {

@@ -10,7 +10,8 @@ const defaultState = {
     sessions,
     topics,
     supervisor: {
-        deleteRequested: false
+        deleteRequested: false,
+        isNew: { topicId: null, sessionId: null },
     }
 };
 

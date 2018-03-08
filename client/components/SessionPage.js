@@ -30,6 +30,7 @@ import {
     momentToTimeString,
     momentIsInThePast,
     momentFromIsBeforeTo,
+    selectedItemIsNew,
 } from "../helpers";
 import ItemAppBar from "./ItemAppBar";
 import ItemBottomNavigation from "./ItemBottomNavigation";
@@ -45,7 +46,7 @@ const TopicPage = React.createClass({
         this.resetErrorState();
     },
     getSelectedSession() {
-        return getSelectedItem(this.props, "code") || { isNew: true };
+        return getSelectedItem(this.props, "code") || { };
     },
     getFromDate() {
         return momentToDateString(this.getSelectedSession(), "from");
@@ -297,7 +298,7 @@ const TopicPage = React.createClass({
     },
     renderFloatingStartSessionButton() {
         const selectedSession = this.getSelectedSession();
-        if (selectedSession.isNew ||
+        if (selectedItemIsNew(this.props, "code") ||
             (selectedSession.to === selectedSession.from) ||
             selectedSession.isRunning) { 
             return (

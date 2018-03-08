@@ -36,6 +36,7 @@ const compareSession = (a, b) => {
 const SessionList = React.createClass({
     isSelectedForDeletion(session) {
         const { supervisor } = this.props;
+        console.log(supervisor.toDelete);
         const index = _.findIndex(
             supervisor.toDelete,
             (sessionId) => {

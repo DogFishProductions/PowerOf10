@@ -133,5 +133,14 @@ export const getSelectedItem = (props, selectionProperty) => {
         selectionProperty,
         selectionValue,
     );
-    return selectedItem || { isNew: true };
+    return selectedItem || { };
+}
+
+export const selectedItemIsNew = (props, selectionProperty) => {
+    const selectedItem = getSelectedItem(props, selectionProperty);
+    const {
+        sessionId,
+        topicId,
+    } = props.supervisor.isNew;
+    return ((selectedItem[selectionProperty] === sessionId) || (selectedItem[selectionProperty] === topicId));
 }

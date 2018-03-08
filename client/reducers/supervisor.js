@@ -2,6 +2,7 @@ import * as _ from "lodash";
 
 const postSupervisor = (state = {}, action) => {
     const {
+        topicId,
         sessionId,
     } = action;
     const sessionsForDeletion = state.toDelete || [];
@@ -9,7 +10,7 @@ const postSupervisor = (state = {}, action) => {
         case "SELECT_SESSION_FOR_DELETION":
             return {
                 ...state,
-                toDelete: _.uniq(_.concat(sessionsForDeletion, [sessionId])),
+                toDelete: _.uniq(_.concat(sessionsForDeletion, [action.sessionId])),
             };
         case "DESELECT_SESSION_FOR_DELETION":
             const index = _.findIndex(sessionsForDeletion, (item) => {
@@ -31,10 +32,15 @@ const postSupervisor = (state = {}, action) => {
                 selectAllForDeletion: true,
                 toDelete: _.uniq(_.concat(sessionsForDeletion, selectedSessions.map((session) => session.code))),
             };
-        case "MARK_ITEM_AS_NEW":
+        case "CREATE_TOPIC":
             return {
                 ...state,
-                isNew: action.itemId,
+                isNew: { topicId, sessionId: state.isNew.sessionId },
+            };
+        case "CREATE_SESSION":
+            return {
+                ...state,
+                isNew: { topicId: state.isNew.topicId, sessionId },
             };
         default:
             return state;
@@ -66,6 +72,16 @@ const supervisor = (state = {}, action) => {
                 ...state,
                 selectAllForDeletion: false,
                 toDelete: [],
+            };
+        case "ADD_TOPIC":
+            return {
+                ...state,
+                isNew: { topicId: null, sessionId: state.isNew.sessionId },
+            };
+        case "ADD_SESSION":
+            return {
+                ...state,
+                isNew: { topicId: state.isNew.topicId, sessionId: null },
             };
         default:
             return state;

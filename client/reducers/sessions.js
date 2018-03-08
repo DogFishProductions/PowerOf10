@@ -18,8 +18,7 @@ const postSession = (state = [], action) => {
                     code: action.sessionId,
                     description: "",
                     from: now,
-                    to: now,
-                    isNew: true
+                    to: now
                 }
             ];
         case "UPDATE_SESSION":

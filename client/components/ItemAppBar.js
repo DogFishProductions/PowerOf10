@@ -11,7 +11,12 @@ import CloseIcon from 'material-ui-icons/Close';
 import ArrowBackIcon from 'material-ui-icons/ArrowBack';
 import DeleteIcon from 'material-ui-icons/Delete';
 
-import { dispatchAction, getSelectedItem, getLocalProperties } from "../helpers";
+import {
+    dispatchAction,
+    getSelectedItem,
+    getLocalProperties,
+    selectedItemIsNew,
+} from "../helpers";
 import TopDrawer from "./TopDrawer";
 
 const styles = {
@@ -55,7 +60,7 @@ const ItemAppBar = React.createClass({
     },
     handleOnLeftIconButtonClick(e) {
         const selectedItem = getSelectedItem(this.props, "code");
-        if (selectedItem.isNew) {
+        if (selectedItemIsNew(this.props, "code")) {
             dispatchAction(this.props, "removeItem");
         } else if (selectedItem.isEditingTitle) {
             dispatchAction(this.props, "updateItemProperty", "isEditingTitle", false);
@@ -64,7 +69,7 @@ const ItemAppBar = React.createClass({
     },
     handleOnRightIconButtonClick(e) {
         const selectedItem = getSelectedItem(this.props, "code");
-        if (selectedItem.isNew) {
+        if (selectedItemIsNew(this.props, "code")) {
             dispatchAction(this.props, "updateItemProperty", "isNew", false);
             dispatchAction(this.props, "addItem");
             this.redirectHome();
@@ -108,10 +113,11 @@ const ItemAppBar = React.createClass({
             selectionValue
         } = getLocalProperties(this.props);
         const selectedItem = getSelectedItem(this.props, "code");
-        const defaultTitle = selectedItem.isNew ? `New ${ type }` : `Edit ${ type }`;
+        const itemIsNew = selectedItemIsNew(this.props, "code");
+        const defaultTitle = itemIsNew ? `New ${ type }` : `Edit ${ type }`;
         const title = selectedItem.title || defaultTitle;
         if (selectedItem.isEditingTitle) {
-            if (selectedItem.isNew) {
+            if (itemIsNew) {
                 return (
                     <TextField
                         className={classes.textField}
@@ -135,8 +141,7 @@ const ItemAppBar = React.createClass({
         }
     },
     renderIconElementLeft() {
-        const selectedItem = getSelectedItem(this.props, "code");
-        if (selectedItem.isNew) {
+        if (selectedItemIsNew(this.props, "code")) {
             return (
                 <CloseIcon />
             );
@@ -151,9 +156,8 @@ const ItemAppBar = React.createClass({
             classes,
             supervisor,
         } = this.props;
-        const selectedItem = getSelectedItem(this.props, "code");
         const toDelete = supervisor.toDelete || [];
-        if (selectedItem.isNew) {
+        if (selectedItemIsNew(this.props, "code")) {
             return (
                 <IconButton
                     className={classes.menuButton}

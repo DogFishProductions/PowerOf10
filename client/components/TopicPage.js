@@ -48,7 +48,7 @@ const TopicPage = React.createClass({
         calcCurrentDuration = null;
     },
     getSelectedTopic() {
-        return getSelectedItem(this.props, "code") || { isNew: true };
+        return getSelectedItem(this.props, "code") || { code: 0 };
     },
     getNewSessionId() {
         const sessionId = randomString(10, "aA#!");
@@ -97,7 +97,7 @@ const TopicPage = React.createClass({
     },
     renderDetailView() {
         const selectedIndex = getBottomNavSelectedIndex(this.props);
-        const defaultSessionListText = this.getSelectedTopic().isNew ? "Save topic to start recording sessions" : "Start recording sessions";
+        const defaultSessionListText = (this.props.supervisor.isNew === this.getSelectedTopic().code) ? "Save topic to start recording sessions" : "Start recording sessions";
         switch(selectedIndex) {
             case 0:
                 const runningSessionIndex = this.getRunningSessionIndex();

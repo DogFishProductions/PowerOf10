@@ -17,7 +17,6 @@ const postTopic = (state = [], action) => {
                     code: action.topicId,
                     title: "New topic",
                     description: "",
-                    isNew: true
                 }
             ];
         case "UPDATE_TOPIC":
