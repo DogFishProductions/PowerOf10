@@ -9,7 +9,8 @@ import MenuIcon from 'material-ui-icons/Menu';
 import TextField from 'material-ui/TextField';
 import CloseIcon from 'material-ui-icons/Close';
 import ArrowBackIcon from 'material-ui-icons/ArrowBack';
-import DeleteIcon from 'material-ui-icons/Delete';
+import MoreVertIcon from 'material-ui-icons/MoreVert';
+import Menu, { MenuItem } from 'material-ui/Menu';
 
 import {
     dispatchAction,
@@ -78,6 +79,7 @@ const ItemAppBar = React.createClass({
         } else {
             this.props.deleteRequested(true);
             this.props.displaySelectForDeletion(true);
+            this.props.openMenu(false);
         }
         this.props.editItemTitle(false);
     },
@@ -102,6 +104,9 @@ const ItemAppBar = React.createClass({
             removeItem("session", sessionId, topicId);
         })
     },
+    handleMenuButtonOnClick(e) {
+        this.props.openMenu(true, e.currentTarget);
+    },
     handleTitleOnChange(e) {
         dispatchAction(this.props, "updateItemProperty", "title", e.target.value);
     },
@@ -124,7 +129,7 @@ const ItemAppBar = React.createClass({
             if (itemIsNew) {
                 return (
                     <TextField
-                        className={classes.textField}
+                        className={classes.flex}
                         fullWidth={ true }
                         placeholder={ title }
                         onChange={ this.handleTitleOnChange }
@@ -207,12 +212,33 @@ const ItemAppBar = React.createClass({
             const sessions = this.props.sessions[topicId] || [];
             if (sessions.length > 0) {
                 return (
-                    <IconButton
-                        className={classes.menuButton}
-                        onClick={ this.handleOnRightIconButtonClick }
-                        color="inherit">
-                        <DeleteIcon />
-                    </IconButton>
+                    <div>
+                        <IconButton
+                            className={ classes.menuButton }
+                            onClick={ this.handleMenuButtonOnClick }
+                            color="inherit">
+                            <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                            id="menu-appbar"
+                            anchorEl={ supervisor.menuAnchor }
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            open={ Boolean(supervisor.menuAnchor) }
+                            >
+                            <MenuItem
+                                onClick={ this.handleOnRightIconButtonClick }
+                            >
+                                Delete Sessions
+                            </MenuItem>
+                        </Menu>
+                    </div>
                 );
             }
         }

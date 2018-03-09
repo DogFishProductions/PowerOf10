@@ -6,7 +6,8 @@ import Toolbar from "material-ui/Toolbar";
 import Typography from "material-ui/Typography";
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
-import DeleteIcon from 'material-ui-icons/Delete';
+import MoreVertIcon from 'material-ui-icons/MoreVert';
+import Menu, { MenuItem } from 'material-ui/Menu';
 
 const styles = {
   root: {
@@ -21,11 +22,19 @@ const styles = {
 };
 
 class TopicListAppBar extends React.Component {
-    handleOnRightIconButtonClick(e) {
-    }
-
     render() {
-        const { classes } = this.props;
+        const {
+            classes,
+            supervisor,
+        } = this.props;
+
+        const handleOnRightIconButtonClick = (e) => {
+            this.props.openMenu(false);
+        }
+
+        const handleMenuButtonOnClick = (e) => {
+            this.props.openMenu(true, e.currentTarget);
+        }
         return (
             <div
                 className={classes.root}>
@@ -41,11 +50,30 @@ class TopicListAppBar extends React.Component {
                             Topics
                         </Typography>
                         <IconButton
-                            onClick={ this.handleOnRightIconButtonClick }
-                            className={classes.menuButton}
+                            className={ classes.menuButton }
+                            onClick={ handleMenuButtonOnClick }
                             color="inherit">
-                            <DeleteIcon/>
+                            <MoreVertIcon />
                         </IconButton>
+                        <Menu
+                            id="menu-appbar"
+                            anchorEl={ supervisor.menuAnchor }
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            open={ Boolean(supervisor.menuAnchor) }
+                            >
+                            <MenuItem
+                                onClick={ handleOnRightIconButtonClick }
+                            >
+                                No Actions Available
+                            </MenuItem>
+                        </Menu>
                     </Toolbar>
                 </AppBar>
             </div>

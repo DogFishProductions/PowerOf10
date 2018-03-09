@@ -16,7 +16,7 @@ const TopicListPage = React.createClass({
     render() {
         return (
             <div className="pseudo-phone-main outer">
-                <TopicListAppBar />
+                <TopicListAppBar {...this.props} />
                 <div className="pseudo-phone-list inner">
                     <div>
                         <TopicList {...this.props} />

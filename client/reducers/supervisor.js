@@ -112,6 +112,11 @@ const supervisor = (state = {}, action) => {
                 ...state,
                 isEditingTitle: null,
             }
+        case "OPEN_MENU":
+            return {
+                ...state,
+                menuAnchor: action.option ? action.anchor : null,
+            }
         default:
             return state;
     }

@@ -100,36 +100,6 @@ const TopicPage = React.createClass({
         const defaultSessionListText = (this.props.supervisor.isNew === this.getSelectedTopic().code) ? "Save topic to start recording sessions" : "Start recording sessions";
         switch(selectedIndex) {
             case 0:
-                const runningSessionIndex = this.getRunningSessionIndex();
-                if (runningSessionIndex >= 0) {
-                    return (
-                        <div>
-                            <Grid
-                                container
-                                spacing={ 24 }
-                                style={ gridStyle }
-                            >
-                                <Grid item xs>
-                                    <TextField
-                                        label="Total Time Spent"
-                                        fullWidth={ true }
-                                        disabled={ true }
-                                        value={ durationToString(getTopicSessions(this.props), "long") }
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Grid
-                                container
-                                spacing={ 24 }
-                                style={ bottomGridStyle }
-                            >
-                                <Grid item xs>
-                                    <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
-                                </Grid>
-                            </Grid>
-                        </div>
-                    );
-                }
                 return (
                     <div>
                         <Grid
@@ -142,7 +112,7 @@ const TopicPage = React.createClass({
                                     label="Total Time Spent"
                                     disabled={ true }
                                     fullWidth={ true }
-                                    value={ durationToString(getTopicSessions(this.props), "humanized") }
+                                    value={ durationToString(getTopicSessions(this.props), "long") }
                                 />
                             </Grid>
                         </Grid>

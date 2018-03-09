@@ -149,10 +149,17 @@ export const deselectForDeletion = (type, itemId) => {
 }
 
 export const editItemTitle = (option, topicId) => {
-    console.log(`calling editItemTitle: ${option}, ${topicId}`)
     return {
         type: "EDIT_ITEM_TITLE",
         option,
         topicId,
+    }
+}
+
+export const openMenu = (option, anchor) => {
+    return {
+        type: "OPEN_MENU",
+        option,
+        anchor,
     }
 }
