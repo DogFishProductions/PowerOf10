@@ -53,18 +53,20 @@ const ItemAppBar = React.createClass({
         toDelete.map(manager);
     },
     handleOnTitleClick(e) {
-        const { sessionId } = this.props.params;
+        const {
+            topicId,
+            sessionId,
+        } = this.props.params;
         if (!sessionId) {
-            dispatchAction(this.props, "updateItemProperty", "isEditingTitle", true);
+            this.props.editItemTitle(true, topicId);
         }
     },
     handleOnLeftIconButtonClick(e) {
         const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItemIsNew(this.props, "code")) {
             dispatchAction(this.props, "removeItem");
-        } else if (selectedItem.isEditingTitle) {
-            dispatchAction(this.props, "updateItemProperty", "isEditingTitle", false);
         }
+        this.props.editItemTitle(false);
         this.redirectHome();
     },
     handleOnRightIconButtonClick(e) {
@@ -73,13 +75,11 @@ const ItemAppBar = React.createClass({
             dispatchAction(this.props, "updateItemProperty", "isNew", false);
             dispatchAction(this.props, "addItem");
             this.redirectHome();
-        } else if (selectedItem.isEditingTitle) {
-            dispatchAction(this.props, "updateItemProperty", "isEditingTitle", false);
-            dispatchAction(this.props, "addItem");
         } else {
             this.props.deleteRequested(true);
             this.props.displaySelectForDeletion(true);
         }
+        this.props.editItemTitle(false);
     },
     handleOnRightCancelButtonClick(e) {
         const {
@@ -106,7 +106,10 @@ const ItemAppBar = React.createClass({
         dispatchAction(this.props, "updateItemProperty", "title", e.target.value);
     },
     renderTitle() {
-        const { classes } = this.props;
+        const {
+            classes,
+            supervisor,
+        } = this.props;
         const {
             type,
             targetArray,
@@ -116,7 +119,8 @@ const ItemAppBar = React.createClass({
         const itemIsNew = selectedItemIsNew(this.props, "code");
         const defaultTitle = itemIsNew ? `New ${ type }` : `Edit ${ type }`;
         const title = selectedItem.title || defaultTitle;
-        if (selectedItem.isEditingTitle) {
+        const isEditingTitle = (supervisor.isEditingTitle === selectedItem.code);
+        if (isEditingTitle) {
             if (itemIsNew) {
                 return (
                     <TextField
@@ -214,8 +218,12 @@ const ItemAppBar = React.createClass({
         }
     },
     renderAppBar() {
-        const { classes } = this.props;
+        const {
+            classes,
+            supervisor,
+        } = this.props;
         const selectedItem = getSelectedItem(this.props, "code");
+        const isEditingTitle = (supervisor.isEditingTitle === selectedItem.code);
         return (
             <div
                 className={classes.root}>
@@ -231,7 +239,7 @@ const ItemAppBar = React.createClass({
                         </IconButton>
                         <Typography
                             onClick={ (e) => {
-                                if (!selectedItem.isEditingTitle) {
+                                if (!isEditingTitle) {
                                     this.handleOnTitleClick(e);
                                 }
                             } }

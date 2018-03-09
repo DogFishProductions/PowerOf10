@@ -93,7 +93,7 @@ const TopicPage = React.createClass({
         this.props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
     },
     handleDivOnClick(e) {
-        dispatchAction(this.props, "updateItemProperty", "isEditingTitle", false);
+        this.props.editItemTitle(false);
     },
     renderDetailView() {
         const selectedIndex = getBottomNavSelectedIndex(this.props);

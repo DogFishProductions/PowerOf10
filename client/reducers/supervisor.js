@@ -35,13 +35,24 @@ const postSupervisor = (state = {}, action) => {
         case "CREATE_TOPIC":
             return {
                 ...state,
-                isNew: { topicId, sessionId: state.isNew.sessionId },
+                isNew: {
+                    topicId,
+                    sessionId: state.isNew.sessionId
+                },
             };
         case "CREATE_SESSION":
             return {
                 ...state,
-                isNew: { topicId: state.isNew.topicId, sessionId },
+                isNew: {
+                    topicId: state.isNew.topicId,
+                    sessionId
+                },
             };
+        case "EDIT_ITEM_TITLE":
+            return {
+                ...state,
+                isEditingTitle: topicId,
+            }
         default:
             return state;
     }
@@ -76,13 +87,31 @@ const supervisor = (state = {}, action) => {
         case "ADD_TOPIC":
             return {
                 ...state,
-                isNew: { topicId: null, sessionId: state.isNew.sessionId },
+                isNew: {
+                    topicId: null,
+                    sessionId: state.isNew.sessionId
+                },
+                isEditingTitle: null,
             };
         case "ADD_SESSION":
             return {
                 ...state,
-                isNew: { topicId: state.isNew.topicId, sessionId: null },
+                isNew: {
+                    topicId: state.isNew.topicId,
+                    sessionId: null,
+                },
+                isEditingTitle: null,
             };
+        case "REMOVE_TOPIC":
+            return {
+                ...state,
+                isEditingTitle: null,
+            }
+        case "EDIT_ITEM_TITLE":
+            return {
+                ...state,
+                isEditingTitle: null,
+            }
         default:
             return state;
     }

@@ -11,6 +11,7 @@ const defaultState = {
     topics,
     supervisor: {
         deleteRequested: false,
+        toDelete: [],
         isNew: { topicId: null, sessionId: null },
     }
 };

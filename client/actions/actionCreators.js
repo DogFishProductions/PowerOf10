@@ -115,8 +115,6 @@ export const deselectAllForDeletion = () => {
 }
 
 export const selectForDeletion = (type, itemId) => {
-    console.log(type)
-    console.log(itemId)
     switch(type) {
         case "topic":
             return {
@@ -150,10 +148,11 @@ export const deselectForDeletion = (type, itemId) => {
     }
 }
 
-export const markItemAsNew = (option, itemId) => {
+export const editItemTitle = (option, topicId) => {
+    console.log(`calling editItemTitle: ${option}, ${topicId}`)
     return {
-        type: "MARK_ITEM_AS_NEW",
+        type: "EDIT_ITEM_TITLE",
         option,
-        itemId,
+        topicId,
     }
 }
