@@ -11,8 +11,13 @@ import Divider from "material-ui/Divider";
 import IconButton from 'material-ui/IconButton';
 import TimerIcon from 'material-ui-icons/Timer';
 import TimerOffIcon from 'material-ui-icons/TimerOff';
+import Slide from 'material-ui/transitions/Slide';
+import Checkbox from 'material-ui/Checkbox';
 
-import { durationToString } from "../helpers";
+import {
+    durationToString,
+    itemIsSelectedForDeletion,
+} from "../helpers";
 
 const styles = {
     orangeAvatar: {
@@ -30,6 +35,15 @@ const styles = {
 const TopicList = React.createClass({
     handlePrimaryOnClick(e, topic) {
         this.props.history.push(`/topic/${topic.code}`);
+    },
+    handleCheckboxOnClick(e) {
+        const target = e.target;
+        const type = "topic";
+        if (target.checked) {
+            this.props.selectForDeletion(type, target.value);
+        } else {
+            this.props.deselectForDeletion(type, target.value);
+        }
     },
     renderTimerOffButton() {
         return (
@@ -52,17 +66,29 @@ const TopicList = React.createClass({
         )
     },
     renderTopic(topic, i) {
+        const { supervisor } = this.props;
         return (
             <div key={i}>
-                <ListItem
-                    onClick={ (e) => this.handlePrimaryOnClick(e, topic) }
-                >
+                <ListItem>
+                    <Slide
+                        direction="right"
+                        in={ supervisor.displaySelectForDeletion }
+                    >
+                        <ListItemIcon>
+                            <Checkbox
+                                checked={ itemIsSelectedForDeletion(supervisor.toDelete, topic.code) }
+                                onChange={ this.handleCheckboxOnClick }
+                                value={ topic.code }
+                            />
+                        </ListItemIcon>
+                    </Slide>
                     <Avatar
                         style={ styles.orangeAvatar }
                     >
                         { durationToString(this.props.sessions[topic.code], "stacked") }
                     </Avatar>
                     <ListItemText
+                        onClick={ (e) => this.handlePrimaryOnClick(e, topic) }
                         primary={ topic.title }
                         secondary={ _.truncate(topic.description, { length: 100 }) }
                     />

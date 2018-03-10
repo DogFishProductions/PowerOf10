@@ -4,7 +4,8 @@ import AddIcon from "material-ui-icons/Add";
 import Button from 'material-ui/Button';
 
 import * as helpers from "../helpers";
-import TopicListAppBar from "./TopicListAppBar";
+// import TopicListAppBar from "./TopicListAppBar";
+import ItemAppBar from "./ItemAppBar";
 import TopicList from "./TopicList";
 
 const TopicListPage = React.createClass({
@@ -16,7 +17,7 @@ const TopicListPage = React.createClass({
     render() {
         return (
             <div className="pseudo-phone-main outer">
-                <TopicListAppBar {...this.props} />
+                <ItemAppBar {...this.props} />
                 <div className="pseudo-phone-list inner">
                     <div>
                         <TopicList {...this.props} />

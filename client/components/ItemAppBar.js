@@ -58,7 +58,7 @@ const ItemAppBar = React.createClass({
             topicId,
             sessionId,
         } = this.props.params;
-        if (!sessionId) {
+        if (topicId && !sessionId) {
             this.props.editItemTitle(true, topicId);
         }
     },
@@ -73,7 +73,6 @@ const ItemAppBar = React.createClass({
     handleOnRightIconButtonClick(e) {
         const selectedItem = getSelectedItem(this.props, "code");
         if (selectedItemIsNew(this.props, "code")) {
-            dispatchAction(this.props, "updateItemProperty", "isNew", false);
             dispatchAction(this.props, "addItem");
             this.redirectHome();
         } else {
@@ -88,9 +87,13 @@ const ItemAppBar = React.createClass({
             deselectForDeletion,
             params,
         } = this.props;
-        this.manageItemsMarkedForDeletion((sessionId) => {
+        this.manageItemsMarkedForDeletion((itemId) => {
+            let type = "topic";
+            if (params.topicId) {
+                type = "session";
+            }
             // don't use handler dispatchAction as session id is not in URL
-            deselectForDeletion("session", sessionId);
+            deselectForDeletion(type, itemId);
         })
     },
     handleOnRightDeleteButtonClick(e) {
@@ -99,9 +102,16 @@ const ItemAppBar = React.createClass({
             params,
         } = this.props;
         const topicId = params.topicId;
-        this.manageItemsMarkedForDeletion((sessionId) => {
-            // don't use handler dispatchAction as session id is not in URL
-            removeItem("session", sessionId, topicId);
+        this.manageItemsMarkedForDeletion((itemId) => {
+            if (topicId) {
+                const type = "session";
+                // don't use handler dispatchAction as session id is not in URL
+                removeItem("session", itemId, topicId);
+            } else {
+                const type = "topic";
+                // don't use handler dispatchAction as session id is not in URL
+                removeItem("topic", itemId);
+            }
         })
     },
     handleMenuButtonOnClick(e) {
@@ -114,39 +124,44 @@ const ItemAppBar = React.createClass({
         const {
             classes,
             supervisor,
+            params,
         } = this.props;
-        const {
-            type,
-            targetArray,
-            selectionValue
-        } = getLocalProperties(this.props);
-        const selectedItem = getSelectedItem(this.props, "code");
-        const itemIsNew = selectedItemIsNew(this.props, "code");
-        const defaultTitle = itemIsNew ? `New ${ type }` : `Edit ${ type }`;
-        const title = selectedItem.title || defaultTitle;
-        const isEditingTitle = (supervisor.isEditingTitle === selectedItem.code);
-        if (isEditingTitle) {
-            if (itemIsNew) {
-                return (
-                    <TextField
-                        className={classes.flex}
-                        fullWidth={ true }
-                        placeholder={ title }
-                        onChange={ this.handleTitleOnChange }
-                    />
-                )
-            } else {
-                return (
-                    <TextField
-                        className={classes.flex}
-                        fullWidth={ true }
-                        defaultValue={ title }
-                        onChange={ this.handleTitleOnChange }
-                    />
-                )
-            }
+        if (!params.topicId) {
+            return "Topics";
         } else {
-            return title;
+            const {
+                type,
+                targetArray,
+                selectionValue
+            } = getLocalProperties(this.props);
+            const selectedItem = getSelectedItem(this.props, "code");
+            const itemIsNew = selectedItemIsNew(this.props, "code");
+            const defaultTitle = itemIsNew ? `New ${ type }` : `Edit ${ type }`;
+            const title = selectedItem.title || defaultTitle;
+            const isEditingTitle = (supervisor.isEditingTitle === selectedItem.code);
+            if (isEditingTitle) {
+                if (itemIsNew) {
+                    return (
+                        <TextField
+                            className={classes.flex}
+                            fullWidth={ true }
+                            placeholder={ title }
+                            onChange={ this.handleTitleOnChange }
+                        />
+                    )
+                } else {
+                    return (
+                        <TextField
+                            className={classes.flex}
+                            fullWidth={ true }
+                            defaultValue={ title }
+                            onChange={ this.handleTitleOnChange }
+                        />
+                    )
+                }
+            } else {
+                return title;
+            }
         }
     },
     renderIconElementLeft() {
@@ -164,6 +179,7 @@ const ItemAppBar = React.createClass({
         const {
             classes,
             supervisor,
+            params,
         } = this.props;
         const toDelete = supervisor.toDelete || [];
         if (selectedItemIsNew(this.props, "code")) {
@@ -208,9 +224,9 @@ const ItemAppBar = React.createClass({
                 </span>
             );
         } else {
-            const { topicId } = this.props.params;
+            const { topicId } = params;
             const sessions = this.props.sessions[topicId] || [];
-            if (sessions.length > 0) {
+            if (!topicId || (sessions.length > 0)) {
                 return (
                     <div>
                         <IconButton
@@ -235,7 +251,7 @@ const ItemAppBar = React.createClass({
                             <MenuItem
                                 onClick={ this.handleOnRightIconButtonClick }
                             >
-                                Delete Sessions
+                                { topicId ? "Delete Sessions" : "Delete Topics" }
                             </MenuItem>
                         </Menu>
                     </div>
@@ -247,6 +263,7 @@ const ItemAppBar = React.createClass({
         const {
             classes,
             supervisor,
+            params,
         } = this.props;
         const selectedItem = getSelectedItem(this.props, "code");
         const isEditingTitle = (supervisor.isEditingTitle === selectedItem.code);
@@ -257,12 +274,14 @@ const ItemAppBar = React.createClass({
                     position="static"
                     color="primary">
                     <Toolbar>
-                        <IconButton
-                            onClick={ this.handleOnLeftIconButtonClick }
-                            className={classes.menuButton}
-                            color="inherit">
-                            { this.renderIconElementLeft() }
-                        </IconButton>
+                        { params.topicId && (
+                            <IconButton
+                                onClick={ this.handleOnLeftIconButtonClick }
+                                className={classes.menuButton}
+                                color="inherit">
+                                { this.renderIconElementLeft() }
+                            </IconButton>
+                        ) }
                         <Typography
                             onClick={ (e) => {
                                 if (!isEditingTitle) {

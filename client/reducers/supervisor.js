@@ -5,19 +5,39 @@ const postSupervisor = (state = {}, action) => {
         topicId,
         sessionId,
     } = action;
-    const sessionsForDeletion = state.toDelete || [];
+    const itemsForDeletion = state.toDelete || [];
+    let index, before, after;
+    let itemId;
     switch(action.type) {
         case "SELECT_SESSION_FOR_DELETION":
             return {
                 ...state,
-                toDelete: _.uniq(_.concat(sessionsForDeletion, [action.sessionId])),
+                toDelete: _.uniq(_.concat(itemsForDeletion, [action.sessionId])),
+            };
+        case "SELECT_TOPIC_FOR_DELETION":
+            return {
+                ...state,
+                toDelete: _.uniq(_.concat(itemsForDeletion, [action.topicId])),
             };
         case "DESELECT_SESSION_FOR_DELETION":
-            const index = _.findIndex(sessionsForDeletion, (item) => {
+            index = _.findIndex(itemsForDeletion, (item) => {
                 return (item === sessionId);
             });
-            const before = sessionsForDeletion.slice(0, index);   // before the one we are removing
-            const after = sessionsForDeletion.slice(index + 1);   // after the one we are removing
+            before = itemsForDeletion.slice(0, index);   // before the one we are removing
+            after = itemsForDeletion.slice(index + 1);   // after the one we are removing
+            return {
+                ...state,
+                toDelete: [
+                    ...before,
+                    ...after,
+                ],
+            };
+        case "DESELECT_TOPIC_FOR_DELETION":
+            index = _.findIndex(itemsForDeletion, (item) => {
+                return (item === topicId);
+            });
+            before = itemsForDeletion.slice(0, index);   // before the one we are removing
+            after = itemsForDeletion.slice(index + 1);   // after the one we are removing
             return {
                 ...state,
                 toDelete: [
@@ -30,7 +50,15 @@ const postSupervisor = (state = {}, action) => {
             return {
                 ...state,
                 selectAllForDeletion: true,
-                toDelete: _.uniq(_.concat(sessionsForDeletion, selectedSessions.map((session) => session.code))),
+                toDelete: _.uniq(_.concat(itemsForDeletion, selectedSessions.map((session) => session.code))),
+            };
+        
+        case "SELECT_ALL_TOPICS_FOR_DELETION":
+            const selectedTopics = action.topics;
+            return {
+                ...state,
+                selectAllForDeletion: true,
+                toDelete: _.uniq(_.concat(itemsForDeletion, action.topics.map((topic) => topic.code))),
             };
         case "CREATE_TOPIC":
             return {
@@ -47,6 +75,24 @@ const postSupervisor = (state = {}, action) => {
                     topicId: state.isNew.topicId,
                     sessionId
                 },
+            };
+        case "ADD_TOPIC":
+            return {
+                ...state,
+                isNew: {
+                    topicId: null,
+                    sessionId: state.isNew.sessionId
+                },
+                isEditingTitle: null,
+            };
+        case "ADD_SESSION":
+            return {
+                ...state,
+                isNew: {
+                    topicId: state.isNew.topicId,
+                    sessionId: null,
+                },
+                isEditingTitle: null,
             };
         case "EDIT_ITEM_TITLE":
             return {
@@ -83,24 +129,6 @@ const supervisor = (state = {}, action) => {
                 ...state,
                 selectAllForDeletion: false,
                 toDelete: [],
-            };
-        case "ADD_TOPIC":
-            return {
-                ...state,
-                isNew: {
-                    topicId: null,
-                    sessionId: state.isNew.sessionId
-                },
-                isEditingTitle: null,
-            };
-        case "ADD_SESSION":
-            return {
-                ...state,
-                isNew: {
-                    topicId: state.isNew.topicId,
-                    sessionId: null,
-                },
-                isEditingTitle: null,
             };
         case "REMOVE_TOPIC":
             return {

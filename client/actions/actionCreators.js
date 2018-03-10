@@ -39,6 +39,7 @@ export const createItem = (type, itemId, topicId) => {
 }
 
 export const addItem = (type, itemId, topicId) => {
+    console.log("type: ", type);
     switch(type) {
         case "topic":
             return {
@@ -97,6 +98,12 @@ export const displaySelectForDeletion = (option) => {
 
 export const selectAllForDeletion = (type, items, topicId) => {
     switch(type) {
+        case "topic":
+            return {
+                type: "SELECT_ALL_TOPICS_FOR_DELETION",
+                topics: items,
+                topicId: "1", // return a dummy topic id
+            }
         case "session":
             return {
                 type: "SELECT_ALL_SESSIONS_FOR_DELETION",

@@ -144,3 +144,13 @@ export const selectedItemIsNew = (props, selectionProperty) => {
     } = props.supervisor.isNew;
     return ((selectedItem[selectionProperty] === sessionId) || (selectedItem[selectionProperty] === topicId));
 }
+
+export const itemIsSelectedForDeletion = (items, itemId) => {
+    const index = _.findIndex(
+        items,
+        (currentItemId) => {
+            return (currentItemId === itemId);
+        },
+    );
+    return (index >= 0);
+}

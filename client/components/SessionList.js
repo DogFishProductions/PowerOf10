@@ -11,7 +11,12 @@ import TimerOffIcon from 'material-ui-icons/TimerOff';
 import orange from 'material-ui/colors/orange';
 import Slide from 'material-ui/transitions/Slide';
 
-import { momentToDatetimeString, durationToString, getTopicSessions } from "../helpers";
+import {
+    momentToDatetimeString, 
+    durationToString,
+    getTopicSessions,
+    itemIsSelectedForDeletion,
+} from "../helpers";
 
 const defaultTextStyle = {
     marginLeft: "16px",
@@ -34,26 +39,16 @@ const compareSession = (a, b) => {
 }
 
 const SessionList = React.createClass({
-    isSelectedForDeletion(session) {
-        const { supervisor } = this.props;
-        const index = _.findIndex(
-            supervisor.toDelete,
-            (sessionId) => {
-                const result = (sessionId === session.code);
-                return result;
-            },
-        );
-        return (index >= 0);
-    },
     handlePrimaryOnClick(e, session) {
         this.props.history.push(`/topic/${this.props.params.topicId}/session/${session.code}`);
     },
     handleCheckboxOnClick(e) {
         const target = e.target;
+        const type = "session";
         if (target.checked) {
-            this.props.selectForDeletion("session", target.value);
+            this.props.selectForDeletion(type, target.value);
         } else {
-            this.props.deselectForDeletion("session", target.value);
+            this.props.deselectForDeletion(type, target.value);
         }
     },
     handleTimerOffButtonOnClick(e, sessionId) {
@@ -101,7 +96,7 @@ const SessionList = React.createClass({
                     >
                         <ListItemIcon>
                             <Checkbox
-                                checked={ this.isSelectedForDeletion(session) }
+                                checked={ itemIsSelectedForDeletion(supervisor.toDelete, session.code) }
                                 onChange={ this.handleCheckboxOnClick }
                                 value={ session.code }
                             />
