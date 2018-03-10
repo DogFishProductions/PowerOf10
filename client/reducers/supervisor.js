@@ -7,34 +7,24 @@ const postSupervisor = (state = {}, action) => {
     } = action;
     const itemsForDeletion = state.toDelete || [];
     let index, before, after;
-    let itemId;
+    let itemId, selectedItems;
     switch(action.type) {
         case "SELECT_SESSION_FOR_DELETION":
-            return {
-                ...state,
-                toDelete: _.uniq(_.concat(itemsForDeletion, [action.sessionId])),
-            };
+            itemId = action.sessionId;
         case "SELECT_TOPIC_FOR_DELETION":
+            itemId = itemId || action.topicId;
             return {
                 ...state,
-                toDelete: _.uniq(_.concat(itemsForDeletion, [action.topicId])),
+                toDelete: _.uniq(_.concat(itemsForDeletion, [itemId])),
             };
+        case "REMOVE_SESSION":
         case "DESELECT_SESSION_FOR_DELETION":
-            index = _.findIndex(itemsForDeletion, (item) => {
-                return (item === sessionId);
-            });
-            before = itemsForDeletion.slice(0, index);   // before the one we are removing
-            after = itemsForDeletion.slice(index + 1);   // after the one we are removing
-            return {
-                ...state,
-                toDelete: [
-                    ...before,
-                    ...after,
-                ],
-            };
+            itemId = action.sessionId;
+        case "REMOVE_TOPIC":
         case "DESELECT_TOPIC_FOR_DELETION":
+            itemId = itemId || action.topicId;
             index = _.findIndex(itemsForDeletion, (item) => {
-                return (item === topicId);
+                return (item === itemId);
             });
             before = itemsForDeletion.slice(0, index);   // before the one we are removing
             after = itemsForDeletion.slice(index + 1);   // after the one we are removing
@@ -44,21 +34,18 @@ const postSupervisor = (state = {}, action) => {
                     ...before,
                     ...after,
                 ],
+                isEditingTitle: null,
             };
         case "SELECT_ALL_SESSIONS_FOR_DELETION":
-            const selectedSessions = action.sessions[action.topicId];
-            return {
-                ...state,
-                selectAllForDeletion: true,
-                toDelete: _.uniq(_.concat(itemsForDeletion, selectedSessions.map((session) => session.code))),
-            };
-        
+            itemId = action.sessionId;
+            selectedItems = action.sessions[action.topicId];
         case "SELECT_ALL_TOPICS_FOR_DELETION":
-            const selectedTopics = action.topics;
+            itemId = itemId || action.topicId;
+            selectedItems = selectedItems || action.topics;
             return {
                 ...state,
                 selectAllForDeletion: true,
-                toDelete: _.uniq(_.concat(itemsForDeletion, action.topics.map((topic) => topic.code))),
+                toDelete: _.uniq(_.concat(itemsForDeletion, selectedItems.map((item) => item.code))),
             };
         case "CREATE_TOPIC":
             return {
@@ -130,11 +117,6 @@ const supervisor = (state = {}, action) => {
                 selectAllForDeletion: false,
                 toDelete: [],
             };
-        case "REMOVE_TOPIC":
-            return {
-                ...state,
-                isEditingTitle: null,
-            }
         case "EDIT_ITEM_TITLE":
             return {
                 ...state,

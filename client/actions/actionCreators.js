@@ -39,7 +39,6 @@ export const createItem = (type, itemId, topicId) => {
 }
 
 export const addItem = (type, itemId, topicId) => {
-    console.log("type: ", type);
     switch(type) {
         case "topic":
             return {

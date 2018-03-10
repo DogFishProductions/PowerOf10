@@ -34,13 +34,22 @@ const styles = {
 
 const ItemAppBar = React.createClass({
     componentWillUnmount() {
-        this.props.deleteRequested(false);
-        this.props.displaySelectForDeletion(false);
+        const {
+            deleteRequested,
+            displaySelectForDeletion
+        } = this.props;
+        deleteRequested(false);
+        displaySelectForDeletion(false);
     },
     redirectHome() {
-        this.props.history.goBack();
-        this.props.deleteRequested(false);
-        this.props.displaySelectForDeletion(false);
+        const {
+            history,
+            deleteRequested,
+            displaySelectForDeletion
+        } = this.props;
+        history.goBack();
+        deleteRequested(false);
+        displaySelectForDeletion(false);
     },
     manageItemsMarkedForDeletion(manager) {
         const {
@@ -54,47 +63,53 @@ const ItemAppBar = React.createClass({
         toDelete.map(manager);
     },
     handleOnTitleClick(e) {
+        const props = this.props;
         const {
             topicId,
             sessionId,
-        } = this.props.params;
+        } = props.params;
         if (topicId && !sessionId) {
-            this.props.editItemTitle(true, topicId);
+            props.editItemTitle(true, topicId);
         }
     },
     handleOnLeftIconButtonClick(e) {
-        const selectedItem = getSelectedItem(this.props, "code");
-        if (selectedItemIsNew(this.props, "code")) {
-            dispatchAction(this.props, "removeItem");
+        const props = this.props;
+        const selectedItem = getSelectedItem(props, "code");
+        if (selectedItemIsNew(props, "code")) {
+            dispatchAction(props, "removeItem");
         }
-        this.props.editItemTitle(false);
+        props.editItemTitle(false);
         this.redirectHome();
     },
     handleOnRightIconButtonClick(e) {
-        const selectedItem = getSelectedItem(this.props, "code");
-        if (selectedItemIsNew(this.props, "code")) {
-            dispatchAction(this.props, "addItem");
+        const props = this.props;
+        const {
+            openMenu,
+            deleteRequested,
+            displaySelectForDeletion,
+        } = props;
+        const selectedItem = getSelectedItem(props, "code");
+        if (selectedItemIsNew(props, "code")) {
+            dispatchAction(props, "addItem");
             this.redirectHome();
         } else {
-            this.props.deleteRequested(true);
-            this.props.displaySelectForDeletion(true);
-            this.props.openMenu(false);
+            deleteRequested(true);
+            displaySelectForDeletion(true);
+            openMenu(false);
         }
-        this.props.editItemTitle(false);
+        props.editItemTitle(false);
     },
     handleOnRightCancelButtonClick(e) {
         const {
-            deselectForDeletion,
-            params,
+            deselectAllForDeletion,
+            deleteRequested,
+            displaySelectForDeletion,
+            openMenu,
         } = this.props;
-        this.manageItemsMarkedForDeletion((itemId) => {
-            let type = "topic";
-            if (params.topicId) {
-                type = "session";
-            }
-            // don't use handler dispatchAction as session id is not in URL
-            deselectForDeletion(type, itemId);
-        })
+        displaySelectForDeletion(false);
+        deleteRequested(false);
+        deselectAllForDeletion();
+        openMenu(false);
     },
     handleOnRightDeleteButtonClick(e) {
         const {
@@ -121,11 +136,12 @@ const ItemAppBar = React.createClass({
         dispatchAction(this.props, "updateItemProperty", "title", e.target.value);
     },
     renderTitle() {
+        const props = this.props;
         const {
             classes,
             supervisor,
             params,
-        } = this.props;
+        } = props;
         if (!params.topicId) {
             return "Topics";
         } else {
@@ -133,9 +149,9 @@ const ItemAppBar = React.createClass({
                 type,
                 targetArray,
                 selectionValue
-            } = getLocalProperties(this.props);
-            const selectedItem = getSelectedItem(this.props, "code");
-            const itemIsNew = selectedItemIsNew(this.props, "code");
+            } = getLocalProperties(props);
+            const selectedItem = getSelectedItem(props, "code");
+            const itemIsNew = selectedItemIsNew(props, "code");
             const defaultTitle = itemIsNew ? `New ${ type }` : `Edit ${ type }`;
             const title = selectedItem.title || defaultTitle;
             const isEditingTitle = (supervisor.isEditingTitle === selectedItem.code);
@@ -176,13 +192,14 @@ const ItemAppBar = React.createClass({
         }
     },
     renderIconElementRight() {
+        const props = this.props;
         const {
             classes,
             supervisor,
             params,
-        } = this.props;
+        } = props;
         const toDelete = supervisor.toDelete || [];
-        if (selectedItemIsNew(this.props, "code")) {
+        if (selectedItemIsNew(props, "code")) {
             return (
                 <IconButton
                     className={classes.menuButton}
@@ -220,13 +237,16 @@ const ItemAppBar = React.createClass({
                             Delete
                         </Typography>
                     </IconButton>
-                    <TopDrawer { ...this.props } />
+                    <TopDrawer { ...props } />
                 </span>
             );
         } else {
-            const { topicId } = params;
+            const {
+                topicId,
+                sessionId,
+            } = params;
             const sessions = this.props.sessions[topicId] || [];
-            if (!topicId || (sessions.length > 0)) {
+            if (!topicId || (!sessionId && (sessions.length > 0))) {
                 return (
                     <div>
                         <IconButton
@@ -247,6 +267,7 @@ const ItemAppBar = React.createClass({
                                 horizontal: 'right',
                             }}
                             open={ Boolean(supervisor.menuAnchor) }
+                            onClose={ this.handleOnRightCancelButtonClick }
                             >
                             <MenuItem
                                 onClick={ this.handleOnRightIconButtonClick }
@@ -260,12 +281,13 @@ const ItemAppBar = React.createClass({
         }
     },
     renderAppBar() {
+        const props = this.props;
         const {
             classes,
             supervisor,
             params,
-        } = this.props;
-        const selectedItem = getSelectedItem(this.props, "code");
+        } = props;
+        const selectedItem = getSelectedItem(props, "code");
         const isEditingTitle = (supervisor.isEditingTitle === selectedItem.code);
         return (
             <div
