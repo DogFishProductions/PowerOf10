@@ -11,6 +11,8 @@ import CloseIcon from 'material-ui-icons/Close';
 import ArrowBackIcon from 'material-ui-icons/ArrowBack';
 import MoreVertIcon from 'material-ui-icons/MoreVert';
 import Menu, { MenuItem } from 'material-ui/Menu';
+import Dialog, { DialogActions, DialogTitle } from 'material-ui/Dialog';
+import Button from 'material-ui/Button';
 
 import {
     dispatchAction,
@@ -112,10 +114,15 @@ const ItemAppBar = React.createClass({
         openMenu(false);
     },
     handleOnRightDeleteButtonClick(e) {
+        this.props.openDialog(true);
+    },
+    handleDeleteConfirmedOnClick(e) {
         const {
             removeItem,
             params,
+            openDialog,
         } = this.props;
+        openDialog(false);
         const topicId = params.topicId;
         this.manageItemsMarkedForDeletion((itemId) => {
             if (topicId) {
@@ -127,7 +134,10 @@ const ItemAppBar = React.createClass({
                 // don't use handler dispatchAction as session id is not in URL
                 removeItem("topic", itemId);
             }
-        })
+        });
+    },
+    handleCancelConfirmedOnClick(e) {
+        this.props.openDialog(false);
     },
     handleMenuButtonOnClick(e) {
         this.props.openMenu(true, e.currentTarget);
@@ -286,6 +296,7 @@ const ItemAppBar = React.createClass({
             classes,
             supervisor,
             params,
+            openDialog,
         } = props;
         const selectedItem = getSelectedItem(props, "code");
         const isEditingTitle = (supervisor.isEditingTitle === selectedItem.code);
@@ -318,6 +329,28 @@ const ItemAppBar = React.createClass({
                         { this.renderIconElementRight() }
                     </Toolbar>
                 </AppBar>
+                <Dialog
+                    disableBackdropClick
+                    disableEscapeKeyDown
+                    maxWidth="xs"
+                    open={ supervisor.openDialog }
+                >
+                    <DialogTitle>Confirm Delete</DialogTitle>
+                    <DialogActions>
+                        <Button
+                            onClick={ this.handleCancelConfirmedOnClick }
+                            color="primary"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={ this.handleDeleteConfirmedOnClick }
+                            color="primary"
+                        >
+                            Ok
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </div>
         );
     },

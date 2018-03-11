@@ -169,3 +169,10 @@ export const openMenu = (option, anchor) => {
         anchor,
     }
 }
+
+export const openDialog = (option) => {
+    return {
+        type: "OPEN_DIALOG",
+        option,
+    }
+}

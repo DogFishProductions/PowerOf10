@@ -127,6 +127,11 @@ const supervisor = (state = {}, action) => {
                 ...state,
                 menuAnchor: action.option ? action.anchor : null,
             }
+        case "OPEN_DIALOG":
+            return {
+                ...state,
+                openDialog: action.option,
+            }
         default:
             return state;
     }

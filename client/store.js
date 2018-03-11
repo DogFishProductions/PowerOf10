@@ -10,9 +10,15 @@ const defaultState = {
     sessions,
     topics,
     supervisor: {
+        bottomNavSelectedIndex: 0,
         deleteRequested: false,
+        displaySelectForDeletion: false,
+        selectAllForDeletion: false,
         toDelete: [],
         isNew: { topicId: null, sessionId: null },
+        isEditingTitle: null,
+        menuAnchor: null,
+        openDialog: false,
     }
 };
 
