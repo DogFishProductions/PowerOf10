@@ -15,6 +15,7 @@ import Slide from 'material-ui/transitions/Slide';
 import Checkbox from 'material-ui/Checkbox';
 
 import {
+    randomString,
     durationToString,
     itemIsSelectedForDeletion,
 } from "../helpers";
@@ -33,6 +34,20 @@ const styles = {
 };
 
 const TopicList = React.createClass({
+    getNewSessionId(topicId) {
+        const sessionId = randomString(10, "aA#!");
+        const start = Date.now();
+        // don't use handler dispatchAction as session id is not in URL yet
+        this.props.createItem("session", sessionId, topicId);
+        return {
+            sessionId,
+            topicId,
+        };
+    },
+    getRunningSessionIndex(topicId) {
+        const sessions = this.props.sessions[topicId] || [];
+        return _.findIndex(sessions, (s) => s.isRunning);
+    },
     handlePrimaryOnClick(e, topic) {
         this.props.history.push(`/topic/${topic.code}`);
     },
@@ -45,19 +60,45 @@ const TopicList = React.createClass({
             this.props.deselectForDeletion(type, target.value);
         }
     },
-    renderTimerOffButton() {
-        return (
-            <IconButton>
-                <TimerOffIcon
-                    style={ styles.icon }
-                />
-            </IconButton>
-        )
+    handleTimerButtonOnClick(e, topic) {
+        const topicId = topic.code;
+        const runningSessionIndex = this.getRunningSessionIndex(topicId);
+        const props = this.props;
+        if (runningSessionIndex >= 0) {   
+            const runningSession = props.sessions[topicId][runningSessionIndex];
+            const sessionId = runningSession.code;
+            // don't use handler dispatchAction as session id is not in URL
+            props.updateItemProperty("session", sessionId, "isRunning", false, topicId);
+            props.addItem("session", sessionId);
+        } else { 
+            const {
+                sessionId,
+            } = this.getNewSessionId(topicId);
+            // don't use handler dispatchAction as session id is not in URL
+            props.updateItemProperty("session", sessionId, "isRunning", true, topicId);
+            props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
+        }
     },
-    renderTimerButton(enabled) {
+    renderTimerButton(topic) {
+        const {
+            supervisor,
+        } = this.props;
+        const runningSessionIndex = this.getRunningSessionIndex(topic.code);
+        if (runningSessionIndex >= 0) {
+            return (
+                <IconButton
+                    onClick={ (e) => this.handleTimerButtonOnClick(e, topic) }
+                >
+                    <TimerOffIcon
+                        style={ styles.icon }
+                    />
+                </IconButton>
+            )
+        }
         return (
             <IconButton
-                disabled={ !enabled }
+                disabled={ supervisor.sessionIsRunning }
+                onClick={ (e) => this.handleTimerButtonOnClick(e, topic) }
             >
                 <TimerIcon
                     style={ styles.icon }
@@ -73,6 +114,8 @@ const TopicList = React.createClass({
                     <Slide
                         direction="right"
                         in={ supervisor.displaySelectForDeletion }
+                        mountOnEnter
+                        unmountOnExit={ true }
                     >
                         <ListItemIcon>
                             <Checkbox
@@ -93,7 +136,7 @@ const TopicList = React.createClass({
                         secondary={ _.truncate(topic.description, { length: 100 }) }
                     />
                     <ListItemSecondaryAction>
-                        { this.renderTimerButton(false) }
+                        { this.renderTimerButton(topic) }
                     </ListItemSecondaryAction>
                 </ListItem>
                 <Divider />

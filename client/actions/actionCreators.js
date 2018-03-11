@@ -176,3 +176,10 @@ export const openDialog = (option) => {
         option,
     }
 }
+
+export const sessionIsRunning = (option) => {
+    return {
+        type: "SESSION_IS_RUNNING",
+        option,
+    }
+}

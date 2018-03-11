@@ -93,6 +93,8 @@ const SessionList = React.createClass({
                     <Slide
                         direction="right"
                         in={ supervisor.displaySelectForDeletion }
+                        mountOnEnter
+                        unmountOnExit={ true }
                     >
                         <ListItemIcon>
                             <Checkbox

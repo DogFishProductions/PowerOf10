@@ -68,21 +68,22 @@ const TopicPage = React.createClass({
     },
     handleStartSessionOnClick(e) {
         const runningSessionIndex = this.getRunningSessionIndex();
+        const props = this.props;
         if (runningSessionIndex >= 0) {   
-            const { topicId } = this.props.params;
-            const runningSession = this.props.sessions[topicId][runningSessionIndex];
+            const { topicId } = props.params;
+            const runningSession = props.sessions[topicId][runningSessionIndex];
             const sessionId = runningSession.code;
             // don't use handler dispatchAction as session id is not in URL
-            this.props.updateItemProperty("session", sessionId, "isRunning", false, topicId);
-            this.props.addItem("session", sessionId, topicId);
+            props.updateItemProperty("session", sessionId, "isRunning", false, topicId);
+            props.addItem("session", sessionId);
         } else {
             const {
                 sessionId,
                 topicId,
             } = this.getNewSessionId();
             // don't use handler dispatchAction as session id is not in URL
-            this.props.updateItemProperty("session", sessionId, "isRunning", true, topicId);
-            this.props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
+            props.updateItemProperty("session", sessionId, "isRunning", true, topicId);
+            props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
         }
     },
     handleAddSessionOnClick(e) {

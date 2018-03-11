@@ -81,6 +81,14 @@ const postSupervisor = (state = {}, action) => {
                 },
                 isEditingTitle: null,
             };
+        case "UPDATE_SESSION":
+            if (action.propName === "isRunning") {
+                return {
+                    ...state,
+                    sessionIsRunning: action.newValue,
+                }
+            }
+            return state;
         case "EDIT_ITEM_TITLE":
             return {
                 ...state,

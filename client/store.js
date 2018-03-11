@@ -19,6 +19,7 @@ const defaultState = {
         isEditingTitle: null,
         menuAnchor: null,
         openDialog: false,
+        sessionIsRunning: false,
     }
 };
 
