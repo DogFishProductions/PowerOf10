@@ -34,7 +34,10 @@ import {
     dispatchAction,
     durationToString,
     getTopicSessions,
-    randomString
+    randomString,
+    getNewSessionId,
+    getRunningSessionIndex,
+    handleStartSessionOnClick,
 } from "../helpers";
 import ItemAppBar from "./ItemAppBar";
 import ItemBottomNavigation from "./ItemBottomNavigation";
@@ -50,48 +53,13 @@ const TopicPage = React.createClass({
     getSelectedTopic() {
         return getSelectedItem(this.props, "code") || { code: 0 };
     },
-    getNewSessionId() {
-        const sessionId = randomString(10, "aA#!");
-        const { topicId } = this.props.params;
-        const start = Date.now();
-        // don't use handler dispatchAction as session id is not in URL yet
-        this.props.createItem("session", sessionId, topicId);
-        return {
-            sessionId,
-            topicId,
-        };
-    },
-    getRunningSessionIndex() {
-        const { topicId } = this.props.params;
-        const sessions = this.props.sessions[topicId] || [];
-        return _.findIndex(sessions, (s) => s.isRunning);
-    },
-    handleStartSessionOnClick(e) {
-        const runningSessionIndex = this.getRunningSessionIndex();
-        const props = this.props;
-        if (runningSessionIndex >= 0) {   
-            const { topicId } = props.params;
-            const runningSession = props.sessions[topicId][runningSessionIndex];
-            const sessionId = runningSession.code;
-            // don't use handler dispatchAction as session id is not in URL
-            props.updateItemProperty("session", sessionId, "isRunning", false, topicId);
-            props.addItem("session", sessionId);
-        } else {
-            const {
-                sessionId,
-                topicId,
-            } = this.getNewSessionId();
-            // don't use handler dispatchAction as session id is not in URL
-            props.updateItemProperty("session", sessionId, "isRunning", true, topicId);
-            props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
-        }
-    },
     handleAddSessionOnClick(e) {
+        const props = this.props;
         const {
             sessionId,
             topicId,
-        } = this.getNewSessionId();
-        this.props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
+        } = getNewSessionId(props);
+        props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
     },
     handleDivOnClick(e) {
         this.props.editItemTitle(false);
@@ -149,7 +117,7 @@ const TopicPage = React.createClass({
         }
     },
     renderStartSessionIcon() {
-        const runningSessionIndex = this.getRunningSessionIndex();
+        const runningSessionIndex = getRunningSessionIndex(this.props);
         if (runningSessionIndex >= 0) {
             if (!calcCurrentDuration) {    
                 const { topicId } = this.props.params;
@@ -169,9 +137,10 @@ const TopicPage = React.createClass({
         return (<TimerIcon />);
     },
     render() {
+        const props = this.props;
         return (
             <div className="pseudo-phone-main outer">
-                <ItemAppBar { ...this.props } />
+                <ItemAppBar { ...props } />
                 <div className="pseudo-phone-list-no-scroll inner" onClick={ this.handleDivOnClick }>
                     { this.renderDetailView() }
                 </div>
@@ -190,12 +159,12 @@ const TopicPage = React.createClass({
                             variant="fab"
                             color="primary"
                             style={ { top: "-56px" } }
-                            onClick={ this.handleStartSessionOnClick }>
+                            onClick={ (e) => handleStartSessionOnClick(e, props) }>
                             { this.renderStartSessionIcon() }
                         </Button>
                     </div>
                     <div className="bottom-nav" onClick={ this.handleDivOnClick }>
-                        <ItemBottomNavigation { ...this.props } />
+                        <ItemBottomNavigation { ...props } />
                     </div>
                 </div>
             </div>

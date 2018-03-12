@@ -19,7 +19,7 @@ const defaultState = {
         isEditingTitle: null,
         menuAnchor: null,
         openDialog: false,
-        sessionIsRunning: false,
+        isRunning: { topicId: null, sessionId: null },
     }
 };
 

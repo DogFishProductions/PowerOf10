@@ -18,6 +18,9 @@ import {
     randomString,
     durationToString,
     itemIsSelectedForDeletion,
+    getNewSessionId,
+    getRunningSessionIndex,
+    handleStartSessionOnClick,
 } from "../helpers";
 
 const styles = {
@@ -34,20 +37,6 @@ const styles = {
 };
 
 const TopicList = React.createClass({
-    getNewSessionId(topicId) {
-        const sessionId = randomString(10, "aA#!");
-        const start = Date.now();
-        // don't use handler dispatchAction as session id is not in URL yet
-        this.props.createItem("session", sessionId, topicId);
-        return {
-            sessionId,
-            topicId,
-        };
-    },
-    getRunningSessionIndex(topicId) {
-        const sessions = this.props.sessions[topicId] || [];
-        return _.findIndex(sessions, (s) => s.isRunning);
-    },
     handlePrimaryOnClick(e, topic) {
         this.props.history.push(`/topic/${topic.code}`);
     },
@@ -60,49 +49,21 @@ const TopicList = React.createClass({
             this.props.deselectForDeletion(type, target.value);
         }
     },
-    handleTimerButtonOnClick(e, topic) {
-        const topicId = topic.code;
-        const runningSessionIndex = this.getRunningSessionIndex(topicId);
-        const props = this.props;
-        if (runningSessionIndex >= 0) {   
-            const runningSession = props.sessions[topicId][runningSessionIndex];
-            const sessionId = runningSession.code;
-            // don't use handler dispatchAction as session id is not in URL
-            props.updateItemProperty("session", sessionId, "isRunning", false, topicId);
-            props.addItem("session", sessionId);
-        } else { 
-            const {
-                sessionId,
-            } = this.getNewSessionId(topicId);
-            // don't use handler dispatchAction as session id is not in URL
-            props.updateItemProperty("session", sessionId, "isRunning", true, topicId);
-            props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
-        }
-    },
     renderTimerButton(topic) {
-        const {
-            supervisor,
-        } = this.props;
-        const runningSessionIndex = this.getRunningSessionIndex(topic.code);
-        if (runningSessionIndex >= 0) {
-            return (
-                <IconButton
-                    onClick={ (e) => this.handleTimerButtonOnClick(e, topic) }
-                >
-                    <TimerOffIcon
-                        style={ styles.icon }
-                    />
-                </IconButton>
-            )
-        }
+        const props = this.props;
+        const runningSessionIndex = getRunningSessionIndex(props, topic.code);
         return (
             <IconButton
-                disabled={ supervisor.sessionIsRunning }
-                onClick={ (e) => this.handleTimerButtonOnClick(e, topic) }
+                onClick={ (e) => handleStartSessionOnClick(e, props, topic.code) }
             >
-                <TimerIcon
-                    style={ styles.icon }
-                />
+                { (runningSessionIndex >= 0) ?
+                    ( <TimerOffIcon
+                        style={ styles.icon }
+                    /> ) :
+                    (<TimerIcon
+                        style={ styles.icon }
+                    />)
+                }
             </IconButton>
         )
     },

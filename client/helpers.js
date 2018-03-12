@@ -154,3 +154,50 @@ export const itemIsSelectedForDeletion = (items, itemId) => {
     );
     return (index >= 0);
 }
+
+export const getNewSessionId = (props, topicId) => {
+    const sessionId = randomString(10, "aA#!");
+    topicId = props.params.topicId || topicId;
+    const start = Date.now();
+    // don't use handler dispatchAction as session id is not in URL yet
+    props.createItem("session", sessionId, topicId);
+    return {
+        sessionId,
+        topicId,
+    };
+}
+
+export const getRunningSessionIndex = (props, topicId) => {
+    topicId = props.params.topicId || topicId;
+    const sessions = props.sessions[topicId] || [];
+    return _.findIndex(sessions, (s) => s.isRunning);
+}
+
+export const handleStartSessionOnClick = (event, props, topicId) => {
+    topicId = props.params.topicId || topicId;
+    const runningSessionIndex = getRunningSessionIndex(props, topicId);
+    if (runningSessionIndex >= 0) {
+        const runningSession = props.sessions[topicId][runningSessionIndex];
+        const sessionId = runningSession.code;
+        // don't use handler dispatchAction as session id is not in URL
+        props.updateItemProperty("session", sessionId, "isRunning", false, topicId);
+        props.addItem("session", sessionId);
+    } else { 
+        const {
+            supervisor,
+        } = props;
+        const isRunning = supervisor.isRunning;
+        // stop currently running session if one exists
+        if (isRunning.topicId) {
+            props.updateItemProperty("session", isRunning.sessionId, "isRunning", false, isRunning.topicId);
+            props.addItem("session", isRunning.sessionId);
+        }
+        // create a new session once the old one has been stopped (otherwise supervisor.isNew will be set to null)
+        const {
+            sessionId,
+        } = getNewSessionId(props, topicId);
+        // don't use handler dispatchAction as session id is not in URL
+        props.updateItemProperty("session", sessionId, "isRunning", true, topicId);
+        props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
+    }
+}

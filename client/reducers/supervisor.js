@@ -83,9 +83,22 @@ const postSupervisor = (state = {}, action) => {
             };
         case "UPDATE_SESSION":
             if (action.propName === "isRunning") {
-                return {
-                    ...state,
-                    sessionIsRunning: action.newValue,
+                if (action.newValue) {
+                    return {
+                        ...state,
+                        isRunning: {
+                            topicId,
+                            sessionId,
+                        },
+                    }
+                } else {
+                    return {
+                        ...state,
+                        isRunning: {
+                            topicId: null,
+                            sessionId: null,
+                        },
+                    }
                 }
             }
             return state;
