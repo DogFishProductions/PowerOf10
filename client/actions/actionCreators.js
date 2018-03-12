@@ -183,3 +183,17 @@ export const sessionIsRunning = (option) => {
         option,
     }
 }
+
+export const setAuthorisedUserId = (uid) => {
+    return {
+        type: "SET_AUTHORISED_USER_ID",
+        uid,
+    }
+}
+
+export const showProgress = (option) =>{
+    return {
+        type: "SHOW_PROGRESS",
+        option,
+    }
+}
