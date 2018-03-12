@@ -62,6 +62,15 @@ const sessions = (state = [], action) => {
           [action.topicId]: postSession(state[action.topicId], action)
         }
     }
+    switch(action.type) {
+        case "REMOVE_TOPIC":
+            return {
+                ...state,
+                [action.topicId]: [],
+            }
+        default:
+            return state;
+    }
     return state;
 }
 
