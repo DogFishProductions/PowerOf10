@@ -1,11 +1,9 @@
 import React from "react";
 
-const TargetPage = React.createClass({
+export default class TargetPage extends React.Component {
     render() {
         return (
             <h1>target</h1>
         );
     }
-});
-
-export default TargetPage;
+};

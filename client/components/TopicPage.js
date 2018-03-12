@@ -45,104 +45,108 @@ import SessionList from "./SessionList";
 import TargetPage from "./TargetPage";
 import NotesPage from "./NotesPage";
 
-const TopicPage = React.createClass({
+export default class TopicPage extends React.Component {
     componentWillUnmount() {
         clearInterval(calcCurrentDuration);
         calcCurrentDuration = null;
-    },
-    getSelectedTopic() {
-        return getSelectedItem(this.props, "code") || { code: 0 };
-    },
-    handleAddSessionOnClick(e) {
-        const props = this.props;
-        const {
-            sessionId,
-            topicId,
-        } = getNewSessionId(props);
-        props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
-    },
-    handleDivOnClick(e) {
-        this.props.editItemTitle(false);
-    },
-    renderDetailView() {
-        const selectedIndex = getBottomNavSelectedIndex(this.props);
-        const defaultSessionListText = (this.props.supervisor.isNew === this.getSelectedTopic().code) ? "Save topic to start recording sessions" : "Start recording sessions";
-        switch(selectedIndex) {
-            case 0:
-                return (
-                    <div>
-                        <Grid
-                            container
-                            spacing={ 24 }
-                            style={ gridStyle }
-                        >
-                            <Grid item xs>
-                                <TextField
-                                    label="Total Time Spent"
-                                    disabled={ true }
-                                    fullWidth={ true }
-                                    value={ durationToString(getTopicSessions(this.props), "long") }
-                                />
-                            </Grid>
-                        </Grid>
-                        <Grid
-                            container
-                            spacing={ 24 }
-                            style={ bottomGridStyle }
-                        >
-                            <Grid item xs>
-                                <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
-                            </Grid>
-                        </Grid>
-                    </div>
-                );
-            case 1:
-                return (
-                    <div>
-                        <TargetPage { ...this.props }/>
-                    </div>
-                );
-            case 2:
-                return (
-                    <div>
-                        <NotesPage { ...this.props }/>
-                    </div>
-                );
-            default:
-                return (
-                    <div>
-                        <SessionList { ...this.props } defaultText={ defaultSessionListText }/>
-                    </div>
-                );
-        }
-    },
-    renderStartSessionIcon() {
-        const runningSessionIndex = getRunningSessionIndex(this.props);
-        if (runningSessionIndex >= 0) {
-            if (!calcCurrentDuration) {    
-                const { topicId } = this.props.params;
-                const runningSession = this.props.sessions[topicId][runningSessionIndex];
-                calcCurrentDuration = setInterval(
-                    () => {
-                        // don't use handler dispatchAction as session id is not in URL
-                        this.props.updateItemProperty("session", runningSession.code, "to", Date.now(), topicId);
-                    },
-                    900,
-                );
-            }
-            return (<TimerOffIcon />);
-        }
-        clearInterval(calcCurrentDuration);
-        calcCurrentDuration = null;
-        return (<TimerIcon />);
-    },
+    }
     render() {
         const props = this.props;
+        const {
+            supervisor,
+            history,
+            editItemTitle,
+        } = props;
+        const getSelectedTopic = () => {
+            return getSelectedItem(props, "code") || { code: 0 };
+        }
+        const handleAddSessionOnClick = (e) => {
+            const {
+                sessionId,
+                topicId,
+            } = getNewSessionId(props);
+            history.push(`/topic/${ topicId }/session/${ sessionId }`);
+        }
+        const handleDivOnClick = (e) => {
+            editItemTitle(false);
+        }
+        const renderDetailView = () => {
+            const selectedIndex = getBottomNavSelectedIndex(props);
+            const defaultSessionListText = (supervisor.isNew === getSelectedTopic().code) ? "Save topic to start recording sessions" : "Start recording sessions";
+            switch(selectedIndex) {
+                case 0:
+                    return (
+                        <div>
+                            <Grid
+                                container
+                                spacing={ 24 }
+                                style={ gridStyle }
+                            >
+                                <Grid item xs>
+                                    <TextField
+                                        label="Total Time Spent"
+                                        disabled={ true }
+                                        fullWidth={ true }
+                                        value={ durationToString(getTopicSessions(props), "long") }
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Grid
+                                container
+                                spacing={ 24 }
+                                style={ bottomGridStyle }
+                            >
+                                <Grid item xs>
+                                    <SessionList { ...props } defaultText={ defaultSessionListText }/>
+                                </Grid>
+                            </Grid>
+                        </div>
+                    );
+                case 1:
+                    return (
+                        <div>
+                            <TargetPage { ...props }/>
+                        </div>
+                    );
+                case 2:
+                    return (
+                        <div>
+                            <NotesPage { ...props }/>
+                        </div>
+                    );
+                default:
+                    return (
+                        <div>
+                            <SessionList { ...props } defaultText={ defaultSessionListText }/>
+                        </div>
+                    );
+            }
+        }
+        const renderStartSessionIcon = () => {
+            const runningSessionIndex = getRunningSessionIndex(props);
+            if (runningSessionIndex >= 0) {
+                if (!calcCurrentDuration) {    
+                    const { topicId } = props.params;
+                    const runningSession = props.sessions[topicId][runningSessionIndex];
+                    calcCurrentDuration = setInterval(
+                        () => {
+                            // don't use handler dispatchAction as session id is not in URL
+                            props.updateItemProperty("session", runningSession.code, "to", Date.now(), topicId);
+                        },
+                        900,
+                    );
+                }
+                return (<TimerOffIcon />);
+            }
+            clearInterval(calcCurrentDuration);
+            calcCurrentDuration = null;
+            return (<TimerIcon />);
+        }
         return (
             <div className="pseudo-phone-main outer">
                 <ItemAppBar { ...props } />
-                <div className="pseudo-phone-list-no-scroll inner" onClick={ this.handleDivOnClick }>
-                    { this.renderDetailView() }
+                <div className="pseudo-phone-list-no-scroll inner" onClick={ handleDivOnClick }>
+                    { renderDetailView() }
                 </div>
                 <div className="inner">
                     <div className="floating-button-bottom-right">
@@ -150,7 +154,7 @@ const TopicPage = React.createClass({
                             variant="fab"
                             color="primary"
                             style={ { top: "-128px" } }
-                            onClick={ this.handleAddSessionOnClick }>
+                            onClick={ handleAddSessionOnClick }>
                             <AddIcon />
                         </Button>
                     </div>
@@ -160,16 +164,14 @@ const TopicPage = React.createClass({
                             color="primary"
                             style={ { top: "-56px" } }
                             onClick={ (e) => handleStartSessionOnClick(e, props) }>
-                            { this.renderStartSessionIcon() }
+                            { renderStartSessionIcon() }
                         </Button>
                     </div>
-                    <div className="bottom-nav" onClick={ this.handleDivOnClick }>
+                    <div className="bottom-nav" onClick={ handleDivOnClick }>
                         <ItemBottomNavigation { ...props } />
                     </div>
                 </div>
             </div>
         )
     }
-});
-
-export default TopicPage;
+};

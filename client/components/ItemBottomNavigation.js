@@ -15,45 +15,49 @@ const styles = theme => ({
     }
 });
 
-const ItemBottomNavigation = React.createClass ({
-    selectIndex(e, i) {
-        this.props.selectBottomNavIndex(i);
-    },
-    renderLeftIcon() {
+class ItemBottomNavigation extends React.Component {
+    render() {
+        const props = this.props;
+        const {
+            classes,
+            params,
+        } = props;
         const {
             topicId,
             sessionId
-        } = this.props.params;
-        if (topicId && !sessionId) {
-            return (
-                <BottomNavigationAction
-                    label="Sessions"
-                    icon={ <ListIcon /> }
-                />
-            );
-        } else {
-            return (
-                <BottomNavigationAction
-                    label="Duration"
-                    icon={ <TimelapseIcon /> }
-                />
-            );
+        } = params;
+        const selectIndex = (e, i) => {
+            props.selectBottomNavIndex(i);
         }
-    },
-    render() {
-        const { classes } = this.props;
-        const selectedIndex = helpers.getBottomNavSelectedIndex(this.props);
+        const renderLeftIcon = () => {
+            if (topicId && !sessionId) {
+                return (
+                    <BottomNavigationAction
+                        label="Sessions"
+                        icon={ <ListIcon /> }
+                    />
+                );
+            } else {
+                return (
+                    <BottomNavigationAction
+                        label="Duration"
+                        icon={ <TimelapseIcon /> }
+                    />
+                );
+            }
+        }
+        const selectedIndex = helpers.getBottomNavSelectedIndex(props);
         return (
             <BottomNavigation
                 value={ selectedIndex }
-                onChange={ this.selectIndex }
+                onChange={ selectIndex }
                 showLabels
                 className={ classes.root }>
-                { this.renderLeftIcon() }
+                { renderLeftIcon() }
                 <BottomNavigationAction
                     disabled={ true }
                     label="Target"
-                    icon={ <DataUsageIcon /> }
+                    icon={ <DataUsageIcon color="disabled" /> }
                 />
                 <BottomNavigationAction
                     label="Notes"
@@ -62,7 +66,7 @@ const ItemBottomNavigation = React.createClass ({
             </BottomNavigation>
         );
     }
-});
+};
 
 ItemBottomNavigation.propTypes = {
   classes: React.PropTypes.object.isRequired,

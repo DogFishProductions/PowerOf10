@@ -19,20 +19,18 @@ const theme = createMuiTheme({
     }
 });
 
-const Main = React.createClass({
-    render() {
-        return (
-            <div>
-                <Reboot>
-                    <MuiThemeProvider theme={ theme }>
-                        <div>
-                            { React.cloneElement(this.props.children, this.props) }
-                        </div>
-                    </MuiThemeProvider>
-                </Reboot>
-            </div>
-        )
-    }
-})
+const Main = (props) => {
+    return (
+        <div>
+            <Reboot>
+                <MuiThemeProvider theme={ theme }>
+                    <div>
+                        { React.cloneElement(props.children, props) }
+                    </div>
+                </MuiThemeProvider>
+            </Reboot>
+        </div>
+    )
+}
 
 export default Main

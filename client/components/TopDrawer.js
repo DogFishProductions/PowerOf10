@@ -28,21 +28,29 @@ const styles = theme => ({
 
 class TopDrawer extends React.Component {
     render() {
+        const props = this.props;
         const {
             classes,
             supervisor,
             params,
+            selectAllForDeletion,
+            deselectAllForDeletion,
+            sessions,
+            topics,
         } = this.props;
-
+        const {
+            topicId,
+            sessionId,
+        } = params;
         const handleCheckboxOnClick = (e) => {
             if (e.target.checked) {
                 if (params.topicId) {
-                    this.props.selectAllForDeletion("session", this.props.sessions, params.topicId);
+                    selectAllForDeletion("session", sessions, topicId);
                 } else {
-                    this.props.selectAllForDeletion("topic", this.props.topics);
+                    selectAllForDeletion("topic", topics);
                 }
             } else {
-                this.props.deselectAllForDeletion();
+                deselectAllForDeletion();
             }
         };
 

@@ -10,15 +10,16 @@ const notesStyle = {
     margin: "8px auto"
 }
 
-const NotesPage = React.createClass({
-    handleOnChange(e) {
-        dispatchAction(this.props, "updateItemProperty", "description", e.target.value);
-    },
-    getItemDescription() {
-        const selectedItem = getSelectedItem(this.props, "code");
-        return selectedItem.description;
-    },
+export default class NotesPage extends React.Component {
     render() {
+        const props = this.props;
+        const handleOnChange = (e) => {
+            dispatchAction(props, "updateItemProperty", "description", e.target.value);
+        }
+        const getItemDescription = () => {
+            const selectedItem = getSelectedItem(props, "code");
+            return selectedItem.description;
+        }
         return (
             <div style={ notesStyle }>
                 <TextField
@@ -28,12 +29,10 @@ const NotesPage = React.createClass({
                     multiline
                     rows="2"
                     rowsMax="15"
-                    onChange={ this.handleOnChange }
-                    value={ this.getItemDescription() }
+                    onChange={ handleOnChange }
+                    value={ getItemDescription() }
                 />
             </div>
         )
     }
-});
-
-export default NotesPage;
+};

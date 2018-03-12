@@ -38,112 +38,122 @@ const compareSession = (a, b) => {
     return 0;
 }
 
-const SessionList = React.createClass({
-    handlePrimaryOnClick(e, session) {
-        this.props.history.push(`/topic/${this.props.params.topicId}/session/${session.code}`);
-    },
-    handleCheckboxOnClick(e) {
-        const target = e.target;
-        const type = "session";
-        if (target.checked) {
-            this.props.selectForDeletion(type, target.value);
-        } else {
-            this.props.deselectForDeletion(type, target.value);
+
+export default class SessionList extends React.Component {
+    render() {
+        const props = this.props;
+        const {
+            supervisor,
+            params,
+            selectForDeletion,
+            deselectForDeletion,
+            history,
+            updateItemProperty,
+            addItem,
+        } = props;
+        const {
+            topicId,
+        } = params;
+        const handlePrimaryOnClick = (e, session) => {
+            history.push(`/topic/${topicId}/session/${session.code}`);
         }
-    },
-    handleTimerOffButtonOnClick(e, sessionId) {
-        const { topicId } = this.props.params;
-        // don't use handler dispatchAction as session id is not in URL
-        this.props.updateItemProperty("session", sessionId, "isRunning", false, topicId);
-        // remove the unnecessary boolean property
-        this.props.addItem("session", sessionId, topicId);
-    },
-    renderSessionDuration(session) {
-        return (
-            <span>{ durationToString([session], "humanized") }</span>
-        );
-    },
-    renderTimerOffButton(sessionId) {
-        return (
-            <IconButton
-                onClick={ (e) => this.handleTimerOffButtonOnClick(e, sessionId)}
-            >
-                <TimerOffIcon
-                    style={ styles.icon }
-                />
-            </IconButton>
-        )
-    },
-    renderTimerButton(enabled) {
-        return (
-            <IconButton
-                disabled={ !enabled }
-            >
-                <TimerIcon
-                    style={ styles.icon }
-                />
-            </IconButton>
-        )
-    },
-    renderSession(session, i) {
-        const { supervisor } = this.props;
-        return (
-            <div key={i}>
-                <ListItem>
-                    <Slide
-                        direction="right"
-                        in={ supervisor.displaySelectForDeletion }
-                        mountOnEnter
-                        unmountOnExit={ true }
-                    >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={ itemIsSelectedForDeletion(supervisor.toDelete, session.code) }
-                                onChange={ this.handleCheckboxOnClick }
-                                value={ session.code }
-                            />
-                        </ListItemIcon>
-                    </Slide>
-                    <ListItemText
-                        onClick={ (e) => this.handlePrimaryOnClick(e, session) }
-                        primary={ momentToDatetimeString(session, "from") }
-                        secondary={ durationToString([session], "long") }
-                    />
-                    { session.isRunning && (
-                        <ListItemSecondaryAction>
-                            { this.renderTimerOffButton(session.code) }
-                        </ListItemSecondaryAction>
-                    ) }
-                </ListItem>
-                <Divider />
-            </div>
-        );
-    },
-    renderListItems(defaultText = "Start recording sessions") {
-        const currentSessions = getTopicSessions(this.props);
-        if (currentSessions.length > 0) {
+        const handleCheckboxOnClick = (e) => {
+            const target = e.target;
+            const type = "session";
+            if (target.checked) {
+                selectForDeletion(type, target.value);
+            } else {
+                deselectForDeletion(type, target.value);
+            }
+        }
+        const handleTimerOffButtonOnClick = (e, sessionId) => {
+            // don't use handler dispatchAction as session id is not in URL
+            updateItemProperty("session", sessionId, "isRunning", false, topicId);
+            // remove the unnecessary boolean property
+            addItem("session", sessionId, topicId);
+        }
+        const renderSessionDuration = (session) => {
             return (
-                <div>
+                <span>{ durationToString([session], "humanized") }</span>
+            );
+        }
+        const renderTimerOffButton = (sessionId) => {
+            return (
+                <IconButton
+                    onClick={ (e) => handleTimerOffButtonOnClick(e, sessionId)}
+                >
+                    <TimerOffIcon
+                        style={ styles.icon }
+                    />
+                </IconButton>
+            )
+        }
+        const renderTimerButton = (enabled) => {
+            return (
+                <IconButton
+                    disabled={ !enabled }
+                >
+                    <TimerIcon
+                        style={ styles.icon }
+                    />
+                </IconButton>
+            )
+        }
+        const renderSession = (session, i) => {
+            return (
+                <div key={i}>
+                    <ListItem>
+                        <Slide
+                            direction="right"
+                            in={ supervisor.displaySelectForDeletion }
+                            mountOnEnter
+                            unmountOnExit={ true }
+                        >
+                            <ListItemIcon>
+                                <Checkbox
+                                    checked={ itemIsSelectedForDeletion(supervisor.toDelete, session.code) }
+                                    onChange={ handleCheckboxOnClick }
+                                    value={ session.code }
+                                />
+                            </ListItemIcon>
+                        </Slide>
+                        <ListItemText
+                            onClick={ (e) => handlePrimaryOnClick(e, session) }
+                            primary={ momentToDatetimeString(session, "from") }
+                            secondary={ durationToString([session], "long") }
+                        />
+                        { session.isRunning && (
+                            <ListItemSecondaryAction>
+                                { renderTimerOffButton(session.code) }
+                            </ListItemSecondaryAction>
+                        ) }
+                    </ListItem>
+                    <Divider />
+                </div>
+            );
+        }
+        const renderListItems = (defaultText = "Start recording sessions") => {
+            const currentSessions = getTopicSessions(props);
+            if (currentSessions.length > 0) {
+                return (
+                    <div>
+                        <List
+                            subheader={ <ListSubheader style={ { backgroundColor: "#FF9800" } }>Sessions</ListSubheader> }
+                        >
+                            { currentSessions.sort(compareSession).map(renderSession)}
+                        </List>
+                    </div>
+                );
+            } else {
+                return (
                     <List
                         subheader={ <ListSubheader style={ { backgroundColor: "#FF9800" } }>Sessions</ListSubheader> }
                     >
-                        { currentSessions.sort(compareSession).map(this.renderSession)}
+                        <span style={ defaultTextStyle }>{ defaultText }</span>
                     </List>
-                </div>
-            );
-        } else {
-            return (
-                <List
-                    subheader={ <ListSubheader style={ { backgroundColor: "#FF9800" } }>Sessions</ListSubheader> }
-                >
-                    <span style={ defaultTextStyle }>{ defaultText }</span>
-                </List>
-            );
+                );
+            }
         }
-    },
-    render() {
-        return this.renderListItems(this.props.defaultText);
+        return renderListItems(props.defaultText);
     }
-});
-
-export default SessionList;
+};

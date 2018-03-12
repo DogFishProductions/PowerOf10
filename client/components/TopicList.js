@@ -36,79 +36,84 @@ const styles = {
     },
 };
 
-const TopicList = React.createClass({
-    handlePrimaryOnClick(e, topic) {
-        this.props.history.push(`/topic/${topic.code}`);
-    },
-    handleCheckboxOnClick(e) {
-        const target = e.target;
-        const type = "topic";
-        if (target.checked) {
-            this.props.selectForDeletion(type, target.value);
-        } else {
-            this.props.deselectForDeletion(type, target.value);
-        }
-    },
-    renderTimerButton(topic) {
-        const props = this.props;
-        const runningSessionIndex = getRunningSessionIndex(props, topic.code);
-        return (
-            <IconButton
-                onClick={ (e) => handleStartSessionOnClick(e, props, topic.code) }
-            >
-                { (runningSessionIndex >= 0) ?
-                    ( <TimerOffIcon
-                        style={ styles.icon }
-                    /> ) :
-                    (<TimerIcon
-                        style={ styles.icon }
-                    />)
-                }
-            </IconButton>
-        )
-    },
-    renderTopic(topic, i) {
-        const { supervisor } = this.props;
-        return (
-            <div key={i}>
-                <ListItem>
-                    <Slide
-                        direction="right"
-                        in={ supervisor.displaySelectForDeletion }
-                        mountOnEnter
-                        unmountOnExit={ true }
-                    >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={ itemIsSelectedForDeletion(supervisor.toDelete, topic.code) }
-                                onChange={ this.handleCheckboxOnClick }
-                                value={ topic.code }
-                            />
-                        </ListItemIcon>
-                    </Slide>
-                    <Avatar
-                        style={ styles.orangeAvatar }
-                    >
-                        { durationToString(this.props.sessions[topic.code], "stacked") }
-                    </Avatar>
-                    <ListItemText
-                        onClick={ (e) => this.handlePrimaryOnClick(e, topic) }
-                        primary={ topic.title }
-                        secondary={ _.truncate(topic.description, { length: 100 }) }
-                    />
-                    <ListItemSecondaryAction>
-                        { this.renderTimerButton(topic) }
-                    </ListItemSecondaryAction>
-                </ListItem>
-                <Divider />
-            </div>
-        )
-    },
+export default class TopicList extends React.Component {
     render() {
+        const props = this.props;
+        const {
+            history,
+            selectForDeletion,
+            deselectForDeletion,
+            displaySelectForDeletion,
+            supervisor,
+            topics,
+        } = props;
+        const handlePrimaryOnClick = (e, topic) => {
+            history.push(`/topic/${topic.code}`);
+        }
+        const handleCheckboxOnClick = (e) => {
+            const target = e.target;
+            const type = "topic";
+            if (target.checked) {
+                selectForDeletion(type, target.value);
+            } else {
+                deselectForDeletion(type, target.value);
+            }
+        }
+        const renderTimerButton = (topic) => {
+            const runningSessionIndex = getRunningSessionIndex(props, topic.code);
+            return (
+                <IconButton
+                    onClick={ (e) => handleStartSessionOnClick(e, props, topic.code) }
+                >
+                    { (runningSessionIndex >= 0) ?
+                        ( <TimerOffIcon
+                            style={ styles.icon }
+                        /> ) :
+                        (<TimerIcon
+                            style={ styles.icon }
+                        />)
+                    }
+                </IconButton>
+            )
+        }
+        const renderTopic = (topic, i) => {
+            return (
+                <div key={i}>
+                    <ListItem>
+                        <Slide
+                            direction="right"
+                            in={ supervisor.displaySelectForDeletion }
+                            mountOnEnter
+                            unmountOnExit={ true }
+                        >
+                            <ListItemIcon>
+                                <Checkbox
+                                    checked={ itemIsSelectedForDeletion(supervisor.toDelete, topic.code) }
+                                    onChange={ handleCheckboxOnClick }
+                                    value={ topic.code }
+                                />
+                            </ListItemIcon>
+                        </Slide>
+                        <Avatar
+                            style={ styles.orangeAvatar }
+                        >
+                            { durationToString(props.sessions[topic.code], "stacked") }
+                        </Avatar>
+                        <ListItemText
+                            onClick={ (e) => handlePrimaryOnClick(e, topic) }
+                            primary={ topic.title }
+                            secondary={ _.truncate(topic.description, { length: 100 }) }
+                        />
+                        <ListItemSecondaryAction>
+                            { renderTimerButton(topic) }
+                        </ListItemSecondaryAction>
+                    </ListItem>
+                    <Divider />
+                </div>
+            )
+        }
         return (
-            <List children={ this.props.topics.map(this.renderTopic)} />
+            <List children={ topics.map(renderTopic) } />
         )
     }
-});
-
-export default TopicList;
+};

@@ -8,19 +8,20 @@ import * as helpers from "../helpers";
 import ItemAppBar from "./ItemAppBar";
 import TopicList from "./TopicList";
 
-const TopicListPage = React.createClass({
-    handleAddTopicOnClick(e) {
-        const topicId = helpers.randomString(10, "aA#!");
-        this.props.createItem("topic", topicId);
-        this.props.history.push(`/topic/${ topicId }`);
-    },
+export default class TopicListPage extends React.Component {
     render() {
+        const props = this.props;
+        const handleAddTopicOnClick = (e) => {
+            const topicId = helpers.randomString(10, "aA#!");
+            props.createItem("topic", topicId);
+            props.history.push(`/topic/${ topicId }`);
+        }
         return (
             <div className="pseudo-phone-main outer">
-                <ItemAppBar {...this.props} />
+                <ItemAppBar {...props} />
                 <div className="pseudo-phone-list inner">
                     <div>
-                        <TopicList {...this.props} />
+                        <TopicList {...props} />
                     </div>
                 </div>
                 <div className="inner">
@@ -28,7 +29,7 @@ const TopicListPage = React.createClass({
                         <Button
                             variant="fab"
                             color="primary"
-                            onClick={ this.handleAddTopicOnClick }>
+                            onClick={ handleAddTopicOnClick }>
                             <AddIcon />
                         </Button>
                     </div>
@@ -36,7 +37,4 @@ const TopicListPage = React.createClass({
             </div>
         )
     }
-})
-
-
-export default TopicListPage;
+}
