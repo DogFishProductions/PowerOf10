@@ -52,10 +52,11 @@ export default class SessionList extends React.Component {
             addItem,
         } = props;
         const {
+            uid,
             topicId,
         } = params;
         const handlePrimaryOnClick = (e, session) => {
-            history.push(`/topic/${topicId}/session/${session.code}`);
+            history.push(`/user/${ uid }/topic/${ topicId }/session/${ session.code }`);
         }
         const handleCheckboxOnClick = (e) => {
             const target = e.target;

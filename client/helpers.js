@@ -185,7 +185,11 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
     } else { 
         const {
             supervisor,
+            params,
         } = props;
+        const {
+            uid,
+        } = params;
         const isRunning = supervisor.isRunning;
         // stop currently running session if one exists
         if (isRunning.topicId) {
@@ -198,6 +202,6 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
         } = getNewSessionId(props, topicId);
         // don't use handler dispatchAction as session id is not in URL
         props.updateItemProperty("session", sessionId, "isRunning", true, topicId);
-        props.history.push(`/topic/${ topicId }/session/${ sessionId }`);
+        props.history.push(`/user/${ uid }/topic/${ topicId }/session/${ sessionId }`);
     }
 }

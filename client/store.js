@@ -10,6 +10,7 @@ const defaultState = {
     sessions,
     topics,
     supervisor: {
+        uid: null,
         bottomNavSelectedIndex: 0,
         deleteRequested: false,
         displaySelectForDeletion: false,

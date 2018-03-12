@@ -46,9 +46,13 @@ export default class TopicList extends React.Component {
             displaySelectForDeletion,
             supervisor,
             topics,
+            params,
         } = props;
+        const {
+            uid,
+        } = params;
         const handlePrimaryOnClick = (e, topic) => {
-            history.push(`/topic/${topic.code}`);
+            history.push(`/user/${ uid }/topic/${ topic.code }`);
         }
         const handleCheckboxOnClick = (e) => {
             const target = e.target;

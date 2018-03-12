@@ -23,15 +23,15 @@ import {
 import TopDrawer from "./TopDrawer";
 
 const styles = {
-  root: {
-    flexGrow: 1,
-  },
-  flex: {
-    flex: 1,
-  },
-  menuButton: {
-    marginLeft: -12,
-  },
+    root: {
+        flexGrow: 1,
+    },
+    flex: {
+        flex: 1,
+    },
+    menuButton: {
+        marginLeft: -12,
+    },
 };
 
 class ItemAppBar extends React.Component {

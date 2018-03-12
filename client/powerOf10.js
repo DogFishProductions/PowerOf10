@@ -10,6 +10,7 @@ import css from "./styles/style.styl";
 
 // import components
 import App from "./components/App";
+import LoginPage from "./components/LoginPage";
 import TopicListPage from "./components/TopicListPage";
 import TopicPage from "./components/TopicPage";
 import SessionPage from "./components/SessionPage";
@@ -18,9 +19,10 @@ const router = (
     <Provider store={ store }>
         <Router history={ history }>
             <Route path="/" component={ App }>
-                <IndexRoute component={ TopicListPage }></IndexRoute>
-                <Route path="/topic/:topicId" component={ TopicPage }></Route>
-                <Route path="/topic/:topicId/session/:sessionId" component={ SessionPage }></Route>
+                <IndexRoute component={ LoginPage }></IndexRoute>
+                <Route path="/user/:uid" component={ TopicListPage }></Route>
+                <Route path="/user/:uid/topic/:topicId" component={ TopicPage }></Route>
+                <Route path="/user/:uid/topic/:topicId/session/:sessionId" component={ SessionPage }></Route>
             </Route>
         </Router>
     </Provider>

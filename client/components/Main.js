@@ -5,6 +5,8 @@ import { MuiThemeProvider, createMuiTheme } from "material-ui/styles";
 import pink from 'material-ui/colors/pink';
 import orange from 'material-ui/colors/orange';
 
+import base from "../base";
+
 const theme = createMuiTheme({
     palette: {
         primary: pink,
@@ -19,18 +21,24 @@ const theme = createMuiTheme({
     }
 });
 
-const Main = (props) => {
-    return (
-        <div>
-            <Reboot>
-                <MuiThemeProvider theme={ theme }>
-                    <div>
-                        { React.cloneElement(props.children, props) }
-                    </div>
-                </MuiThemeProvider>
-            </Reboot>
-        </div>
-    )
-}
+export default class Main extends React.Component {
+    componentWillMount() {
+        // this.ref = base.syncState()
+    }
+    componentWillUnmount() {
 
-export default Main
+    }
+    render() {
+        return (
+            <div>
+                <Reboot>
+                    <MuiThemeProvider theme={ theme }>
+                        <div>
+                            { React.cloneElement(this.props.children, this.props) }
+                        </div>
+                    </MuiThemeProvider>
+                </Reboot>
+            </div>
+        );
+    }
+}

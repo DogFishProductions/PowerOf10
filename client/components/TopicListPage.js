@@ -11,10 +11,18 @@ import TopicList from "./TopicList";
 export default class TopicListPage extends React.Component {
     render() {
         const props = this.props;
+        const {
+            createItem,
+            history,
+            params,
+        } = props;
+        const {
+            uid,
+        } = params;
         const handleAddTopicOnClick = (e) => {
             const topicId = helpers.randomString(10, "aA#!");
-            props.createItem("topic", topicId);
-            props.history.push(`/topic/${ topicId }`);
+            createItem("topic", topicId);
+            history.push(`/${ uid }/topic/${ topicId }`);
         }
         return (
             <div className="pseudo-phone-main outer">
