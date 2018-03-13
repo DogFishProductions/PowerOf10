@@ -1,4 +1,7 @@
 import React from 'react';
+import { compose } from "redux";
+import { connect } from "react-redux";
+import { firebaseConnect } from "react-redux-firebase";
 
 import { withStyles } from "material-ui/styles";
 import AppBar from "material-ui/AppBar";
@@ -57,6 +60,7 @@ class ItemAppBar extends React.Component {
             openDialog,
             classes,
             editItemTitle,
+            firebase,
         } = props;
         const {
             topicId,
@@ -129,6 +133,9 @@ class ItemAppBar extends React.Component {
         }
         const handleTitleOnChange = (e) => {
             dispatchAction(props, "updateItemProperty", "title", e.target.value);
+        }
+        const handleLogoutOnClick = () => {
+            firebase.logout();
         }
         const renderTitle = () => {
             if (!topicId) {
@@ -253,6 +260,11 @@ class ItemAppBar extends React.Component {
                                 >
                                     { topicId ? "Delete Sessions" : "Delete Topics" }
                                 </MenuItem>
+                                <MenuItem
+                                    onClick={ handleLogoutOnClick }
+                                >
+                                    Logout
+                                </MenuItem>
                             </Menu>
                         </div>
                     );
@@ -324,4 +336,7 @@ ItemAppBar.propTypes = {
     classes: React.PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(ItemAppBar);
+export default compose(
+    firebaseConnect(),
+    connect(({ firebase: { auth } }) => ({ auth }))
+)(withStyles(styles)(ItemAppBar));

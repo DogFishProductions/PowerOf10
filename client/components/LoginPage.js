@@ -1,5 +1,7 @@
 import React from "react";
-import firebase from "firebase";
+import { compose } from "redux";
+import { connect } from "react-redux";
+import { firebaseConnect, isLoaded, isEmpty } from "react-redux-firebase";
 
 import { withStyles } from "material-ui/styles";
 import Grid from "material-ui/Grid";
@@ -17,47 +19,19 @@ const styles = (theme) => ({
 });
 
 class LoginPage extends React.Component {
-    componentWillMount() {
-        firebase.auth().getRedirectResult()
-            .then((result) => {
-                if (result.credential) {
-                    // This gives you a Google Access Token. You can use it to access the Google API.
-                    const token = result.credential.accessToken;
-                    // ...
-                }
-                // The signed-in user info.
-                const user = result.user || {};
-                this.props.setAuthorisedUserId(user.uid);
-            })
-            .catch((error) => {
-                // Handle Errors here.
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                // The email of the user's account used.
-                const email = error.email;
-                // The firebase.auth.AuthCredential type that was used.
-                const credential = error.credential;
-                // ...
-            });
-    }
     render() {
-        console.log("rendering")
         const props = this.props;
         const {
             classes,
             supervisor,
             history,
-            showProgress
+            showProgress,
+            setAuthorisedUserId,
+            firebase,
+            auth,
         } = props;
-        const authenticate = (e, providerName) => {
-            let provider;
-            switch(providerName) {
-                case "google":
-                default:
-                    provider = new firebase.auth.GoogleAuthProvider();
-            }
-            firebase.auth().signInWithRedirect(provider);
-            showProgress(true);
+        const authenticate = (e, provider) => {
+            firebase.login({ provider, type: "redirect" }).catch(console.log);
         }
         const renderLogin = () => {
             return (
@@ -74,44 +48,61 @@ class LoginPage extends React.Component {
                         >
                             <h2>Login to experience the Power of 10</h2>
                         </Grid>
-                        <Grid
-                            item
-                            xs={ 12 }
-                        >
-                            <Button
-                                variant="raised"
-                                color="primary"
-                                onClick={ (e) => authenticate(e, "google")}
-                            >
-                                Log in with Google
-                            </Button>
-                        </Grid>
-                        { supervisor.showProgress &&
                             <Grid
                                 item
-                                xs={12}
+                                xs={ 12 }
                             >
-                                <CircularProgress color="secondary" />
+                                { isLoaded(auth)
+                                    ? (isEmpty(auth) &&
+                                        <Button
+                                            variant="raised"
+                                            color="primary"
+                                            onClick={ (e) => authenticate(e, "google")}
+                                        >
+                                            Log in with Google
+                                        </Button>
+                                    )
+                                    : <CircularProgress
+                                        color="secondary"
+                                        disabled={ !supervisor.showProgress }
+                                    />
+                                }
                             </Grid>
-                        }
-                        
+                        <Grid
+                            item
+                            xs={12}
+                        >
+                            { !isEmpty(auth) &&
+                                <Button
+                                    variant="raised"
+                                    color="primary"
+                                    onClick={ (e) => firebase.logout() }
+                                >
+                                    Log out
+                                </Button>
+                            }
+                        </Grid>
                     </Grid>
                 </div>
             );
         }
-        // check if user is not logged in at all
-        console.log("supervisor: ", supervisor);
-        if (!supervisor.authorisedUserId) {
-            return renderLogin();
-        } else {
-            history.push(`/user/${ supervisor.authorisedUserId }`);
-            return renderLogin();
+        // check if user is logged in
+        if (auth.uid) {
+            history.push(`/user/${ auth.uid }`);
         }
+        return renderLogin();
     }
 };
 
 LoginPage.propTypes = {
     classes: React.PropTypes.object.isRequired,
+    firebase: React.PropTypes.shape({
+        login: React.PropTypes.func.isRequired,
+    }),
+    auth: React.PropTypes.object,
 };
 
-export default withStyles(styles)(LoginPage);
+export default compose(
+    firebaseConnect(),
+    connect(({ firebase: { auth } }) => ({ auth }))
+)(withStyles(styles)(LoginPage));

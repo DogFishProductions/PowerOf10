@@ -5,8 +5,6 @@ import { MuiThemeProvider, createMuiTheme } from "material-ui/styles";
 import pink from 'material-ui/colors/pink';
 import orange from 'material-ui/colors/orange';
 
-import base from "../base";
-
 const theme = createMuiTheme({
     palette: {
         primary: pink,

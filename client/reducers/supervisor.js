@@ -153,20 +153,6 @@ const supervisor = (state = {}, action) => {
                 ...state,
                 openDialog: action.option,
             }
-        case "SET_AUTHORISED_USER_ID":
-            console.log("user is: ", action.uid)
-            return {
-                ...state,
-                authorisedUserId: action.uid,
-                showProgress: false,
-            }
-        case "SHOW_PROGRESS":
-            console.log("showing progress")
-            return {
-                ...state,
-                showProgress: action.option,
-            }
-
         default:
             return state;
     }
