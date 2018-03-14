@@ -180,15 +180,15 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
         addItem,
         sessions,
         selectBottomNavIndex,
-    } = props;
-    const runningSessionIndex = getRunningSessionIndex(props, topicId);
-    if (runningSessionIndex >= 0) {
-        const runningSession = sessions[topicId][runningSessionIndex];
-        const sessionId = runningSession.code;
-        // don't use handler dispatchAction as session id is not in URL
-        updateItemProperty("session", sessionId, "isRunning", false, topicId);
-        addItem("session", sessionId);
-    } else { 
+        supervisor,
+    } = props; 
+    const isRunning = supervisor.isRunning;
+    const runningSessionId = isRunning.sessionId;
+    const runningTopicId = isRunning.topicId;
+    if (runningSessionId) {
+        updateItemProperty("session", runningSessionId, "isRunning", false, runningTopicId);
+        addItem("session", runningSessionId);
+    } else {
         const {
             supervisor,
             params,

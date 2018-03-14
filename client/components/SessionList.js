@@ -50,6 +50,8 @@ export default class SessionList extends React.Component {
             router,
             updateItemProperty,
             addItem,
+            sessions,
+            topics,
         } = props;
         const {
             uid,
@@ -67,21 +69,29 @@ export default class SessionList extends React.Component {
                 deselectForDeletion(type, target.value);
             }
         }
-        const handleTimerOffButtonOnClick = (e, sessionId) => {
+        const handleTimerOffButtonOnClick = (e, sessionId, i) => {
             // don't use handler dispatchAction as session id is not in URL
             updateItemProperty("session", sessionId, "isRunning", false, topicId);
             // remove the unnecessary boolean property
             addItem("session", sessionId, topicId);
+        }
+        const handleTimerButtonOnClick = (e, sessionId, i) => {
+            const isRunning = supervisor.isRunning;
+            updateItemProperty("session", isRunning.sessionId, "isRunning", false, isRunning.topicId);
+            // remove the unnecessary boolean property
+            addItem("session", isRunning.sessionId, isRunning.topicId);
+            // don't use handler dispatchAction as session id is not in URL
+            updateItemProperty("session", sessionId, "isRunning", true, topicId);
         }
         const renderSessionDuration = (session) => {
             return (
                 <span>{ durationToString([session], "humanized") }</span>
             );
         }
-        const renderTimerOffButton = (sessionId) => {
+        const renderTimerOffButton = (sessionId, i) => {
             return (
                 <IconButton
-                    onClick={ (e) => handleTimerOffButtonOnClick(e, sessionId)}
+                    onClick={ (e) => handleTimerOffButtonOnClick(e, sessionId, i)}
                 >
                     <TimerOffIcon
                         style={ styles.icon }
@@ -89,10 +99,10 @@ export default class SessionList extends React.Component {
                 </IconButton>
             )
         }
-        const renderTimerButton = (enabled) => {
+        const renderTimerButton = (sessionId, i) => {
             return (
                 <IconButton
-                    disabled={ !enabled }
+                    onClick={ (e) => handleTimerButtonOnClick(e, sessionId, i)}
                 >
                     <TimerIcon
                         style={ styles.icon }
@@ -120,14 +130,19 @@ export default class SessionList extends React.Component {
                         </Slide>
                         <ListItemText
                             onClick={ (e) => handlePrimaryOnClick(e, session) }
-                            primary={ momentToDatetimeString(session, "from") }
+                            primary={ `${momentToDatetimeString(session, "from")} ${session.code}` }
                             secondary={ durationToString([session], "long") }
                         />
                         { session.isRunning && (
                             <ListItemSecondaryAction>
-                                { renderTimerOffButton(session.code) }
+                                { renderTimerOffButton(session.code, i) }
                             </ListItemSecondaryAction>
                         ) }
+                        { (session.to === session.from) &&
+                            <ListItemSecondaryAction>
+                                { renderTimerButton(session.code, i) }
+                            </ListItemSecondaryAction>
+                        }
                     </ListItem>
                     <Divider />
                 </div>

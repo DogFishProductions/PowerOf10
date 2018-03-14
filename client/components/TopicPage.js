@@ -27,6 +27,10 @@ const bottomGridStyle = {
 }
 
 let calcCurrentDuration;
+const clearRunningUpdater = () => {
+    clearInterval(calcCurrentDuration);
+    calcCurrentDuration = null;
+}
 
 import {
     getBottomNavSelectedIndex,
@@ -47,8 +51,14 @@ import NotesPage from "./NotesPage";
 
 export default class TopicPage extends React.Component {
     componentWillUnmount() {
-        clearInterval(calcCurrentDuration);
-        calcCurrentDuration = null;
+        clearRunningUpdater();
+    }
+    componentWillReceiveProps(nextProps)  {
+        const runningSessionId = _.get(this, "props.supervisor.isRunning.sessionId", null);
+        const newRunningSessionId = _.get(nextProps, "supervisor.isRunning.sessionId", null)
+        if (runningSessionId && (runningSessionId != newRunningSessionId)) {
+            clearRunningUpdater();
+        }
     }
     render() {
         const props = this.props;
