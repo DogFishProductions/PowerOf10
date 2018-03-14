@@ -57,6 +57,7 @@ export default class TopicPage extends React.Component {
             router,
             editItemTitle,
             params,
+            selectBottomNavIndex,
         } = props;
         const {
             uid,
@@ -69,6 +70,7 @@ export default class TopicPage extends React.Component {
                 sessionId,
                 topicId,
             } = getNewSessionId(props);
+            selectBottomNavIndex(0);
             router.push(`/user/${ uid }/topic/${ topicId }/session/${ sessionId }`);
         }
         const handleDivOnClick = (e) => {

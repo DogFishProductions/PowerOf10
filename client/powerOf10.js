@@ -4,6 +4,7 @@ import { Router, Route, IndexRedirect } from "react-router";
 import { Provider } from "react-redux";
 
 import store, { history } from "./store";
+import { userIsAuthenticated, userIsAuthorised, userIsNotAuthenticated } from "./auth";
 
 // import css
 import css from "./styles/style.styl";
@@ -20,10 +21,10 @@ const router = (
         <Router history={ history }>
             <Route path="/" component={ App }>
                 <IndexRedirect to="/login"></IndexRedirect>
-                <Route path="/login" component={ LoginPage }></Route>
-                <Route path="/user/:uid" component={ TopicListPage }></Route>
-                <Route path="/user/:uid/topic/:topicId" component={ TopicPage }></Route>
-                <Route path="/user/:uid/topic/:topicId/session/:sessionId" component={ SessionPage }></Route>
+                <Route path="/login" component={ userIsNotAuthenticated(LoginPage) }></Route>
+                <Route path="/user/:uid" component={ userIsAuthenticated(userIsAuthorised(TopicListPage)) }></Route>
+                <Route path="/user/:uid/topic/:topicId" component={ userIsAuthenticated(userIsAuthorised(TopicPage)) }></Route>
+                <Route path="/user/:uid/topic/:topicId/session/:sessionId" component={ userIsAuthenticated(userIsAuthorised(SessionPage)) }></Route>
             </Route>
         </Router>
     </Provider>

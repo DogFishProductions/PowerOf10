@@ -8,7 +8,9 @@ import DataUsageIcon from 'material-ui-icons/DataUsage';
 import DescriptionIcon from 'material-ui-icons/Description';
 import TimelapseIcon from 'material-ui-icons/Timelapse';
 
-import * as helpers from "../helpers";
+import {
+    getBottomNavSelectedIndex
+} from "../helpers";
 
 const styles = theme => ({
     root: {
@@ -22,13 +24,14 @@ class ItemBottomNavigation extends React.Component {
         const {
             classes,
             params,
+            selectBottomNavIndex,
         } = props;
         const {
             topicId,
             sessionId
         } = params;
         const selectIndex = (e, i) => {
-            props.selectBottomNavIndex(i);
+            selectBottomNavIndex(i);
         }
         const renderLeftIcon = () => {
             if (topicId && !sessionId) {
@@ -47,7 +50,7 @@ class ItemBottomNavigation extends React.Component {
                 );
             }
         }
-        const selectedIndex = helpers.getBottomNavSelectedIndex(props);
+        const selectedIndex = getBottomNavSelectedIndex(props);
         return (
             <BottomNavigation
                 value={ selectedIndex }

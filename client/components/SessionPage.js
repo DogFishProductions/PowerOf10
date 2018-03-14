@@ -51,6 +51,7 @@ export default class TopicPage extends React.Component {
         clearInterval(calcCurrentDuration);
         calcCurrentDuration = null;
         resetErrorState();
+        this.props.selectBottomNavIndex(0);
     }
     render() {
         const props = this.props;

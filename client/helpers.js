@@ -179,6 +179,7 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
         updateItemProperty,
         addItem,
         sessions,
+        selectBottomNavIndex,
     } = props;
     const runningSessionIndex = getRunningSessionIndex(props, topicId);
     if (runningSessionIndex >= 0) {
@@ -210,4 +211,5 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
         updateItemProperty("session", sessionId, "isRunning", true, topicId);
         router.push(`/user/${ uid }/topic/${ topicId }/session/${ sessionId }`);
     }
+    selectBottomNavIndex(0);
 }

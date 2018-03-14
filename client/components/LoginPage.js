@@ -3,6 +3,7 @@ import React from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 import { firebaseConnect, isLoaded, isEmpty } from "react-redux-firebase";
+import GoogleButton from "react-google-button";
 
 import { withStyles } from "material-ui/styles";
 import Grid from "material-ui/Grid";
@@ -47,7 +48,7 @@ class LoginPage extends React.Component {
                             item
                             xs={ 12 }
                         >
-                            <h2>Login to experience the Power of 10</h2>
+                            <h2>Experience the Power of 10</h2>
                         </Grid>
                             <Grid
                                 item
@@ -55,13 +56,12 @@ class LoginPage extends React.Component {
                             >
                                 { isLoaded(auth)
                                     ? (isEmpty(auth) &&
-                                        <Button
-                                            variant="raised"
-                                            color="primary"
+                                        <GoogleButton
+                                            style={ { margin: "0 auto" } }
                                             onClick={ (e) => authenticate(e, "google")}
                                         >
                                             Log in with Google
-                                        </Button>
+                                        </GoogleButton>
                                     )
                                     : <CircularProgress
                                         color="secondary"
@@ -86,10 +86,6 @@ class LoginPage extends React.Component {
                     </Grid>
                 </div>
             );
-        }
-        // check if user is logged in
-        if (auth.uid) {
-            router.push(`/user/${ auth.uid }`);
         }
         return renderLogin();
     }
