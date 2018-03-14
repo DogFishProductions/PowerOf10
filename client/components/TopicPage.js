@@ -54,7 +54,7 @@ export default class TopicPage extends React.Component {
         const props = this.props;
         const {
             supervisor,
-            history,
+            router,
             editItemTitle,
             params,
         } = props;
@@ -69,7 +69,7 @@ export default class TopicPage extends React.Component {
                 sessionId,
                 topicId,
             } = getNewSessionId(props);
-            history.push(`/user/${ uid }/topic/${ topicId }/session/${ sessionId }`);
+            router.push(`/user/${ uid }/topic/${ topicId }/session/${ sessionId }`);
         }
         const handleDivOnClick = (e) => {
             editItemTitle(false);

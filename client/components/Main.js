@@ -1,6 +1,6 @@
 import React from "react";
 
-import Reboot from "material-ui/Reboot";
+import CssBaseline from 'material-ui/CssBaseline';
 import { MuiThemeProvider, createMuiTheme } from "material-ui/styles";
 import pink from 'material-ui/colors/pink';
 import orange from 'material-ui/colors/orange';
@@ -29,13 +29,12 @@ export default class Main extends React.Component {
     render() {
         return (
             <div>
-                <Reboot>
-                    <MuiThemeProvider theme={ theme }>
-                        <div>
-                            { React.cloneElement(this.props.children, this.props) }
-                        </div>
-                    </MuiThemeProvider>
-                </Reboot>
+                <MuiThemeProvider theme={ theme }>
+                    <CssBaseline />
+                    <div>
+                        { React.cloneElement(this.props.children, this.props) }
+                    </div>
+                </MuiThemeProvider>
             </div>
         );
     }

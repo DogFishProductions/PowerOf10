@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { compose } from "redux";
 import { connect } from "react-redux";
@@ -49,7 +50,7 @@ class ItemAppBar extends React.Component {
     render() {
         const props = this.props;
         const {
-            history,
+            router,
             deleteRequested,
             displaySelectForDeletion,
             deselectAllForDeletion,
@@ -67,7 +68,7 @@ class ItemAppBar extends React.Component {
             sessionId,
         } = params;
         const redirectHome = () => {
-            history.goBack();
+            router.goBack();
             deleteRequested(false);
             displaySelectForDeletion(false);
         }
@@ -330,10 +331,10 @@ class ItemAppBar extends React.Component {
         }
         return renderAppBar();
     }
-};
+}
 
 ItemAppBar.propTypes = {
-    classes: React.PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired,
 };
 
 export default compose(

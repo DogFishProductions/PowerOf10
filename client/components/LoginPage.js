@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
@@ -24,7 +25,7 @@ class LoginPage extends React.Component {
         const {
             classes,
             supervisor,
-            history,
+            router,
             showProgress,
             setAuthorisedUserId,
             firebase,
@@ -88,18 +89,18 @@ class LoginPage extends React.Component {
         }
         // check if user is logged in
         if (auth.uid) {
-            history.push(`/user/${ auth.uid }`);
+            router.push(`/user/${ auth.uid }`);
         }
         return renderLogin();
     }
-};
+}
 
 LoginPage.propTypes = {
-    classes: React.PropTypes.object.isRequired,
-    firebase: React.PropTypes.shape({
-        login: React.PropTypes.func.isRequired,
+    classes: PropTypes.object.isRequired,
+    firebase: PropTypes.shape({
+        login: PropTypes.func.isRequired,
     }),
-    auth: React.PropTypes.object,
+    auth: PropTypes.object,
 };
 
 export default compose(

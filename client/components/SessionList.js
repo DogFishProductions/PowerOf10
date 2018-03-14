@@ -47,7 +47,7 @@ export default class SessionList extends React.Component {
             params,
             selectForDeletion,
             deselectForDeletion,
-            history,
+            router,
             updateItemProperty,
             addItem,
         } = props;
@@ -56,7 +56,7 @@ export default class SessionList extends React.Component {
             topicId,
         } = params;
         const handlePrimaryOnClick = (e, session) => {
-            history.push(`/user/${ uid }/topic/${ topicId }/session/${ session.code }`);
+            router.push(`/user/${ uid }/topic/${ topicId }/session/${ session.code }`);
         }
         const handleCheckboxOnClick = (e) => {
             const target = e.target;

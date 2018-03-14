@@ -1,5 +1,5 @@
-import { createStore, compose, applyMiddleware } from "redux";
-import { syncHistoryWithStore } from "react-router-redux";
+import { createStore, compose } from "redux";
+import { syncHistoryWithStore, routerReducer } from "react-router-redux";
 import { browserHistory } from "react-router";
 import { reactReduxFirebase, getFirebase } from "react-redux-firebase";
 import firebase from "firebase";

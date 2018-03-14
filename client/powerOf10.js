@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "react-dom";
-import { Router, Route, IndexRoute } from "react-router";
+import { Router, Route, IndexRedirect } from "react-router";
 import { Provider } from "react-redux";
 
 import store, { history } from "./store";
@@ -19,7 +19,8 @@ const router = (
     <Provider store={ store }>
         <Router history={ history }>
             <Route path="/" component={ App }>
-                <IndexRoute component={ LoginPage }></IndexRoute>
+                <IndexRedirect to="/login"></IndexRedirect>
+                <Route path="/login" component={ LoginPage }></Route>
                 <Route path="/user/:uid" component={ TopicListPage }></Route>
                 <Route path="/user/:uid/topic/:topicId" component={ TopicPage }></Route>
                 <Route path="/user/:uid/topic/:topicId/session/:sessionId" component={ SessionPage }></Route>

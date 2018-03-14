@@ -151,78 +151,6 @@ export default class TopicPage extends React.Component {
             }
             return (<TimerIcon />);
         }
-        const renderToDateTime = () => {
-            if (selectedSessionIsRunning()) {
-                return (
-                    <Grid
-                        container
-                        spacing={ 24 }
-                        style={ gridStyle }
-                    >
-                        <Grid item xs={ 8 }>
-                            <TextField
-                                id="toDate"
-                                helperText={ toHelperText }
-                                error={ toIsError }
-                                label="To"
-                                type="date"
-                                value={ getToDate() }
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                            />
-                        </Grid>
-                        <Grid item xs>
-                            <TextField
-                                id="toTime"
-                                error={ toIsError }
-                                label="To"
-                                type="time"
-                                value={ getToTime() }
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                            />
-                        </Grid>
-                    </Grid>
-                );
-            }
-            return (
-                <Grid
-                    container
-                    spacing={ 24 }
-                    style={ gridStyle }
-                >
-                    <Grid item xs={ 8 }>
-                        <TextField
-                            id="toDate"
-                            helperText={ toHelperText }
-                            error={ toIsError }
-                            onChange={ handleDateTimeOnChange }
-                            label="To"
-                            type="date"
-                            defaultValue={ getToDate() }
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                    </Grid>
-                    <Grid item xs>
-                        <TextField
-                            id="toTime"
-                            error={ toIsError }
-                            onChange={ handleDateTimeOnChange }
-                            label="To"
-                            type="time"
-                            defaultValue={ getToTime() }
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                    </Grid>
-                </Grid>
-            );
-        }
         const renderDetailView = () => {
             const selectedIndex = getBottomNavSelectedIndex(props);
             switch(selectedIndex) {
@@ -276,7 +204,41 @@ export default class TopicPage extends React.Component {
                                     />
                                 </Grid>
                             </Grid>
-                            { renderToDateTime() }
+                            <Grid
+                                container
+                                spacing={ 24 }
+                                style={ gridStyle }
+                            >
+                                <Grid item xs={ 8 }>
+                                    <TextField
+                                        id="toDate"
+                                        helperText={ toHelperText }
+                                        error={ toIsError }
+                                        onChange={ handleDateTimeOnChange }
+                                        disabled={ selectedSessionIsRunning() }
+                                        label="To"
+                                        type="date"
+                                        defaultValue={ getToDate() }
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs>
+                                    <TextField
+                                        id="toTime"
+                                        error={ toIsError }
+                                        onChange={ handleDateTimeOnChange }
+                                        disabled={ selectedSessionIsRunning() }
+                                        label="To"
+                                        type="time"
+                                        defaultValue={ getToTime() }
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                    />
+                                </Grid>
+                            </Grid>
                         </div>
                     );
                 case 1:

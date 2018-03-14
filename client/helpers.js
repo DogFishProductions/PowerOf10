@@ -175,17 +175,23 @@ export const getRunningSessionIndex = (props, topicId) => {
 
 export const handleStartSessionOnClick = (event, props, topicId) => {
     topicId = props.params.topicId || topicId;
+    const {
+        updateItemProperty,
+        addItem,
+        sessions,
+    } = props;
     const runningSessionIndex = getRunningSessionIndex(props, topicId);
     if (runningSessionIndex >= 0) {
-        const runningSession = props.sessions[topicId][runningSessionIndex];
+        const runningSession = sessions[topicId][runningSessionIndex];
         const sessionId = runningSession.code;
         // don't use handler dispatchAction as session id is not in URL
-        props.updateItemProperty("session", sessionId, "isRunning", false, topicId);
-        props.addItem("session", sessionId);
+        updateItemProperty("session", sessionId, "isRunning", false, topicId);
+        addItem("session", sessionId);
     } else { 
         const {
             supervisor,
             params,
+            router,
         } = props;
         const {
             uid,
@@ -193,15 +199,15 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
         const isRunning = supervisor.isRunning;
         // stop currently running session if one exists
         if (isRunning.topicId) {
-            props.updateItemProperty("session", isRunning.sessionId, "isRunning", false, isRunning.topicId);
-            props.addItem("session", isRunning.sessionId);
+            updateItemProperty("session", isRunning.sessionId, "isRunning", false, isRunning.topicId);
+            addItem("session", isRunning.sessionId);
         }
         // create a new session once the old one has been stopped (otherwise supervisor.isNew will be set to null)
         const {
             sessionId,
         } = getNewSessionId(props, topicId);
         // don't use handler dispatchAction as session id is not in URL
-        props.updateItemProperty("session", sessionId, "isRunning", true, topicId);
-        props.history.push(`/user/${ uid }/topic/${ topicId }/session/${ sessionId }`);
+        updateItemProperty("session", sessionId, "isRunning", true, topicId);
+        router.push(`/user/${ uid }/topic/${ topicId }/session/${ sessionId }`);
     }
 }

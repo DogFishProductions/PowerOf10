@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { withStyles } from 'material-ui/styles';
 import Drawer from 'material-ui/Drawer';
@@ -84,7 +85,7 @@ class TopDrawer extends React.Component {
 }
 
 TopDrawer.propTypes = {
-  classes: React.PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(TopDrawer);

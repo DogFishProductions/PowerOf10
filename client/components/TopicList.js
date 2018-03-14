@@ -40,7 +40,7 @@ export default class TopicList extends React.Component {
     render() {
         const props = this.props;
         const {
-            history,
+            router,
             selectForDeletion,
             deselectForDeletion,
             displaySelectForDeletion,
@@ -52,7 +52,7 @@ export default class TopicList extends React.Component {
             uid,
         } = params;
         const handlePrimaryOnClick = (e, topic) => {
-            history.push(`/user/${ uid }/topic/${ topic.code }`);
+            router.push(`/user/${ uid }/topic/${ topic.code }`);
         }
         const handleCheckboxOnClick = (e) => {
             const target = e.target;

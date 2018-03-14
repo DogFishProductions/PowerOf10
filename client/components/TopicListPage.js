@@ -13,7 +13,7 @@ export default class TopicListPage extends React.Component {
         const props = this.props;
         const {
             createItem,
-            history,
+            router,
             params,
         } = props;
         const {
@@ -22,7 +22,7 @@ export default class TopicListPage extends React.Component {
         const handleAddTopicOnClick = (e) => {
             const topicId = helpers.randomString(10, "aA#!");
             createItem("topic", topicId);
-            history.push(`/${ uid }/topic/${ topicId }`);
+            router.push(`/${ uid }/topic/${ topicId }`);
         }
         return (
             <div className="pseudo-phone-main outer">

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { withStyles } from 'material-ui/styles';
@@ -32,7 +33,7 @@ const iconTimerButton = (props) => {
 }
 
 iconTimerButton.propTypes = {
-    classes: React.PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired,
 };
 
 export const IconTimerButton = withStyles(styles)(iconTimerButton);
@@ -51,7 +52,7 @@ const iconTimerOffButton = (props) => {
 }
 
 iconTimerOffButton.propTypes = {
-    classes: React.PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired,
 };
 
 export const IconTimerOffButton = withStyles(styles)(iconTimerOffButton);
@@ -67,7 +68,7 @@ const floatingAddButton = (props) => {
 }
 
 floatingAddButton.propTypes = {
-    classes: React.PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired,
 };
 
 export const FloatingAddButton = withStyles(styles)(floatingAddButton);
