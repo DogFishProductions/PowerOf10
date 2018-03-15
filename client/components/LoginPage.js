@@ -50,25 +50,25 @@ class LoginPage extends React.Component {
                         >
                             <h2>Experience the Power of 10</h2>
                         </Grid>
-                            <Grid
-                                item
-                                xs={ 12 }
-                            >
-                                { isLoaded(auth)
-                                    ? (isEmpty(auth) &&
-                                        <GoogleButton
-                                            style={ { margin: "0 auto" } }
-                                            onClick={ (e) => authenticate(e, "google")}
-                                        >
-                                            Log in with Google
-                                        </GoogleButton>
-                                    )
-                                    : <CircularProgress
-                                        color="secondary"
-                                        disabled={ !supervisor.showProgress }
-                                    />
-                                }
-                            </Grid>
+                        <Grid
+                            item
+                            xs={ 12 }
+                        >
+                            { isLoaded(auth)
+                                ? (isEmpty(auth) &&
+                                    <GoogleButton
+                                        style={ { margin: "0 auto" } }
+                                        onClick={ (e) => authenticate(e, "google")}
+                                    >
+                                        Log in with Google
+                                    </GoogleButton>
+                                )
+                                : <CircularProgress
+                                    color="secondary"
+                                    disabled={ !supervisor.showProgress }
+                                />
+                            }
+                        </Grid>
                         <Grid
                             item
                             xs={12}

@@ -8,7 +8,7 @@ function mapStateToProps(state) {
     return {
         sessions: state.sessions,
         topics: state.topics,
-        supervisor: state.supervisor
+        supervisor: state.supervisor,
     }
 }
 

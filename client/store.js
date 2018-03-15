@@ -1,8 +1,10 @@
-import { createStore, compose } from "redux";
+import { createStore, combineReducers, compose } from "redux";
 import { syncHistoryWithStore, routerReducer } from "react-router-redux";
 import { browserHistory } from "react-router";
-import { reactReduxFirebase, getFirebase } from "react-redux-firebase";
 import firebase from "firebase";
+import 'firebase/firestore' // add this to use Firestore
+import { reactReduxFirebase } from "react-redux-firebase";
+import { reduxFirestore } from 'redux-firestore';
 
 import rootReducer from "./reducers";
 import topics from "./data/topics";
@@ -13,10 +15,14 @@ const firebaseConfig = {
     authDomain: "power-of-10.firebaseapp.com",
     databaseURL: "https://power-of-10.firebaseio.com",
     storageBucket: "power-of-10.appspot.com",
+    projectId: "power-of-10",
 }
 
 // initialize firebase instance
 firebase.initializeApp(firebaseConfig);
+
+// initialize firestore
+firebase.firestore();
 
 // react-redux-firebase options
 const rrfConfig = {
@@ -49,6 +55,7 @@ const enhancers = compose(
 
 const createStoreWithFirebase = compose(
     reactReduxFirebase(firebase, rrfConfig),
+    reduxFirestore(firebase),
 )(createStore);
 
 const store = createStoreWithFirebase(

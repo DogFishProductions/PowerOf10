@@ -59,7 +59,7 @@ class ItemBottomNavigation extends React.Component {
                 className={ classes.root }>
                 { renderLeftIcon() }
                 <BottomNavigationAction
-                    disabled={ true }
+                    disabled={ false }
                     label="Target"
                     icon={ <DataUsageIcon color="disabled" /> }
                 />

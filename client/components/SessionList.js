@@ -130,7 +130,7 @@ export default class SessionList extends React.Component {
                         </Slide>
                         <ListItemText
                             onClick={ (e) => handlePrimaryOnClick(e, session) }
-                            primary={ `${momentToDatetimeString(session, "from")} ${session.code}` }
+                            primary={ momentToDatetimeString(session, "from") }
                             secondary={ durationToString([session], "long") }
                         />
                         { session.isRunning && (
