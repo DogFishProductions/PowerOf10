@@ -4,7 +4,6 @@ import AddIcon from "material-ui-icons/Add";
 import Button from 'material-ui/Button';
 
 import * as helpers from "../helpers";
-// import TopicListAppBar from "./TopicListAppBar";
 import ItemAppBar from "./ItemAppBar";
 import TopicList from "./TopicList";
 

@@ -10,6 +10,8 @@ import Grid from "material-ui/Grid";
 import Button from "material-ui/Button";
 import { CircularProgress } from 'material-ui/Progress';
 
+import LoadingIndicator from "./LoadingIndicator";
+
 const styles = (theme) => ({
     root: {
         flexGrow: 1,
@@ -35,59 +37,44 @@ class LoginPage extends React.Component {
         const authenticate = (e, provider) => {
             firebase.login({ provider, type: "redirect" }).catch(console.log);
         }
-        const renderLogin = () => {
-            return (
-                <div
-                    className={ `${ classes.root } pseudo-phone-list-no-scroll` }
+        return (
+            <div
+                className={ `${ classes.root } pseudo-phone-list-no-scroll` }
+            >
+                <Grid
+                    container
+                    className={ classes.flex }
                 >
                     <Grid
-                        container
-                        className={ classes.flex }
+                        item
+                        xs={ 12 }
                     >
-                        <Grid
-                            item
-                            xs={ 12 }
-                        >
-                            <h2>Experience the Power of 10</h2>
-                        </Grid>
-                        <Grid
-                            item
-                            xs={ 12 }
-                        >
-                            { isLoaded(auth)
-                                ? (isEmpty(auth) &&
-                                    <GoogleButton
-                                        style={ { margin: "0 auto" } }
-                                        onClick={ (e) => authenticate(e, "google")}
-                                    >
-                                        Log in with Google
-                                    </GoogleButton>
-                                )
-                                : <CircularProgress
-                                    color="secondary"
-                                    disabled={ !supervisor.showProgress }
-                                />
-                            }
-                        </Grid>
-                        <Grid
-                            item
-                            xs={12}
-                        >
-                            { !isEmpty(auth) &&
-                                <Button
-                                    variant="raised"
-                                    color="primary"
-                                    onClick={ (e) => firebase.logout() }
-                                >
-                                    Log out
-                                </Button>
-                            }
-                        </Grid>
+                        <h2>Experience the Power of 10</h2>
                     </Grid>
-                </div>
-            );
-        }
-        return renderLogin();
+                    {
+                        isLoaded(auth)
+                        ? isEmpty(auth)
+                            ? <GoogleButton
+                                style={ { margin: "0 auto" } }
+                                onClick={ (e) => authenticate(e, "google")}
+                            />
+                            : <Button
+                                variant="raised"
+                                color="primary"
+                                onClick={ (e) => firebase.logout() }
+                            >
+                                Log out
+                            </Button>
+                        : <LoadingIndicator
+                            isLoaded={ isLoaded(auth) }
+                            notLoadedText=""
+                            isEmpty={ isEmpty(auth) }
+                            isEmptyText="Login failed"
+                        />
+                    }
+                </Grid>
+            </div>
+        );
     }
 }
 
