@@ -72,14 +72,10 @@ export default class SessionList extends React.Component {
         const handleTimerOffButtonOnClick = (e, sessionId, i) => {
             // don't use handler dispatchAction as session id is not in URL
             updateItemProperty("session", sessionId, "isRunning", false, topicId);
-            // remove the unnecessary boolean property
-            addItem("session", sessionId, topicId);
         }
         const handleTimerButtonOnClick = (e, sessionId, i) => {
             const isRunning = supervisor.isRunning;
             updateItemProperty("session", isRunning.sessionId, "isRunning", false, isRunning.topicId);
-            // remove the unnecessary boolean property
-            addItem("session", isRunning.sessionId, isRunning.topicId);
             // don't use handler dispatchAction as session id is not in URL
             updateItemProperty("session", sessionId, "isRunning", true, topicId);
         }

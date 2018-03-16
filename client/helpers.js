@@ -187,7 +187,6 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
     const runningTopicId = isRunning.topicId;
     if (runningSessionId) {
         updateItemProperty("session", runningSessionId, "isRunning", false, runningTopicId);
-        addItem("session", runningSessionId);
     } else {
         const {
             supervisor,
@@ -201,7 +200,6 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
         // stop currently running session if one exists
         if (isRunning.topicId) {
             updateItemProperty("session", isRunning.sessionId, "isRunning", false, isRunning.topicId);
-            addItem("session", isRunning.sessionId);
         }
         // create a new session once the old one has been stopped (otherwise supervisor.isNew will be set to null)
         const {

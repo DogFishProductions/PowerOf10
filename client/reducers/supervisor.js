@@ -45,10 +45,8 @@ const postSupervisor = (state = {}, action) => {
                 ...state,
                 toDelete: _.uniq(_.concat(itemsForDeletion, [itemId])),
             };
-        case REMOVE_SESSION:
         case DESELECT_SESSION_FOR_DELETION:
             itemId = sessionId;
-        case REMOVE_TOPIC:
         case DESELECT_TOPIC_FOR_DELETION:
             itemId = itemId || topicId;
             index = _.findIndex(itemsForDeletion, (item) => {
@@ -190,6 +188,10 @@ const supervisor = (state = {}, action) => {
                 ...state,
                 openDialog: option,
             }
+        case "@@reduxFirestore/GET_REQUEST":
+        case "@@reduxFirestore/GET_SUCCESS":
+        case "@@reduxFirestore/GET_FAILURE":
+            console.log(action);
         default:
             return state;
     }

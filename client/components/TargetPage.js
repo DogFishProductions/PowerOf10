@@ -23,38 +23,41 @@ const styles = (theme) => ({
 
 class TargetPage extends React.Component {
     componentWillMount() {
-        this.props.firestore.get("users/A0vdSBqTPAfGVNuNKAjR");
+        this.props.firestore.get({
+            collection: "users",
+            doc: this.props.params.uid,
+            subcollections: [
+                {
+                    collection: "topics",
+                },
+            ],
+        });
     }
     render() {
+        console.log(this.props.user);
         const {
             classes,
-            users,
+            user,
             firestore,
         } = this.props;
         const handleOnChange = (e, key) => {
             firestore.update(`users/${key}`, { first: e.target.value });
         }
         return (
-            isLoaded(users) && !isEmpty(users)
-            ? users.map((user) => {
-                return (
-                    <div key={ user.id }>
-                        <TextField
-                            placeholder="Describe your new topic"
-                            label="Description"
-                            multiline
-                            rows="2"
-                            rowsMax="15"
-                            onChange={ (e) => handleOnChange(e, user.id) }
-                            defaultValue={ user.first }
-                        />
-                    </div>
-                );
-            })
+            isLoaded(user) && !isEmpty(user)
+            ? <TextField
+                placeholder="Describe your new topic"
+                label="Description"
+                multiline
+                rows="2"
+                rowsMax="15"
+                onChange={ (e) => handleOnChange(e, i) }
+                defaultValue="test"
+            />
             : <LoadingIndicator
-                isLoaded={ isLoaded(users) }
+                isLoaded={ isLoaded(user) }
                 notLoadedText="Loading Users"
-                isEmpty={ isEmpty(users) }
+                isEmpty={ isEmpty(user) }
                 isEmptyText="Users list is empty"
             />
         )
@@ -63,7 +66,7 @@ class TargetPage extends React.Component {
 
 export default compose(
   withFirestore,
-  connect((state) => ({
-    users: state.firestore.ordered.users
+  connect((state, props) => ({
+    user: state.firestore.data.users,
   }))
 )(withStyles(styles)(TargetPage));
