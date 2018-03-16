@@ -1,29 +1,44 @@
 import * as _ from "lodash";
 
-import * as helpers from "../helpers";
+import { actionTypes } from "../constants";
+import { getSelectedItemAndIndexFromArray } from "../helpers";
+
+const {
+    CREATE_SESSION,
+    UPDATE_SESSION,
+    ADD_SESSION,
+    REMOVE_SESSION,
+    REMOVE_TOPIC,
+} = actionTypes;
 
 const postSession = (state = [], action) => {
     const {
+        type,
+        sessionId,
+        propName,
+        newValue,
+    } = action;
+    const {
         index,
         selectedItem
-    } = helpers.getSelectedItemAndIndexFromArray(state, "code", action.sessionId);
+    } = getSelectedItemAndIndexFromArray(state, "code", sessionId);
     const before = state.slice(0, index);   // before the one we are updating
     const after = state.slice(index + 1);   // after the one we are updating
-    switch(action.type) {
-        case "CREATE_SESSION":
+    switch(type) {
+        case CREATE_SESSION:
             const now = Date.now();
             return [
                 ...state,
                 {
-                    code: action.sessionId,
+                    code: sessionId,
                     description: "",
                     from: now,
                     to: now
                 }
             ];
-        case "UPDATE_SESSION":
+        case UPDATE_SESSION:
             const updatedValue = {};
-            updatedValue[action.propName] = action.newValue;
+            updatedValue[propName] = newValue;
             return [
                 ...before,
                 {
@@ -32,7 +47,7 @@ const postSession = (state = [], action) => {
                 },
                 ...after
             ];
-        case "ADD_SESSION":
+        case ADD_SESSION:
             // booleans are only used to indicate active editing - false values do not need to be saved
             const updatedSelectedItem = _.pickBy(selectedItem, (prop) => (prop !== false));
             return [
@@ -42,7 +57,7 @@ const postSession = (state = [], action) => {
                 },
                 ...after
             ];
-        case "REMOVE_SESSION":
+        case REMOVE_SESSION:
             return [
                 ...before,
                 ...after
@@ -54,19 +69,24 @@ const postSession = (state = [], action) => {
 }
 
 const sessions = (state = [], action) => {
-    if (typeof action.sessionId !== "undefined") {
+    const {
+        type,
+        sessionId,
+        topicId,
+    } = action;
+    if (typeof sessionId !== "undefined") {
         return {
           // take the current state
           ...state,
           // overwrite this topic with a new one
-          [action.topicId]: postSession(state[action.topicId], action)
+          [topicId]: postSession(state[topicId], action)
         }
     }
-    switch(action.type) {
-        case "REMOVE_TOPIC":
+    switch(type) {
+        case REMOVE_TOPIC:
             return {
                 ...state,
-                [action.topicId]: [],
+                [topicId]: [],
             }
         default:
             return state;

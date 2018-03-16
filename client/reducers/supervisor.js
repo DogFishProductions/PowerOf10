@@ -1,28 +1,56 @@
 import * as _ from "lodash";
 
+import { actionTypes } from "../constants";
+
+const {
+    SELECT_SESSION_FOR_DELETION,
+    SELECT_TOPIC_FOR_DELETION,
+    REMOVE_SESSION,
+    DESELECT_SESSION_FOR_DELETION,
+    REMOVE_TOPIC,
+    DESELECT_TOPIC_FOR_DELETION,
+    SELECT_ALL_SESSIONS_FOR_DELETION,
+    SELECT_ALL_TOPICS_FOR_DELETION,
+    CREATE_TOPIC,
+    CREATE_SESSION,
+    ADD_TOPIC,
+    ADD_SESSION,
+    UPDATE_SESSION,
+    EDIT_ITEM_TITLE,
+    SELECT_BOTTOM_NAV_INDEX,
+    DELETE_REQUESTED,
+    DISPLAY_SELECT_FOR_DELETION,
+    DESELECT_ALL_FOR_DELETION,
+    OPEN_MENU,
+    OPEN_DIALOG,
+} = actionTypes;
+
 const postSupervisor = (state = {}, action) => {
     const {
+        type,
+        topics,
+        sessions,
         topicId,
         sessionId,
     } = action;
     const itemsForDeletion = state.toDelete || [];
     let index, before, after;
     let itemId, selectedItems;
-    switch(action.type) {
-        case "SELECT_SESSION_FOR_DELETION":
-            itemId = action.sessionId;
-        case "SELECT_TOPIC_FOR_DELETION":
-            itemId = itemId || action.topicId;
+    switch(type) {
+        case SELECT_SESSION_FOR_DELETION:
+            itemId = sessionId;
+        case SELECT_TOPIC_FOR_DELETION:
+            itemId = itemId || topicId;
             return {
                 ...state,
                 toDelete: _.uniq(_.concat(itemsForDeletion, [itemId])),
             };
-        case "REMOVE_SESSION":
-        case "DESELECT_SESSION_FOR_DELETION":
-            itemId = action.sessionId;
-        case "REMOVE_TOPIC":
-        case "DESELECT_TOPIC_FOR_DELETION":
-            itemId = itemId || action.topicId;
+        case REMOVE_SESSION:
+        case DESELECT_SESSION_FOR_DELETION:
+            itemId = sessionId;
+        case REMOVE_TOPIC:
+        case DESELECT_TOPIC_FOR_DELETION:
+            itemId = itemId || topicId;
             index = _.findIndex(itemsForDeletion, (item) => {
                 return (item === itemId);
             });
@@ -36,18 +64,18 @@ const postSupervisor = (state = {}, action) => {
                 ],
                 isEditingTitle: null,
             };
-        case "SELECT_ALL_SESSIONS_FOR_DELETION":
-            itemId = action.sessionId;
-            selectedItems = action.sessions[action.topicId];
-        case "SELECT_ALL_TOPICS_FOR_DELETION":
-            itemId = itemId || action.topicId;
-            selectedItems = selectedItems || action.topics;
+        case SELECT_ALL_SESSIONS_FOR_DELETION:
+            itemId = sessionId;
+            selectedItems = sessions[topicId];
+        case SELECT_ALL_TOPICS_FOR_DELETION:
+            itemId = itemId || topicId;
+            selectedItems = selectedItems || topics;
             return {
                 ...state,
                 selectAllForDeletion: true,
                 toDelete: _.uniq(_.concat(itemsForDeletion, selectedItems.map((item) => item.code))),
             };
-        case "CREATE_TOPIC":
+        case CREATE_TOPIC:
             return {
                 ...state,
                 isNew: {
@@ -55,7 +83,7 @@ const postSupervisor = (state = {}, action) => {
                     sessionId: state.isNew.sessionId
                 },
             };
-        case "CREATE_SESSION":
+        case CREATE_SESSION:
             return {
                 ...state,
                 isNew: {
@@ -63,7 +91,7 @@ const postSupervisor = (state = {}, action) => {
                     sessionId
                 },
             };
-        case "ADD_TOPIC":
+        case ADD_TOPIC:
             return {
                 ...state,
                 isNew: {
@@ -72,7 +100,7 @@ const postSupervisor = (state = {}, action) => {
                 },
                 isEditingTitle: null,
             };
-        case "ADD_SESSION":
+        case ADD_SESSION:
             return {
                 ...state,
                 isNew: {
@@ -81,7 +109,7 @@ const postSupervisor = (state = {}, action) => {
                 },
                 isEditingTitle: null,
             };
-        case "UPDATE_SESSION":
+        case UPDATE_SESSION:
             if (action.propName === "isRunning") {
                 if (action.newValue) {
                     return {
@@ -102,7 +130,7 @@ const postSupervisor = (state = {}, action) => {
                 }
             }
             return state;
-        case "EDIT_ITEM_TITLE":
+        case EDIT_ITEM_TITLE:
             return {
                 ...state,
                 isEditingTitle: topicId,
@@ -113,45 +141,54 @@ const postSupervisor = (state = {}, action) => {
 }
 
 const supervisor = (state = {}, action) => {
-    if ((typeof action.topicId !== "undefined") || (typeof action.sessionId !== "undefined")) {
+    const {
+        type,
+        index,
+        option,
+        topicId,
+        sessionId,
+        anchor,
+    } = action;
+
+    if ((typeof topicId !== "undefined") || (typeof sessionId !== "undefined")) {
         return postSupervisor(state, action);
     }
-    switch(action.type) {
-        case "SELECT_BOTTOM_NAV_INDEX":
+    switch(type) {
+        case SELECT_BOTTOM_NAV_INDEX:
             return {
                 ...state,
-                bottomNavSelectedIndex: action.index
+                bottomNavSelectedIndex: index
             };
-        case "DELETE_REQUESTED":
+        case DELETE_REQUESTED:
             return {
                 ...state,
-                deleteRequested: action.option
+                deleteRequested: option
             };
-        case "DISPLAY_SELECT_FOR_DELETION":
+        case DISPLAY_SELECT_FOR_DELETION:
             return {
                 ...state,
-                displaySelectForDeletion: action.option
+                displaySelectForDeletion: option
             };
-        case "DESELECT_ALL_FOR_DELETION":
+        case DESELECT_ALL_FOR_DELETION:
             return {
                 ...state,
                 selectAllForDeletion: false,
                 toDelete: [],
             };
-        case "EDIT_ITEM_TITLE":
+        case EDIT_ITEM_TITLE:
             return {
                 ...state,
                 isEditingTitle: null,
             }
-        case "OPEN_MENU":
+        case OPEN_MENU:
             return {
                 ...state,
-                menuAnchor: action.option ? action.anchor : null,
+                menuAnchor: option ? anchor :null,
             }
-        case "OPEN_DIALOG":
+        case OPEN_DIALOG:
             return {
                 ...state,
-                openDialog: action.option,
+                openDialog: option,
             }
         default:
             return state;

@@ -1,27 +1,41 @@
 import * as _ from "lodash";
 
-import * as helpers from "../helpers";
+import { actionTypes } from "../constants";
+import { getSelectedItemAndIndexFromArray } from "../helpers";
+
+const {
+    CREATE_TOPIC,
+    UPDATE_TOPIC,
+    ADD_TOPIC,
+    REMOVE_TOPIC,
+} = actionTypes;
 
 const postTopic = (state = [], action) => {
     const {
+        type,
+        topicId,
+        propName,
+        newValue,
+    } = action;
+    const {
         index,
         selectedItem
-    } = helpers.getSelectedItemAndIndexFromArray(state, "code", action.topicId);
+    } = getSelectedItemAndIndexFromArray(state, "code", topicId);
     const before = state.slice(0, index);   // before the one we are updating
     const after = state.slice(index + 1);   // after the one we are updating
-    switch(action.type) {
-        case "CREATE_TOPIC":
+    switch(type) {
+        case CREATE_TOPIC:
             return [
                 ...state,
                 {
-                    code: action.topicId,
+                    code: topicId,
                     title: "New topic",
                     description: "",
                 }
             ];
-        case "UPDATE_TOPIC":
+        case UPDATE_TOPIC:
             const updatedValue = {};
-            updatedValue[action.propName] = action.newValue;
+            updatedValue[propName] = newValue;
             return [
                 ...before,
                 {
@@ -30,7 +44,7 @@ const postTopic = (state = [], action) => {
                 },
                 ...after
             ];
-        case "ADD_TOPIC":
+        case ADD_TOPIC:
             // booleans are only used to indicate active editing - false values do not need to be saved
             const updatedSelectedItem = _.pickBy(selectedItem, (prop) => (prop !== false));
             return [
@@ -40,7 +54,7 @@ const postTopic = (state = [], action) => {
                 },
                 ...after
             ];
-        case "REMOVE_TOPIC":
+        case REMOVE_TOPIC:
             return [
                 ...before,
                 ...after
