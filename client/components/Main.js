@@ -20,12 +20,6 @@ const theme = createMuiTheme({
 });
 
 export default class Main extends React.Component {
-    componentWillMount() {
-        // this.ref = base.syncState()
-    }
-    componentWillUnmount() {
-
-    }
     render() {
         return (
             <div>

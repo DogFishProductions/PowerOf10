@@ -187,7 +187,6 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
     const runningTopicId = isRunning.topicId;
     if (runningSessionId) {
         updateItemProperty("session", runningSessionId, "isRunning", false, runningTopicId);
-        addItem("session", runningSessionId);
     } else {
         const {
             supervisor,
@@ -201,7 +200,6 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
         // stop currently running session if one exists
         if (isRunning.topicId) {
             updateItemProperty("session", isRunning.sessionId, "isRunning", false, isRunning.topicId);
-            addItem("session", isRunning.sessionId);
         }
         // create a new session once the old one has been stopped (otherwise supervisor.isNew will be set to null)
         const {
@@ -212,4 +210,21 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
         router.push(`/user/${ uid }/topic/${ topicId }/session/${ sessionId }`);
     }
     selectBottomNavIndex(0);
+}
+
+export const parseFirestoreData = ({ payload }) => {
+    const sessions = {};
+    const topics = _.transform(
+        _.get(payload, "data", {}),
+        (result, value, key) => {
+            const currentSessions = _.pick(value, ["sessions"]);
+            sessions[key] = _.get(currentSessions, "sessions", []).map((session) => _.assign(session, { code: randomString(10, "aA#!") }));
+            result.push(_.assign(_.omit(value, ["sessions"]), { code: key }));
+        },
+        []
+    );
+    return {
+        topics,
+        sessions,
+    }
 }

@@ -1,7 +1,10 @@
 import * as _ from "lodash";
 
 import { actionTypes } from "../constants";
-import { getSelectedItemAndIndexFromArray } from "../helpers";
+import {
+    getSelectedItemAndIndexFromArray,
+    parseFirestoreData,
+} from "../helpers";
 
 const {
     CREATE_SESSION,
@@ -37,24 +40,21 @@ const postSession = (state = [], action) => {
                 }
             ];
         case UPDATE_SESSION:
-            const updatedValue = {};
-            updatedValue[propName] = newValue;
+            const updatedSelectedItem = {
+                ...selectedItem,
+                ...{ [propName]: newValue },
+            }
+            // booleans are only used to indicate active editing - false values do not need to be saved
+            const filteredSelectedItem = _.pickBy(updatedSelectedItem, (prop) => (prop !== false));
             return [
                 ...before,
-                {
-                    ...selectedItem,
-                    ...updatedValue
-                },
+                filteredSelectedItem,
                 ...after
             ];
         case ADD_SESSION:
-            // booleans are only used to indicate active editing - false values do not need to be saved
-            const updatedSelectedItem = _.pickBy(selectedItem, (prop) => (prop !== false));
             return [
                 ...before,
-                {
-                    ...updatedSelectedItem,
-                },
+                selectedItem,
                 ...after
             ];
         case REMOVE_SESSION:
@@ -88,6 +88,16 @@ const sessions = (state = [], action) => {
                 ...state,
                 [topicId]: [],
             }
+        case "@@reduxFirestore/GET_SUCCESS":
+            const {
+                sessions,
+            } = parseFirestoreData(action);
+            // overwrite this to simply return state to use dummy data
+            return {
+                ...sessions,
+            }
+        // case "@@reduxFirestore/GET_REQUEST":
+        // case "@@reduxFirestore/GET_FAILURE":
         default:
             return state;
     }

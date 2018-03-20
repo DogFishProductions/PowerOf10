@@ -45,11 +45,14 @@ import TargetPage from "./TargetPage";
 import NotesPage from "./NotesPage";
 
 let calcCurrentDuration;
+const clearRunningUpdater = () => {
+    clearInterval(calcCurrentDuration);
+    calcCurrentDuration = null;
+}
 
 export default class TopicPage extends React.Component {
     componentWillUnmount() {
-        clearInterval(calcCurrentDuration);
-        calcCurrentDuration = null;
+        clearRunningUpdater();
         resetErrorState();
         this.props.selectBottomNavIndex(0);
     }

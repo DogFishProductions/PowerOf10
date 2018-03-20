@@ -1,4 +1,7 @@
 import React from "react";
+import { connect } from 'react-redux'
+import { compose } from 'redux'
+import { withFirestore, isLoaded, isEmpty } from 'react-redux-firebase'
 
 import AddIcon from "material-ui-icons/Add";
 import Button from 'material-ui/Button';
@@ -6,14 +9,28 @@ import Button from 'material-ui/Button';
 import * as helpers from "../helpers";
 import ItemAppBar from "./ItemAppBar";
 import TopicList from "./TopicList";
+import LoadingIndicator from "./LoadingIndicator";
 
-export default class TopicListPage extends React.Component {
+class TopicListPage extends React.Component {
+    componentWillMount() {
+        this.props.firestore.get({
+            collection: "users",
+            doc: this.props.params.uid,
+            subcollections: [
+                {
+                    collection: "topics",
+                },
+            ],
+        });
+    }
     render() {
         const props = this.props;
         const {
             createItem,
             router,
             params,
+            topics,
+            supervisor,
         } = props;
         const {
             uid,
@@ -23,8 +40,11 @@ export default class TopicListPage extends React.Component {
             createItem("topic", topicId);
             router.push(`/user/${ uid }/topic/${ topicId }`);
         }
+        const isLoaded = (supervisor.isLoaded || false);
+        const isEmpty = (topics.length == 0);
         return (
-            <div className="pseudo-phone-main outer">
+            isLoaded && !isEmpty
+            ? <div className="pseudo-phone-main outer">
                 <ItemAppBar {...props} />
                 <div className="pseudo-phone-list inner">
                     <div>
@@ -42,6 +62,16 @@ export default class TopicListPage extends React.Component {
                     </div>
                 </div>
             </div>
+            : <LoadingIndicator
+                isLoaded={ isLoaded }
+                notLoadedText="Loading Topics"
+                isEmpty={ isEmpty }
+                isEmptyText="Add a Topic to get started"
+            />
         )
     }
 }
+
+export default compose(
+  withFirestore,
+)(TopicListPage);

@@ -30,5 +30,4 @@ const router = (
     </Provider>
 );
 
-
 render(router, document.getElementById('root'));

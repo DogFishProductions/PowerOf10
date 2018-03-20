@@ -52,6 +52,7 @@ import NotesPage from "./NotesPage";
 export default class TopicPage extends React.Component {
     componentWillUnmount() {
         clearRunningUpdater();
+        this.props.selectBottomNavIndex(0);
     }
     componentWillReceiveProps(nextProps)  {
         const runningSessionId = _.get(this, "props.supervisor.isRunning.sessionId", null);
