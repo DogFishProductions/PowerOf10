@@ -107,6 +107,17 @@ const postSupervisor = (state = {}, action) => {
                 },
                 isEditingTitle: null,
             };
+        case REMOVE_SESSION:
+            if (action.sessionId === state.isRunning.sessionId) {
+                return {
+                    ...state,
+                    isRunning: {
+                        topicId: null,
+                        sessionId: null,
+                    },
+                }
+            }
+            return state;
         case UPDATE_SESSION:
             if (action.propName === "isRunning") {
                 if (action.newValue) {
@@ -189,9 +200,23 @@ const supervisor = (state = {}, action) => {
                 openDialog: option,
             }
         case "@@reduxFirestore/GET_REQUEST":
+            return {
+                ...state,
+                isFetching: true,
+                isLoaded: false,
+            }
         case "@@reduxFirestore/GET_SUCCESS":
+            return {
+                ...state,
+                isFetching: false,
+                isLoaded: true,
+            }
         case "@@reduxFirestore/GET_FAILURE":
-            console.log(action);
+        return {
+                ...state,
+                isFetching: false,
+                isloaded: true,
+            }
         default:
             return state;
     }

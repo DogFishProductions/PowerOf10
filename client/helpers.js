@@ -211,3 +211,20 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
     }
     selectBottomNavIndex(0);
 }
+
+export const parseFirestoreData = ({ payload }) => {
+    const sessions = {};
+    const topics = _.transform(
+        _.get(payload, "data", {}),
+        (result, value, key) => {
+            const currentSessions = _.pick(value, ["sessions"]);
+            sessions[key] = _.get(currentSessions, "sessions", []).map((session) => _.assign(session, { code: randomString(10, "aA#!") }));
+            result.push(_.assign(_.omit(value, ["sessions"]), { code: key }));
+        },
+        []
+    );
+    return {
+        topics,
+        sessions,
+    }
+}

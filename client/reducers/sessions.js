@@ -1,7 +1,10 @@
 import * as _ from "lodash";
 
 import { actionTypes } from "../constants";
-import { getSelectedItemAndIndexFromArray } from "../helpers";
+import {
+    getSelectedItemAndIndexFromArray,
+    parseFirestoreData,
+} from "../helpers";
 
 const {
     CREATE_SESSION,
@@ -85,6 +88,16 @@ const sessions = (state = [], action) => {
                 ...state,
                 [topicId]: [],
             }
+        case "@@reduxFirestore/GET_SUCCESS":
+            const {
+                sessions,
+            } = parseFirestoreData(action);
+            // overwrite this to simply return state to use dummy data
+            return {
+                ...sessions,
+            }
+        // case "@@reduxFirestore/GET_REQUEST":
+        // case "@@reduxFirestore/GET_FAILURE":
         default:
             return state;
     }

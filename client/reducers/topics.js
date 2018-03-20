@@ -1,7 +1,10 @@
 import * as _ from "lodash";
 
 import { actionTypes } from "../constants";
-import { getSelectedItemAndIndexFromArray } from "../helpers";
+import {
+    getSelectedItemAndIndexFromArray,
+    parseFirestoreData,
+} from "../helpers";
 
 const {
     CREATE_TOPIC,
@@ -68,6 +71,18 @@ const postTopic = (state = [], action) => {
 const topics = (state = [], action) => {
     if (typeof action.topicId !== "undefined") {
         return postTopic(state, action);
+    }
+    switch (action.type) {
+        case "@@reduxFirestore/GET_SUCCESS":
+            const {
+                topics,
+            } = parseFirestoreData(action);
+            return [
+                ...topics,
+            ];
+        // case "@@reduxFirestore/GET_REQUEST":
+        // case "@@reduxFirestore/GET_FAILURE":
+        default:
     }
     return state;
 }
