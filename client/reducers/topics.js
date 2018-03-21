@@ -3,7 +3,7 @@ import * as _ from "lodash";
 import { actionTypes } from "../constants";
 import {
     getSelectedItemAndIndexFromArray,
-    parseFirestoreData,
+    parseFirestoreTopics,
 } from "../helpers";
 
 const {
@@ -74,11 +74,9 @@ const topics = (state = [], action) => {
     }
     switch (action.type) {
         case "@@reduxFirestore/GET_SUCCESS":
-            const {
-                topics,
-            } = parseFirestoreData(action);
+            // overwrite this to simply return state to use dummy data
             return [
-                ...topics,
+                ...parseFirestoreTopics(action),
             ];
         // case "@@reduxFirestore/GET_REQUEST":
         // case "@@reduxFirestore/GET_FAILURE":

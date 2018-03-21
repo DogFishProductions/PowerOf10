@@ -217,6 +217,13 @@ const supervisor = (state = {}, action) => {
                 isFetching: false,
                 isloaded: true,
             }
+        case "@@reduxFirestore/ADD_REQUEST":
+        case "@@reduxFirestore/ADD_SUCCESS":
+        case "@@reduxFirestore/ADD_FAILURE":
+        case "@@reduxFirestore/SET_REQUEST":
+        case "@@reduxFirestore/SET_SUCCESS":
+        case "@@reduxFirestore/SET_FAILURE":
+            console.log("action: ", action);
         default:
             return state;
     }

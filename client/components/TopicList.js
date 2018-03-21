@@ -16,7 +16,7 @@ import Checkbox from 'material-ui/Checkbox';
 
 import {
     randomString,
-    durationToString,
+    topicDurationToString,
     itemIsSelectedForDeletion,
     getNewSessionId,
     getRunningSessionIndex,
@@ -101,7 +101,7 @@ export default class TopicList extends React.Component {
                         <Avatar
                             style={ styles.orangeAvatar }
                         >
-                            { durationToString(props.sessions[topic.code], "stacked") }
+                            { topicDurationToString(topic, "stacked") }
                         </Avatar>
                         <ListItemText
                             onClick={ (e) => handlePrimaryOnClick(e, topic) }

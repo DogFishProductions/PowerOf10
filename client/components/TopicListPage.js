@@ -1,7 +1,6 @@
 import React from "react";
-import { connect } from 'react-redux'
 import { compose } from 'redux'
-import { withFirestore, isLoaded, isEmpty } from 'react-redux-firebase'
+import { withFirestore } from 'react-redux-firebase'
 
 import AddIcon from "material-ui-icons/Add";
 import Button from 'material-ui/Button';
@@ -10,6 +9,9 @@ import * as helpers from "../helpers";
 import ItemAppBar from "./ItemAppBar";
 import TopicList from "./TopicList";
 import LoadingIndicator from "./LoadingIndicator";
+import {
+    getSelectedItemAndIndexFromArray,
+} from "../helpers";
 
 class TopicListPage extends React.Component {
     componentWillMount() {
@@ -36,7 +38,7 @@ class TopicListPage extends React.Component {
             uid,
         } = params;
         const handleAddTopicOnClick = (e) => {
-            const topicId = helpers.randomString(10, "aA#!");
+            const topicId = helpers.randomString(20, "aA#");
             createItem("topic", topicId);
             router.push(`/user/${ uid }/topic/${ topicId }`);
         }

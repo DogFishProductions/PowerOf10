@@ -20,6 +20,10 @@ export const getTopicSessions = (props) => {
 
 export const durationToString = (sessions = [], type) => {
     const duration = moment.duration(durationFromArrayOfSessions(sessions), "milliseconds");
+    return durationToStringType(duration, type);
+}
+
+const durationToStringType = (duration, type) => {
     const hours = Math.trunc(duration.asHours());
     const mins = duration.minutes();
     const secs = duration.seconds();
@@ -39,6 +43,11 @@ export const durationToString = (sessions = [], type) => {
         default:
             return `${duration.hours()}h ${duration.minutes()}m`;
     }
+}
+
+export const topicDurationToString = (topic, type) => {
+    const duration = moment.duration(topic.duration || 0, "milliseconds");
+    return durationToStringType(duration, type);
 }
 
 export const momentToDatetimeString = (session, prop) => {
@@ -156,7 +165,7 @@ export const itemIsSelectedForDeletion = (items, itemId) => {
 }
 
 export const getNewSessionId = (props, topicId) => {
-    const sessionId = randomString(10, "aA#!");
+    const sessionId = randomString(20, "aA#");
     topicId = props.params.topicId || topicId;
     const start = Date.now();
     // don't use handler dispatchAction as session id is not in URL yet
@@ -212,19 +221,25 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
     selectBottomNavIndex(0);
 }
 
-export const parseFirestoreData = ({ payload }) => {
-    const sessions = {};
-    const topics = _.transform(
+const parseFirestoreData = (payload) => {
+    return _.transform(
         _.get(payload, "data", {}),
         (result, value, key) => {
-            const currentSessions = _.pick(value, ["sessions"]);
-            sessions[key] = _.get(currentSessions, "sessions", []).map((session) => _.assign(session, { code: randomString(10, "aA#!") }));
             result.push(_.assign(_.omit(value, ["sessions"]), { code: key }));
         },
         []
     );
+}
+
+export const parseFirestoreTopics = ({ payload }) => {
+    return parseFirestoreData(payload);
+}
+
+export const parseFirestoreSessions = ({ payload, meta }) => {
+    const subcollections = _.get(meta, "subcollections", []);
+    const topic = subcollections.find((sColl) => _.get(sColl, "collection") === "topics");
     return {
-        topics,
-        sessions,
-    }
+        topicId: _.get(topic, "doc", "unknown"),
+        sessions: parseFirestoreData(payload),
+    };
 }

@@ -3,6 +3,7 @@ import React from 'react';
 import { compose } from "redux";
 import { connect } from "react-redux";
 import { firebaseConnect } from "react-redux-firebase";
+import { withFirestore } from 'react-redux-firebase'
 
 import { withStyles } from "material-ui/styles";
 import AppBar from "material-ui/AppBar";
@@ -64,6 +65,7 @@ class ItemAppBar extends React.Component {
             firebase,
         } = props;
         const {
+            uid,
             topicId,
             sessionId,
         } = params;
@@ -95,7 +97,22 @@ class ItemAppBar extends React.Component {
             const selectedItem = getSelectedItem(props, "code");
             if (selectedItemIsNew(props, "code")) {
                 dispatchAction(props, "addItem");
-                redirectHome();
+                if (sessionId) {
+                    // save session to database
+                } else {
+                    this.props.firestore.set({
+                            collection: "users",
+                            doc: uid,
+                            subcollections: [
+                                {
+                                    collection: "topics",
+                                    doc: topicId,
+                                },
+                            ],
+                        },
+                        selectedItem,
+                    );
+                }
             } else {
                 deleteRequested(true);
                 displaySelectForDeletion(true);
@@ -339,5 +356,6 @@ ItemAppBar.propTypes = {
 
 export default compose(
     firebaseConnect(),
+    withFirestore,
     connect(({ firebase: { auth } }) => ({ auth }))
 )(withStyles(styles)(ItemAppBar));
