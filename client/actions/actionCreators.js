@@ -179,9 +179,11 @@ export const openDialog = (option) => {
     }
 }
 
-export const sessionIsRunning = (option) => {
+export const sessionIsRunning = (option, topicId, sessionId) => {
     return {
         type: actionTypes.SESSION_IS_RUNNING,
         option,
+        topicId,
+        sessionId,
     }
 }

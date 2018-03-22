@@ -4,6 +4,9 @@ import { actionTypes } from "../constants";
 import {
     getSelectedItemAndIndexFromArray,
     parseFirestoreTopics,
+    firestoreMetaHasSessions,
+    findFirestoreMetaSubCollection,
+    excludedProperties,
 } from "../helpers";
 
 const {
@@ -37,13 +40,12 @@ const postTopic = (state = [], action) => {
                 }
             ];
         case UPDATE_TOPIC:
-            const updatedValue = {};
-            updatedValue[propName] = newValue;
             return [
                 ...before,
                 {
                     ...selectedItem,
-                    ...updatedValue,
+                    ...{ [propName]: newValue },
+                    requiresUpdate: true,
                 },
                 ...after
             ];
@@ -72,14 +74,37 @@ const topics = (state = [], action) => {
     if (typeof action.topicId !== "undefined") {
         return postTopic(state, action);
     }
+    const { meta } = action;
     switch (action.type) {
         case "@@reduxFirestore/GET_SUCCESS":
-            // overwrite this to simply return state to use dummy data
-            return [
-                ...parseFirestoreTopics(action),
-            ];
+            if (!firestoreMetaHasSessions(meta)) {
+                return [
+                    ...parseFirestoreTopics(action),
+                ];
+            }
         // case "@@reduxFirestore/GET_REQUEST":
         // case "@@reduxFirestore/GET_FAILURE":
+        case "@@reduxFirestore/UPDATE_SUCCESS":
+            if (!firestoreMetaHasSessions(meta)) {
+                const topic = findFirestoreMetaSubCollection(action.meta, "topics");
+                if (topic) {
+                    const topicId = topic.doc;
+                    if (topicId) {
+                        console.log("topic marked as requiring update has been updated");
+                        const {
+                            index,
+                            selectedItem
+                        } = getSelectedItemAndIndexFromArray(state, "code", topicId);
+                        const before = state.slice(0, index);   // before the one we are updating
+                        const after = state.slice(index + 1);   // after the one we are updating
+                        return [
+                            ...before,
+                            _.omit(selectedItem, excludedProperties),
+                            ...after,
+                        ]
+                    }
+                }
+            }
         default:
     }
     return state;

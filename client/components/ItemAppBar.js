@@ -24,6 +24,8 @@ import {
     getSelectedItem,
     getLocalProperties,
     selectedItemIsNew,
+    createFirestoreQueryPath,
+    excludedProperties,
 } from "../helpers";
 import TopDrawer from "./TopDrawer";
 
@@ -63,6 +65,7 @@ class ItemAppBar extends React.Component {
             classes,
             editItemTitle,
             firebase,
+            firestore,
         } = props;
         const {
             uid,
@@ -89,6 +92,11 @@ class ItemAppBar extends React.Component {
             const selectedItem = getSelectedItem(props, "code");
             if (selectedItemIsNew(props, "code")) {
                 dispatchAction(props, "removeItem");
+            } else if (selectedItem.requiresUpdate) {
+                firestore.update(
+                    createFirestoreQueryPath(uid, true, topicId, null, sessionId),
+                    _.omit(selectedItem, excludedProperties),
+                );
             }
             editItemTitle(false);
             redirectHome();
@@ -97,22 +105,10 @@ class ItemAppBar extends React.Component {
             const selectedItem = getSelectedItem(props, "code");
             if (selectedItemIsNew(props, "code")) {
                 dispatchAction(props, "addItem");
-                if (sessionId) {
-                    // save session to database
-                } else {
-                    this.props.firestore.set({
-                            collection: "users",
-                            doc: uid,
-                            subcollections: [
-                                {
-                                    collection: "topics",
-                                    doc: topicId,
-                                },
-                            ],
-                        },
-                        selectedItem,
-                    );
-                }
+                firestore.set(
+                    createFirestoreQueryPath(uid, true, topicId, null, sessionId),
+                    _.omit(selectedItem, excludedProperties),
+                );
             } else {
                 deleteRequested(true);
                 displaySelectForDeletion(true);
@@ -136,10 +132,12 @@ class ItemAppBar extends React.Component {
                     const type = "session";
                     // don't use handler dispatchAction as session id is not in URL
                     removeItem("session", itemId, topicId);
+                    firestore.deleteRef(createFirestoreQueryPath(uid, true, topicId, true, itemId));
                 } else {
                     const type = "topic";
                     // don't use handler dispatchAction as session id is not in URL
                     removeItem("topic", itemId);
+                    firestore.deleteRef(createFirestoreQueryPath(uid, true, itemId));
                 }
             });
         }

@@ -23,6 +23,7 @@ const {
     DESELECT_ALL_FOR_DELETION,
     OPEN_MENU,
     OPEN_DIALOG,
+    SESSION_IS_RUNNING,
 } = actionTypes;
 
 const postSupervisor = (state = {}, action) => {
@@ -139,6 +140,24 @@ const postSupervisor = (state = {}, action) => {
                 }
             }
             return state;
+        case SESSION_IS_RUNNING:
+            if (!option) {
+                return {
+                    ...state,
+                    isRunning: {
+                        topicId: null,
+                        sessionId: null,
+                    },
+                }
+            } else {
+                return {
+                        ...state,
+                        isRunning: {
+                            topicId,
+                            sessionId,
+                        },
+                    }
+            }
         case EDIT_ITEM_TITLE:
             return {
                 ...state,
@@ -223,6 +242,9 @@ const supervisor = (state = {}, action) => {
         case "@@reduxFirestore/SET_REQUEST":
         case "@@reduxFirestore/SET_SUCCESS":
         case "@@reduxFirestore/SET_FAILURE":
+        case "@@reduxFirestore/DELETE_REQUEST":
+        case "@@reduxFirestore/DELETE_SUCCESS":
+        case "@@reduxFirestore/DELETE_FAILURE":
             console.log("action: ", action);
         default:
             return state;

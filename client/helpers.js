@@ -243,3 +243,39 @@ export const parseFirestoreSessions = ({ payload, meta }) => {
         sessions: parseFirestoreData(payload),
     };
 }
+
+export const createFirestoreQueryPath = (userId, topics = false, topicId, sessions = false, sessionId) => {
+    const query = {
+        collection: "users",
+        doc: userId,
+        subcollections: [],
+    }
+    if (topics || topicId) {
+        const tsc = { collection: "topics" };
+        if (topicId) {
+            tsc.doc = topicId; 
+        }
+        query.subcollections.push(tsc);
+    }
+    if (sessions || sessionId) {
+        const ssc = { collection: "sessions" };
+        if (topicId) {
+            ssc.doc = sessionId; 
+        }
+        query.subcollections.push(ssc);
+    }
+    return query;
+}
+
+export const findFirestoreMetaSubCollection = (meta, scName) => {
+    return _.get(meta, "subcollections", []).find((item) => _.get(item, "collection") === scName);
+}
+
+export const firestoreMetaHasSessions = (meta) => {
+    return _.get(meta, "subcollections", []).find((item) => _.get(item, "collection") === "sessions") != undefined;
+}
+
+export const excludedProperties = [
+    "isRunning",
+    "requiresUpdate",
+];

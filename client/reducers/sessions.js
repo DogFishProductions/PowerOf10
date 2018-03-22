@@ -4,6 +4,7 @@ import { actionTypes } from "../constants";
 import {
     getSelectedItemAndIndexFromArray,
     parseFirestoreSessions,
+    findFirestoreMetaSubCollection,
 } from "../helpers";
 
 const {
@@ -40,21 +41,20 @@ const postSession = (state = [], action) => {
                 }
             ];
         case UPDATE_SESSION:
-            const updatedSelectedItem = {
-                ...selectedItem,
-                ...{ [propName]: newValue },
-            }
-            // booleans are only used to indicate active editing - false values do not need to be saved
-            const filteredSelectedItem = _.pickBy(updatedSelectedItem, (prop) => (prop !== false));
+            // ONLY ADD REQUIRES UPDATE IF PROP IS NOT "isRunning"
             return [
                 ...before,
-                filteredSelectedItem,
+                {
+                    ...selectedItem,
+                    ...{ [propName]: newValue },
+                    requiresUpdate: true,
+                },
                 ...after
             ];
         case ADD_SESSION:
             return [
                 ...before,
-                selectedItem,
+                _.pickBy(selectedItem, (prop) => (prop !== false)), // booleans are only used to indicate active editing - false values do not need to be saved
                 ...after
             ];
         case REMOVE_SESSION:
@@ -89,14 +89,17 @@ const sessions = (state = [], action) => {
                 [topicId]: [],
             }
         case "@@reduxFirestore/GET_SUCCESS":
-            const {
-                topicId,
-                sessions,
-            } = parseFirestoreSessions(action);
-            // overwrite this to simply return state to use dummy data
-            return {
-                ...state,
-                [topicId]: sessions,
+            const sessions = findFirestoreMetaSubCollection(action.meta, "sessions");
+            if (sessions) {
+                const {
+                    topicId,
+                    sessions,
+                } = parseFirestoreSessions(action);
+                // overwrite this to simply return state to use dummy data
+                return {
+                    ...state,
+                    [topicId]: sessions,
+                }
             }
         // case "@@reduxFirestore/GET_REQUEST":
         // case "@@reduxFirestore/GET_FAILURE":
