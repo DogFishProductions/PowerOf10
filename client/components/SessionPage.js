@@ -58,6 +58,9 @@ export default class TopicPage extends React.Component {
     }
     render() {
         const props = this.props;
+        const {
+            supervisor,
+        } = props;
         const getSelectedSession = () => {
             return getSelectedItem(props, "code") || { };
         }
@@ -108,16 +111,16 @@ export default class TopicPage extends React.Component {
         }
         const selectedSessionIsRunning = () => {
             const selectedSession = getSelectedSession();
-            return selectedSession.isRunning;
+            return _.get(supervisor, "isRunning.sessionId", 0) === selectedSession.code;
         }
         const handleStartSessionOnClick = (e) => {
             if (selectedSessionIsRunning()) {
-                dispatchAction(props, "updateItemProperty", "isRunning", false);
+                dispatchAction(props, "sessionIsRunning", false);
                 clearInterval(calcCurrentDuration);
                 calcCurrentDuration = null;
             } else {
                 dispatchAction(props, "updateItemProperty", "to", Date.now());
-                dispatchAction(props, "updateItemProperty", "isRunning", true);
+                dispatchAction(props, "sessionIsRunning", true);
             }
         }
         const handleDateTimeOnChange = (e) => {
@@ -269,7 +272,7 @@ export default class TopicPage extends React.Component {
             const selectedSession = getSelectedSession();
             if (selectedItemIsNew(props, "code") ||
                 (selectedSession.to === selectedSession.from) ||
-                selectedSession.isRunning) { 
+                selectedSessionIsRunning()) { 
                 return (
                     <div className="floating-button-bottom-right">
                         <Button

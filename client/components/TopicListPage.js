@@ -45,13 +45,19 @@ class TopicListPage extends React.Component {
         const isLoaded = (supervisor.isLoaded || false);
         const isEmpty = (topics.length == 0);
         return (
-            isLoaded && !isEmpty
+            isLoaded
             ? <div className="pseudo-phone-main outer">
                 <ItemAppBar {...props} />
                 <div className="pseudo-phone-list inner">
-                    <div>
-                        <TopicList {...props} />
-                    </div>
+                    {
+                        isEmpty
+                        ? <h2>
+                            Add a Topic to get started
+                        </h2>
+                        : <div>
+                            <TopicList {...props} />
+                        </div>
+                    }
                 </div>
                 <div className="inner">
                     <div className="floating-button-bottom-right">

@@ -66,6 +66,7 @@ class ItemAppBar extends React.Component {
             editItemTitle,
             firebase,
             firestore,
+            sessions,
         } = props;
         const {
             uid,
@@ -88,15 +89,25 @@ class ItemAppBar extends React.Component {
                 editItemTitle(true, topicId);
             }
         }
+        const updateItem = (selectedItem, itemId) => {
+            firestore.update(
+                createFirestoreQueryPath(uid, true, topicId, null, itemId),
+                _.omit(selectedItem, excludedProperties),
+            );
+        }
         const handleOnLeftIconButtonClick = (e) => {
             const selectedItem = getSelectedItem(props, "code");
             if (selectedItemIsNew(props, "code")) {
                 dispatchAction(props, "removeItem");
-            } else if (selectedItem.requiresUpdate) {
-                firestore.update(
-                    createFirestoreQueryPath(uid, true, topicId, null, sessionId),
-                    _.omit(selectedItem, excludedProperties),
-                );
+            } else {
+                if (selectedItem.requiresUpdate) {
+                    updateItem(selectedItem, sessionId);
+                }
+                if (!sessionId) {
+                    const topicSessions = sessions[topicId] || [];
+                    const sessionsToUpdate = topicSessions.filter((session) => session.requiresUpdate);
+                    sessionsToUpdate.map((session) => updateItem(session, session.code));
+                }
             }
             editItemTitle(false);
             redirectHome();
@@ -139,6 +150,7 @@ class ItemAppBar extends React.Component {
                     removeItem("topic", itemId);
                     firestore.deleteRef(createFirestoreQueryPath(uid, true, itemId));
                 }
+                dispatchAction(props, "deselectAllForDeletion");
             });
         }
         const handleCancelConfirmedOnClick = (e) => {

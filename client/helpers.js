@@ -45,8 +45,18 @@ const durationToStringType = (duration, type) => {
     }
 }
 
-export const topicDurationToString = (topic, type) => {
-    const duration = moment.duration(topic.duration || 0, "milliseconds");
+export const topicDurationToString = (sessions, topicId, type) => {
+    console.log({ sessions, topicId });
+    const currentSessions = sessions[topicId] || [];
+    const duration = currentSessions.reduce(
+        (total, currentSession) => {
+            console.log(total);
+            const diff = moment.duration(currentSession.to - currentSession.from, "milliseconds");
+            total.add(diff);
+        },
+        moment.duration(0, "milliseconds"),
+    )
+    // const duration = moment.duration(topic.duration || 0, "milliseconds");
     return durationToStringType(duration, type);
 }
 
@@ -176,12 +186,6 @@ export const getNewSessionId = (props, topicId) => {
     };
 }
 
-export const getRunningSessionIndex = (props, topicId) => {
-    topicId = props.params.topicId || topicId;
-    const sessions = props.sessions[topicId] || [];
-    return _.findIndex(sessions, (s) => s.isRunning);
-}
-
 export const handleStartSessionOnClick = (event, props, topicId) => {
     topicId = props.params.topicId || topicId;
     const {
@@ -190,12 +194,13 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
         sessions,
         selectBottomNavIndex,
         supervisor,
+        sessionIsRunning,
     } = props; 
     const isRunning = supervisor.isRunning;
     const runningSessionId = isRunning.sessionId;
     const runningTopicId = isRunning.topicId;
-    if (runningSessionId) {
-        updateItemProperty("session", runningSessionId, "isRunning", false, runningTopicId);
+    if (runningSessionId && (runningTopicId === topicId)) {
+        sessionIsRunning(false);
     } else {
         const {
             supervisor,
@@ -208,14 +213,13 @@ export const handleStartSessionOnClick = (event, props, topicId) => {
         const isRunning = supervisor.isRunning;
         // stop currently running session if one exists
         if (isRunning.topicId) {
-            updateItemProperty("session", isRunning.sessionId, "isRunning", false, isRunning.topicId);
+            sessionIsRunning(false);
         }
-        // create a new session once the old one has been stopped (otherwise supervisor.isNew will be set to null)
         const {
             sessionId,
         } = getNewSessionId(props, topicId);
         // don't use handler dispatchAction as session id is not in URL
-        updateItemProperty("session", sessionId, "isRunning", true, topicId);
+        sessionIsRunning(true, topicId, sessionId);
         router.push(`/user/${ uid }/topic/${ topicId }/session/${ sessionId }`);
     }
     selectBottomNavIndex(0);

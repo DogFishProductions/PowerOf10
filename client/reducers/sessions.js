@@ -41,7 +41,6 @@ const postSession = (state = [], action) => {
                 }
             ];
         case UPDATE_SESSION:
-            // ONLY ADD REQUIRES UPDATE IF PROP IS NOT "isRunning"
             return [
                 ...before,
                 {
@@ -89,13 +88,13 @@ const sessions = (state = [], action) => {
                 [topicId]: [],
             }
         case "@@reduxFirestore/GET_SUCCESS":
+            console.log("get success");
             const sessions = findFirestoreMetaSubCollection(action.meta, "sessions");
             if (sessions) {
                 const {
                     topicId,
                     sessions,
                 } = parseFirestoreSessions(action);
-                // overwrite this to simply return state to use dummy data
                 return {
                     ...state,
                     [topicId]: sessions,

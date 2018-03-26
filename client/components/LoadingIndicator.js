@@ -49,7 +49,7 @@ const LoadingIndicator = (props) => {
     }
     return (
         isLoaded
-        ? isEmpty && (<h2>isEmptyText</h2>)
+        ? isEmpty && (<h2>{ isEmptyText }</h2>)
         : renderLoadingProgress()
     )
 }

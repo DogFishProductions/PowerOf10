@@ -33,6 +33,7 @@ const postSupervisor = (state = {}, action) => {
         sessions,
         topicId,
         sessionId,
+        option,
     } = action;
     const itemsForDeletion = state.toDelete || [];
     let index, before, after;
@@ -119,27 +120,6 @@ const postSupervisor = (state = {}, action) => {
                 }
             }
             return state;
-        case UPDATE_SESSION:
-            if (action.propName === "isRunning") {
-                if (action.newValue) {
-                    return {
-                        ...state,
-                        isRunning: {
-                            topicId,
-                            sessionId,
-                        },
-                    }
-                } else {
-                    return {
-                        ...state,
-                        isRunning: {
-                            topicId: null,
-                            sessionId: null,
-                        },
-                    }
-                }
-            }
-            return state;
         case SESSION_IS_RUNNING:
             if (!option) {
                 return {
@@ -218,6 +198,18 @@ const supervisor = (state = {}, action) => {
                 ...state,
                 openDialog: option,
             }
+        case SESSION_IS_RUNNING:
+            if (!option) {
+                return {
+                    ...state,
+                    isRunning: {
+                        topicId: null,
+                        sessionId: null,
+                    },
+                }
+            } else {
+                return state;
+            }
         case "@@reduxFirestore/GET_REQUEST":
             return {
                 ...state,
@@ -242,6 +234,9 @@ const supervisor = (state = {}, action) => {
         case "@@reduxFirestore/SET_REQUEST":
         case "@@reduxFirestore/SET_SUCCESS":
         case "@@reduxFirestore/SET_FAILURE":
+        case "@@reduxFirestore/UPDATE_REQUEST":
+        case "@@reduxFirestore/UPDATE_SUCCESS":
+        case "@@reduxFirestore/UPDATE_FAILURE":
         case "@@reduxFirestore/DELETE_REQUEST":
         case "@@reduxFirestore/DELETE_SUCCESS":
         case "@@reduxFirestore/DELETE_FAILURE":

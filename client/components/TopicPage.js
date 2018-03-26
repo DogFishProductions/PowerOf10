@@ -18,7 +18,6 @@ import {
     getTopicSessions,
     randomString,
     getNewSessionId,
-    getRunningSessionIndex,
     handleStartSessionOnClick,
 } from "../helpers";
 import ItemAppBar from "./ItemAppBar";
@@ -170,14 +169,13 @@ class TopicPage extends React.Component {
             }
         }
         const renderStartSessionIcon = () => {
-            const runningSessionIndex = getRunningSessionIndex(props);
-            if (runningSessionIndex >= 0) {
-                if (!calcCurrentDuration) {    
-                    const runningSession = props.sessions[topicId][runningSessionIndex];
+            if (_.get(supervisor, "isRunning.topicId", 0) === topicId) {
+                if (!calcCurrentDuration) {
+                    const runningSessionId = _.get(supervisor, "isRunning.sessionId", 0);
                     calcCurrentDuration = setInterval(
                         () => {
                             // don't use handler dispatchAction as session id is not in URL
-                            props.updateItemProperty("session", runningSession.code, "to", Date.now(), topicId);
+                            props.updateItemProperty("session", runningSessionId, "to", Date.now(), topicId);
                         },
                         900,
                     );

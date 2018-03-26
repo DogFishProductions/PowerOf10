@@ -48,10 +48,11 @@ export default class SessionList extends React.Component {
             selectForDeletion,
             deselectForDeletion,
             router,
-            updateItemProperty,
             addItem,
             sessions,
             topics,
+            sessionIsRunning,
+            updateItemProperty,
         } = props;
         const {
             uid,
@@ -70,14 +71,14 @@ export default class SessionList extends React.Component {
             }
         }
         const handleTimerOffButtonOnClick = (e, sessionId, i) => {
+            const running = supervisor.isRunning;
+            updateItemProperty("session", running.sessionId, "to", Date.now(), running.topicId);
             // don't use handler dispatchAction as session id is not in URL
-            updateItemProperty("session", sessionId, "isRunning", false, topicId);
+            sessionIsRunning(false);
         }
         const handleTimerButtonOnClick = (e, sessionId, i) => {
-            const isRunning = supervisor.isRunning;
-            updateItemProperty("session", isRunning.sessionId, "isRunning", false, isRunning.topicId);
             // don't use handler dispatchAction as session id is not in URL
-            updateItemProperty("session", sessionId, "isRunning", true, topicId);
+            sessionIsRunning(true, topicId, sessionId);
         }
         const renderSessionDuration = (session) => {
             return (
@@ -129,7 +130,7 @@ export default class SessionList extends React.Component {
                             primary={ momentToDatetimeString(session, "from") }
                             secondary={ durationToString([session], "long") }
                         />
-                        { session.isRunning && (
+                        { (_.get(supervisor, "isRunning.sessionId", 0) === session.code) && (
                             <ListItemSecondaryAction>
                                 { renderTimerOffButton(session.code, i) }
                             </ListItemSecondaryAction>

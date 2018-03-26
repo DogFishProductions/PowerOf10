@@ -90,7 +90,6 @@ const topics = (state = [], action) => {
                 if (topic) {
                     const topicId = topic.doc;
                     if (topicId) {
-                        console.log("topic marked as requiring update has been updated");
                         const {
                             index,
                             selectedItem

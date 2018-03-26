@@ -19,7 +19,6 @@ import {
     topicDurationToString,
     itemIsSelectedForDeletion,
     getNewSessionId,
-    getRunningSessionIndex,
     handleStartSessionOnClick,
 } from "../helpers";
 
@@ -46,6 +45,7 @@ export default class TopicList extends React.Component {
             displaySelectForDeletion,
             supervisor,
             topics,
+            sessions,
             params,
         } = props;
         const {
@@ -64,12 +64,12 @@ export default class TopicList extends React.Component {
             }
         }
         const renderTimerButton = (topic) => {
-            const runningSessionIndex = getRunningSessionIndex(props, topic.code);
+            const topicId = topic.code;
             return (
                 <IconButton
-                    onClick={ (e) => handleStartSessionOnClick(e, props, topic.code) }
+                    onClick={ (e) => handleStartSessionOnClick(e, props, topicId) }
                 >
-                    { (runningSessionIndex >= 0) ?
+                    { (_.get(supervisor, "isRunning.topicId", 0) === topicId) ?
                         ( <TimerOffIcon
                             style={ styles.icon }
                         /> ) :
@@ -101,7 +101,7 @@ export default class TopicList extends React.Component {
                         <Avatar
                             style={ styles.orangeAvatar }
                         >
-                            { topicDurationToString(topic, "stacked") }
+                            { topicDurationToString(sessions, topic.code, "stacked") }
                         </Avatar>
                         <ListItemText
                             onClick={ (e) => handlePrimaryOnClick(e, topic) }
