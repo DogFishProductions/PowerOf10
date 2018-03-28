@@ -43,12 +43,51 @@ const styles = {
 
 class ItemAppBar extends React.Component {
     componentWillUnmount() {
+        const props = this.props;
         const {
             deleteRequested,
-            displaySelectForDeletion
-        } = this.props;
+            displaySelectForDeletion,
+            firestore,
+            params,
+            editItemTitle,
+            sessions,
+            supervisor,
+        } = props;
+        const {
+            uid,
+            topicId,
+            sessionId,
+        } = params;
+        const updateItem = (selectedItem, itemId) => {
+            firestore.update(
+                createFirestoreQueryPath(uid, true, topicId, null, itemId),
+                _.omit(selectedItem, excludedProperties),
+            );
+        }
         deleteRequested(false);
         displaySelectForDeletion(false);
+        // const topicsRequiringUpdate = supervisor.requiresUpdate.topics || [];
+        // const sessionsRequiringUpdate = supervisor.requiresUpdate.sessions || [];
+        const selectedItem = getSelectedItem(props, "code");
+        if (selectedItemIsNew(props, "code")) {
+            dispatchAction(props, "removeItem");
+        }
+        // _.each(topicsRequiringUpdate, (topic) => updateItem(topic, _.get(topic, "code", -1)));
+        // _.each(sessionsRequiringUpdate, (session) => updateItem(session, _.get(session, "code", -1)));
+         else {
+            // REQUIRES UPDATE IS NO LONGER ON ITEM, IT'S ON SUPERVISOR. IF SESSION REQUIRES UPDATE, NEED TO
+            // KNOW IT'S TOPIC ID TOO - I'M HERE.........
+            if (selectedItem.requiresUpdate) {
+                updateItem(selectedItem, sessionId);
+            }
+            if (!sessionId) {
+                const topicSessions = sessions[topicId] || [];
+                const sessionsToUpdate = topicSessions.filter((session) => session.requiresUpdate);
+                console.log(sessionsToUpdate)
+                sessionsToUpdate.map((session) => updateItem(session, session.code));
+            }
+        }
+        editItemTitle(false);
     }
     render() {
         const props = this.props;
@@ -89,27 +128,7 @@ class ItemAppBar extends React.Component {
                 editItemTitle(true, topicId);
             }
         }
-        const updateItem = (selectedItem, itemId) => {
-            firestore.update(
-                createFirestoreQueryPath(uid, true, topicId, null, itemId),
-                _.omit(selectedItem, excludedProperties),
-            );
-        }
         const handleOnLeftIconButtonClick = (e) => {
-            const selectedItem = getSelectedItem(props, "code");
-            if (selectedItemIsNew(props, "code")) {
-                dispatchAction(props, "removeItem");
-            } else {
-                if (selectedItem.requiresUpdate) {
-                    updateItem(selectedItem, sessionId);
-                }
-                if (!sessionId) {
-                    const topicSessions = sessions[topicId] || [];
-                    const sessionsToUpdate = topicSessions.filter((session) => session.requiresUpdate);
-                    sessionsToUpdate.map((session) => updateItem(session, session.code));
-                }
-            }
-            editItemTitle(false);
             redirectHome();
         }
         const handleOnRightIconButtonClick = (e) => {

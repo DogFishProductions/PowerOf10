@@ -16,6 +16,7 @@ import {
     durationToString,
     getTopicSessions,
     itemIsSelectedForDeletion,
+    handleStartSessionOnClick,
 } from "../helpers";
 
 const defaultTextStyle = {
@@ -70,16 +71,16 @@ export default class SessionList extends React.Component {
                 deselectForDeletion(type, target.value);
             }
         }
-        const handleTimerOffButtonOnClick = (e, sessionId, i) => {
-            const running = supervisor.isRunning;
-            updateItemProperty("session", running.sessionId, "to", Date.now(), running.topicId);
-            // don't use handler dispatchAction as session id is not in URL
-            sessionIsRunning(false);
-        }
-        const handleTimerButtonOnClick = (e, sessionId, i) => {
-            // don't use handler dispatchAction as session id is not in URL
-            sessionIsRunning(true, topicId, sessionId);
-        }
+        // const handleTimerOffButtonOnClick = (e, sessionId, i) => {
+        //     const running = supervisor.isRunning;
+        //     updateItemProperty("session", running.sessionId, "to", Date.now(), running.topicId);
+        //     // don't use handler dispatchAction as session id is not in URL
+        //     sessionIsRunning(false);
+        // }
+        // const handleTimerButtonOnClick = (e, sessionId, i) => {
+        //     // don't use handler dispatchAction as session id is not in URL
+        //     sessionIsRunning(true, topicId, sessionId);
+        // }
         const renderSessionDuration = (session) => {
             return (
                 <span>{ durationToString([session], "humanized") }</span>
@@ -88,7 +89,7 @@ export default class SessionList extends React.Component {
         const renderTimerOffButton = (sessionId, i) => {
             return (
                 <IconButton
-                    onClick={ (e) => handleTimerOffButtonOnClick(e, sessionId, i)}
+                    onClick={ (e) => handleStartSessionOnClick(e, props, topicId, sessionId)}
                 >
                     <TimerOffIcon
                         style={ styles.icon }
@@ -99,7 +100,7 @@ export default class SessionList extends React.Component {
         const renderTimerButton = (sessionId, i) => {
             return (
                 <IconButton
-                    onClick={ (e) => handleTimerButtonOnClick(e, sessionId, i)}
+                    onClick={ (e) => handleStartSessionOnClick(e, props, topicId, sessionId)}
                 >
                     <TimerIcon
                         style={ styles.icon }

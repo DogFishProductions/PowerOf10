@@ -17,7 +17,7 @@ import {
     durationToString,
     getTopicSessions,
     randomString,
-    getNewSessionId,
+    getNewSession,
     handleStartSessionOnClick,
 } from "../helpers";
 import ItemAppBar from "./ItemAppBar";
@@ -43,12 +43,6 @@ const bottomGridStyle = {
     overflow: "auto",
     width: "360px",
     maxHeight: "416px"
-}
-
-let calcCurrentDuration;
-const clearRunningUpdater = () => {
-    clearInterval(calcCurrentDuration);
-    calcCurrentDuration = null;
 }
 
 class TopicPage extends React.Component {
@@ -79,15 +73,7 @@ class TopicPage extends React.Component {
         }
     }
     componentWillUnmount() {
-        clearRunningUpdater();
         this.props.selectBottomNavIndex(0);
-    }
-    componentWillReceiveProps(nextProps)  {
-        const runningSessionId = _.get(this, "props.supervisor.isRunning.sessionId", null);
-        const newRunningSessionId = _.get(nextProps, "supervisor.isRunning.sessionId", null)
-        if (runningSessionId && (runningSessionId != newRunningSessionId)) {
-            clearRunningUpdater();
-        }
     }
     render() {
         const props = this.props;
@@ -97,6 +83,7 @@ class TopicPage extends React.Component {
             editItemTitle,
             params,
             selectBottomNavIndex,
+            sessions,
         } = props;
         const {
             uid,
@@ -107,9 +94,7 @@ class TopicPage extends React.Component {
         }
         const topicIsNew = supervisor.isNew.topicId === topicId;
         const handleAddSessionOnClick = (e) => {
-            const {
-                sessionId,
-            } = getNewSessionId(props);
+            const sessionId = _.get(getNewSession(props), "code", -1);
             selectBottomNavIndex(0);
             router.push(`/user/${ uid }/topic/${ topicId }/session/${ sessionId }`);
         }
@@ -170,20 +155,8 @@ class TopicPage extends React.Component {
         }
         const renderStartSessionIcon = () => {
             if (_.get(supervisor, "isRunning.topicId", 0) === topicId) {
-                if (!calcCurrentDuration) {
-                    const runningSessionId = _.get(supervisor, "isRunning.sessionId", 0);
-                    calcCurrentDuration = setInterval(
-                        () => {
-                            // don't use handler dispatchAction as session id is not in URL
-                            props.updateItemProperty("session", runningSessionId, "to", Date.now(), topicId);
-                        },
-                        900,
-                    );
-                }
                 return (<TimerOffIcon />);
             }
-            clearInterval(calcCurrentDuration);
-            calcCurrentDuration = null;
             return (<TimerIcon />);
         }
         const isLoaded = (supervisor.isLoaded || false);

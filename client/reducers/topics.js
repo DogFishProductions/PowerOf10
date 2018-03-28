@@ -19,6 +19,7 @@ const {
 const postTopic = (state = [], action) => {
     const {
         type,
+        topic,
         topicId,
         propName,
         newValue,
@@ -33,37 +34,34 @@ const postTopic = (state = [], action) => {
         case CREATE_TOPIC:
             return [
                 ...state,
-                {
-                    code: topicId,
-                    title: "New topic",
-                    description: "",
-                }
+                topic,
             ];
         case UPDATE_TOPIC:
-            return [
-                ...before,
-                {
-                    ...selectedItem,
-                    ...{ [propName]: newValue },
-                    requiresUpdate: true,
-                },
-                ...after
-            ];
+            if (selectedItem) {
+                return [
+                    ...before,
+                    {
+                        ...selectedItem,
+                        ...{ [propName]: newValue },
+                    },
+                    ...after
+                ];
+            }
         case ADD_TOPIC:
-            // booleans are only used to indicate active editing - false values do not need to be saved
-            const updatedSelectedItem = _.pickBy(selectedItem, (prop) => (prop !== false));
-            return [
-                ...before,
-                {
-                    ...updatedSelectedItem,
-                },
-                ...after
-            ];
+            if (selectedItem) {
+                return [
+                    ...before,
+                    _.pickBy(selectedItem, (prop) => (prop !== false)),
+                    ...after
+                ];
+            }
         case REMOVE_TOPIC:
-            return [
-                ...before,
-                ...after
-            ];
+            if (selectedItem) {
+                return [
+                    ...before,
+                    ...after
+                ];
+            }
         default:
             return state;
     }

@@ -22,16 +22,18 @@ export const updateItemProperty = (type, itemId, propName, newValue, topicId) =>
     }
 }
 
-export const createItem = (type, itemId, topicId) => {
+export const createItem = (type, item, itemId, topicId) => {
     switch(type) {
         case "topic":
             return {
                 type: actionTypes.CREATE_TOPIC,
+                topic: item,
                 topicId: itemId
             }
         case "session":
             return {
                 type: actionTypes.CREATE_SESSION,
+                session: item,
                 sessionId: itemId,
                 topicId
             }

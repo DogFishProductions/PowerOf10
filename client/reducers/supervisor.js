@@ -15,6 +15,7 @@ const {
     CREATE_SESSION,
     ADD_TOPIC,
     ADD_SESSION,
+    UPDATE_TOPIC,
     UPDATE_SESSION,
     EDIT_ITEM_TITLE,
     SELECT_BOTTOM_NAV_INDEX,
@@ -109,8 +110,8 @@ const postSupervisor = (state = {}, action) => {
                 },
                 isEditingTitle: null,
             };
-        case REMOVE_SESSION:
-            if (action.sessionId === state.isRunning.sessionId) {
+        case REMOVE_TOPIC:
+            if (topicId === state.isRunning.topicId) {
                 return {
                     ...state,
                     isRunning: {
@@ -119,7 +120,44 @@ const postSupervisor = (state = {}, action) => {
                     },
                 }
             }
-            return state;
+        case REMOVE_SESSION:
+            if (sessionId === state.isRunning.sessionId) {
+                return {
+                    ...state,
+                    isRunning: {
+                        topicId: null,
+                        sessionId: null,
+                    },
+                }
+            }
+        case UPDATE_TOPIC:
+            const topicsRequiringUpdate = state.requiresUpdate.topics;
+            if (topicsRequiringUpdate.indexOf(topicId) < 0) {
+                return {
+                    ...state,
+                    requiresUpdate: {
+                        topics: [
+                            ...topicsRequiringUpdate,
+                            topicId,
+                        ],
+                        sessions: state.requiresUpdate.sessions,
+                    },
+                }
+            }
+        case UPDATE_SESSION:
+            const sessionsRequiringUpdate = state.requiresUpdate.sessions;
+            if (sessionsRequiringUpdate.indexOf(sessionId) < 0) {
+                return {
+                    ...state,
+                    requiresUpdate: {
+                        topics: state.requiresUpdate.topics,
+                        sessions: [
+                            ...sessionsRequiringUpdate,
+                            sessionId,
+                        ],
+                    },
+                }
+            }
         case SESSION_IS_RUNNING:
             if (!option) {
                 return {
@@ -240,7 +278,6 @@ const supervisor = (state = {}, action) => {
         case "@@reduxFirestore/DELETE_REQUEST":
         case "@@reduxFirestore/DELETE_SUCCESS":
         case "@@reduxFirestore/DELETE_FAILURE":
-            console.log("action: ", action);
         default:
             return state;
     }

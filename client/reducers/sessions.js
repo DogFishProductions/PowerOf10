@@ -18,6 +18,7 @@ const {
 const postSession = (state = [], action) => {
     const {
         type,
+        session,
         sessionId,
         propName,
         newValue,
@@ -33,34 +34,34 @@ const postSession = (state = [], action) => {
             const now = Date.now();
             return [
                 ...state,
-                {
-                    code: sessionId,
-                    description: "",
-                    from: now,
-                    to: now
-                }
+                session,
             ];
         case UPDATE_SESSION:
-            return [
-                ...before,
-                {
-                    ...selectedItem,
-                    ...{ [propName]: newValue },
-                    requiresUpdate: true,
-                },
-                ...after
-            ];
+            if (selectedItem) {
+                return [
+                    ...before,
+                    {
+                        ...selectedItem,
+                        ...{ [propName]: newValue },
+                    },
+                    ...after
+                ];
+            }
         case ADD_SESSION:
-            return [
-                ...before,
-                _.pickBy(selectedItem, (prop) => (prop !== false)), // booleans are only used to indicate active editing - false values do not need to be saved
-                ...after
-            ];
+            if (selectedItem) {
+                return [
+                    ...before,
+                    _.pickBy(selectedItem, (prop) => (prop !== false)), // booleans are only used to indicate active editing - false values do not need to be saved
+                    ...after
+                ];
+            }
         case REMOVE_SESSION:
-            return [
-                ...before,
-                ...after
-            ];
+            if (selectedItem) {
+                return [
+                    ...before,
+                    ...after
+                ];
+            }
         default:
             return state;
     }
@@ -88,7 +89,6 @@ const sessions = (state = [], action) => {
                 [topicId]: [],
             }
         case "@@reduxFirestore/GET_SUCCESS":
-            console.log("get success");
             const sessions = findFirestoreMetaSubCollection(action.meta, "sessions");
             if (sessions) {
                 const {

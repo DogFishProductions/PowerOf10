@@ -7,8 +7,6 @@ import { reactReduxFirebase } from "react-redux-firebase";
 import { reduxFirestore } from 'redux-firestore';
 
 import rootReducer from "./reducers";
-import topics from "./data/topics";
-import sessions from "./data/sessions";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDvcx7XjKawUJvYqeerYyZ_jEOQxLQmM58",
@@ -32,8 +30,8 @@ const rrfConfig = {
 }
 
 const defaultState = {
-    sessions,
-    topics,
+    sessions: [],
+    topics: [],
     supervisor: {
         authorisedUserId: null,
         bottomNavSelectedIndex: 0,

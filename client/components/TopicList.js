@@ -18,7 +18,6 @@ import {
     randomString,
     topicDurationToString,
     itemIsSelectedForDeletion,
-    getNewSessionId,
     handleStartSessionOnClick,
 } from "../helpers";
 
@@ -69,13 +68,13 @@ export default class TopicList extends React.Component {
                 <IconButton
                     onClick={ (e) => handleStartSessionOnClick(e, props, topicId) }
                 >
-                    { (_.get(supervisor, "isRunning.topicId", 0) === topicId) ?
-                        ( <TimerOffIcon
-                            style={ styles.icon }
-                        /> ) :
-                        (<TimerIcon
-                            style={ styles.icon }
-                        />)
+                    { (_.get(supervisor, "isRunning.topicId", 0) === topicId)
+                    ? ( <TimerOffIcon
+                        style={ styles.icon }
+                    /> )
+                    : (<TimerIcon
+                        style={ styles.icon }
+                    />)
                     }
                 </IconButton>
             )
@@ -101,7 +100,7 @@ export default class TopicList extends React.Component {
                         <Avatar
                             style={ styles.orangeAvatar }
                         >
-                            { topicDurationToString(sessions, topic.code, "stacked") }
+                            { topicDurationToString(topic.duration, "stacked") }
                         </Avatar>
                         <ListItemText
                             onClick={ (e) => handlePrimaryOnClick(e, topic) }

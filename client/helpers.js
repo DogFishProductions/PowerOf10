@@ -1,6 +1,12 @@
 import React from "react";
 import moment from "moment";
 
+let calcCurrentDuration;
+const clearRunningUpdater = () => {
+    clearInterval(calcCurrentDuration);
+    calcCurrentDuration = null;
+}
+
 const durationFromArrayOfSessions = (sessions = []) => {
     return sessions.reduce(
         (duration, session) => {
@@ -45,19 +51,9 @@ const durationToStringType = (duration, type) => {
     }
 }
 
-export const topicDurationToString = (sessions, topicId, type) => {
-    console.log({ sessions, topicId });
-    const currentSessions = sessions[topicId] || [];
-    const duration = currentSessions.reduce(
-        (total, currentSession) => {
-            console.log(total);
-            const diff = moment.duration(currentSession.to - currentSession.from, "milliseconds");
-            total.add(diff);
-        },
-        moment.duration(0, "milliseconds"),
-    )
-    // const duration = moment.duration(topic.duration || 0, "milliseconds");
-    return durationToStringType(duration, type);
+export const topicDurationToString = (duration = 0, type) => {
+    const dur = moment.duration(duration || 0, "milliseconds");
+    return durationToStringType(dur, type);
 }
 
 export const momentToDatetimeString = (session, prop) => {
@@ -174,55 +170,88 @@ export const itemIsSelectedForDeletion = (items, itemId) => {
     return (index >= 0);
 }
 
-export const getNewSessionId = (props, topicId) => {
+export const getNewSession = ({ params, createItem }, topicId) => {
     const sessionId = randomString(20, "aA#");
-    topicId = props.params.topicId || topicId;
+    topicId = params.topicId || topicId;
     const start = Date.now();
     // don't use handler dispatchAction as session id is not in URL yet
-    props.createItem("session", sessionId, topicId);
-    return {
-        sessionId,
-        topicId,
-    };
+    const newSession = {
+        code: sessionId,
+        description: "",
+        from: start,
+        to: start
+    }
+    createItem("session", newSession, sessionId, topicId);
+    return newSession;
 }
 
-export const handleStartSessionOnClick = (event, props, topicId) => {
-    topicId = props.params.topicId || topicId;
-    const {
+export const handleStartSessionOnClick = (
+    event,
+    {
         updateItemProperty,
-        addItem,
-        sessions,
         selectBottomNavIndex,
+        createItem,
         supervisor,
         sessionIsRunning,
-    } = props; 
+        topics,
+        sessions,
+        params,
+        router,
+    },
+    selectedTopicId,
+    selectedSessionId,
+) => {
     const isRunning = supervisor.isRunning;
     const runningSessionId = isRunning.sessionId;
     const runningTopicId = isRunning.topicId;
-    if (runningSessionId && (runningTopicId === topicId)) {
+    const {
+        topicId = selectedTopicId,
+        sessionId = selectedSessionId,
+    } = params;
+    if ((!sessionId && (runningTopicId === topicId)) || (runningSessionId === sessionId)) {
+        updateItemProperty("session", runningSessionId, "to", Date.now(), topicId);
         sessionIsRunning(false);
+        clearRunningUpdater();
     } else {
-        const {
-            supervisor,
-            params,
-            router,
-        } = props;
         const {
             uid,
         } = params;
-        const isRunning = supervisor.isRunning;
         // stop currently running session if one exists
-        if (isRunning.topicId) {
+        if (runningTopicId) {
+            updateItemProperty("session", runningSessionId, "to", Date.now(), topicId);
             sessionIsRunning(false);
+            clearRunningUpdater();
         }
-        const {
-            sessionId,
-        } = getNewSessionId(props, topicId);
+        // if we've got this far then the sessionId doesn't match the running sessionId which means
+        // it is either a session we've created but not yet started or a new session
+        let newSessionId = sessionId;
+        let newSession;
+        if (!newSessionId) {
+            newSession = getNewSession({ params, createItem }, topicId);
+            newSessionId = _.get(newSession, "code", -1);
+        }
         // don't use handler dispatchAction as session id is not in URL
-        sessionIsRunning(true, topicId, sessionId);
-        router.push(`/user/${ uid }/topic/${ topicId }/session/${ sessionId }`);
+        sessionIsRunning(true, topicId, newSessionId);
+        const topicSessions = sessions[topicId] || [];
+        const runningSession = newSession || topicSessions.find((sess) => sess.code === newSessionId);
+        const { selectedItem } = getSelectedItemAndIndexFromArray(topics, "code", topicId);
+        calcCurrentDuration = setInterval(
+            () => {
+                const newTo = Date.now();
+                // don't use handler dispatchAction as session id is not in URL
+                updateItemProperty("session", newSessionId, "to", newTo, topicId);
+                let duration = _.get(selectedItem, "duration", 0);
+                duration += (newTo - _.get(runningSession, "from", newTo));
+                // don't use handler dispatchAction as topic id may not be in URL
+                updateItemProperty("topic", topicId, "duration", duration);
+            },
+            200,
+        );
+        if (supervisor.isNew) {
+            router.push(`/user/${ uid }/topic/${ topicId }/session/${ newSessionId }`);
+            selectBottomNavIndex(0);
+        }
     }
-    selectBottomNavIndex(0);
 }
 
 const parseFirestoreData = (payload) => {
@@ -281,5 +310,4 @@ export const firestoreMetaHasSessions = (meta) => {
 
 export const excludedProperties = [
     "isRunning",
-    "requiresUpdate",
 ];

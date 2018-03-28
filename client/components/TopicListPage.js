@@ -39,7 +39,12 @@ class TopicListPage extends React.Component {
         } = params;
         const handleAddTopicOnClick = (e) => {
             const topicId = helpers.randomString(20, "aA#");
-            createItem("topic", topicId);
+            const newTopic = {
+                code: topicId,
+                title: "New topic",
+                description: "",
+            }
+            createItem("topic", newTopic, topicId);
             router.push(`/user/${ uid }/topic/${ topicId }`);
         }
         const isLoaded = (supervisor.isLoaded || false);
