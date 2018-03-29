@@ -114,16 +114,6 @@ export default class TopicPage extends React.Component {
             const selectedSession = getSelectedSession();
             return _.get(supervisor, "isRunning.sessionId", 0) === selectedSession.code;
         }
-        // const handleStartSessionOnClick = (e) => {
-        //     if (selectedSessionIsRunning()) {
-        //         dispatchAction(props, "sessionIsRunning", false);
-        //         clearInterval(calcCurrentDuration);
-        //         calcCurrentDuration = null;
-        //     } else {
-        //         dispatchAction(props, "updateItemProperty", "to", Date.now());
-        //         dispatchAction(props, "sessionIsRunning", true);
-        //     }
-        // }
         const handleDateTimeOnChange = (e) => {
             const target = e.target;
             const prop = target.id;

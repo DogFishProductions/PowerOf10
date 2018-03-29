@@ -50,6 +50,7 @@ class ItemAppBar extends React.Component {
             firestore,
             params,
             editItemTitle,
+            topics,
             sessions,
             supervisor,
         } = props;
@@ -58,35 +59,32 @@ class ItemAppBar extends React.Component {
             topicId,
             sessionId,
         } = params;
-        const updateItem = (selectedItem, itemId) => {
+        const updateItem = (selectedItem, tId, sId) => {
             firestore.update(
-                createFirestoreQueryPath(uid, true, topicId, null, itemId),
+                createFirestoreQueryPath(uid, null, tId, null, sId),
                 _.omit(selectedItem, excludedProperties),
             );
         }
+        const persistItemsRequiringUpdate = () => {
+            const topicsRequiringUpdate = _.get(supervisor, "requiresUpdate.topics", []);
+            const sessionsRequiringUpdate = _.get(supervisor, "requiresUpdate.sessions", {});
+            if (selectedItemIsNew(props, "code")) {
+                dispatchAction(props, "removeItem");
+            }
+            _.each(topicsRequiringUpdate, (tId) => updateItem(topics[tId], tId));
+            _.each(sessionsRequiringUpdate, (sessionIds, tId) => {
+                _.each(sessionIds, (sId) => {
+                    updateItem(
+                        sessions[tId].find((sess) => sess.code === sId),
+                        tId,
+                        sId,
+                    )
+                })
+            });
+        }
+        persistItemsRequiringUpdate();
         deleteRequested(false);
         displaySelectForDeletion(false);
-        // const topicsRequiringUpdate = supervisor.requiresUpdate.topics || [];
-        // const sessionsRequiringUpdate = supervisor.requiresUpdate.sessions || [];
-        const selectedItem = getSelectedItem(props, "code");
-        if (selectedItemIsNew(props, "code")) {
-            dispatchAction(props, "removeItem");
-        }
-        // _.each(topicsRequiringUpdate, (topic) => updateItem(topic, _.get(topic, "code", -1)));
-        // _.each(sessionsRequiringUpdate, (session) => updateItem(session, _.get(session, "code", -1)));
-         else {
-            // REQUIRES UPDATE IS NO LONGER ON ITEM, IT'S ON SUPERVISOR. IF SESSION REQUIRES UPDATE, NEED TO
-            // KNOW IT'S TOPIC ID TOO - I'M HERE.........
-            if (selectedItem.requiresUpdate) {
-                updateItem(selectedItem, sessionId);
-            }
-            if (!sessionId) {
-                const topicSessions = sessions[topicId] || [];
-                const sessionsToUpdate = topicSessions.filter((session) => session.requiresUpdate);
-                console.log(sessionsToUpdate)
-                sessionsToUpdate.map((session) => updateItem(session, session.code));
-            }
-        }
         editItemTitle(false);
     }
     render() {

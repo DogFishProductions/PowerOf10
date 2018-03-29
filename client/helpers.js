@@ -308,6 +308,25 @@ export const firestoreMetaHasSessions = (meta) => {
     return _.get(meta, "subcollections", []).find((item) => _.get(item, "collection") === "sessions") != undefined;
 }
 
-export const excludedProperties = [
-    "isRunning",
-];
+export const handleDeleteItemCheckboxOnClick = (e, { selectForDeletion, deselectForDeletion }, type) => {
+    const target = e.target;
+    if (target.checked) {
+        selectForDeletion(type, target.value);
+    } else {
+        deselectForDeletion(type, target.value);
+    }
+}
+
+export const getSelectedItemAndBeforeAndAfterArraysFromState = (state, itemId) => {
+    const {
+        index,
+        selectedItem
+    } = getSelectedItemAndIndexFromArray(state, "code", itemId);
+    const before = state.slice(0, index);   // before the one we are updating
+    const after = state.slice(index + 1);   // after the one we are updating
+    return {
+        before,
+        selectedItem,
+        after,
+    }
+}

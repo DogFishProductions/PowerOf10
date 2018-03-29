@@ -11,12 +11,11 @@ import Button from 'material-ui/Button';
 import Grid from 'material-ui/Grid';
 
 import {
+    createFirestoreQueryPath,
     getBottomNavSelectedIndex,
     getSelectedItem,
-    dispatchAction,
     durationToString,
     getTopicSessions,
-    randomString,
     getNewSession,
     handleStartSessionOnClick,
 } from "../helpers";
@@ -56,20 +55,8 @@ class TopicPage extends React.Component {
             uid,
             topicId,
         } = params;
-        if (supervisor.isNew.topicId != topicId) {
-            firestore.get({
-                collection: "users",
-                doc: uid,
-                subcollections: [
-                    {
-                        collection: "topics",
-                        doc: topicId,
-                    },
-                    {
-                        collection: "sessions",
-                    },
-                ],
-            });
+        if (_.get(supervisor, "isNew.topicId", -1) != topicId) {
+            firestore.get(createFirestoreQueryPath(uid, true, topicId, true));
         }
     }
     componentWillUnmount() {

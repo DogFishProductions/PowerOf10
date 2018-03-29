@@ -2,11 +2,9 @@ import * as _ from "lodash";
 
 import { actionTypes } from "../constants";
 import {
-    getSelectedItemAndIndexFromArray,
     parseFirestoreTopics,
     firestoreMetaHasSessions,
-    findFirestoreMetaSubCollection,
-    excludedProperties,
+    getSelectedItemAndBeforeAndAfterArraysFromState,
 } from "../helpers";
 
 const {
@@ -25,11 +23,10 @@ const postTopic = (state = [], action) => {
         newValue,
     } = action;
     const {
-        index,
-        selectedItem
-    } = getSelectedItemAndIndexFromArray(state, "code", topicId);
-    const before = state.slice(0, index);   // before the one we are updating
-    const after = state.slice(index + 1);   // after the one we are updating
+        before,
+        selectedItem,
+        after,
+    } = getSelectedItemAndBeforeAndAfterArraysFromState(state, topicId);
     switch(type) {
         case CREATE_TOPIC:
             return [
@@ -42,11 +39,12 @@ const postTopic = (state = [], action) => {
                     ...before,
                     {
                         ...selectedItem,
-                        ...{ [propName]: newValue },
+                        [propName]: newValue,
                     },
                     ...after
                 ];
             }
+            return state;
         case ADD_TOPIC:
             if (selectedItem) {
                 return [
@@ -55,6 +53,7 @@ const postTopic = (state = [], action) => {
                     ...after
                 ];
             }
+            return state;
         case REMOVE_TOPIC:
             if (selectedItem) {
                 return [
@@ -62,6 +61,7 @@ const postTopic = (state = [], action) => {
                     ...after
                 ];
             }
+            return state;
         default:
             return state;
     }
@@ -82,26 +82,6 @@ const topics = (state = [], action) => {
             }
         // case "@@reduxFirestore/GET_REQUEST":
         // case "@@reduxFirestore/GET_FAILURE":
-        case "@@reduxFirestore/UPDATE_SUCCESS":
-            if (!firestoreMetaHasSessions(meta)) {
-                const topic = findFirestoreMetaSubCollection(action.meta, "topics");
-                if (topic) {
-                    const topicId = topic.doc;
-                    if (topicId) {
-                        const {
-                            index,
-                            selectedItem
-                        } = getSelectedItemAndIndexFromArray(state, "code", topicId);
-                        const before = state.slice(0, index);   // before the one we are updating
-                        const after = state.slice(index + 1);   // after the one we are updating
-                        return [
-                            ...before,
-                            _.omit(selectedItem, excludedProperties),
-                            ...after,
-                        ]
-                    }
-                }
-            }
         default:
     }
     return state;

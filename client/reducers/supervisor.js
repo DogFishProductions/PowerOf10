@@ -1,6 +1,10 @@
 import * as _ from "lodash";
 
 import { actionTypes } from "../constants";
+import {
+    firestoreMetaHasSessions,
+    findFirestoreMetaSubCollection,
+} from "../helpers";
 
 const {
     SELECT_SESSION_FOR_DELETION,
@@ -120,6 +124,7 @@ const postSupervisor = (state = {}, action) => {
                     },
                 }
             }
+            return state;
         case REMOVE_SESSION:
             if (sessionId === state.isRunning.sessionId) {
                 return {
@@ -130,8 +135,9 @@ const postSupervisor = (state = {}, action) => {
                     },
                 }
             }
+            return state;
         case UPDATE_TOPIC:
-            const topicsRequiringUpdate = state.requiresUpdate.topics;
+            const topicsRequiringUpdate = _.get(state, "requiresUpdate.topics", []);
             if (topicsRequiringUpdate.indexOf(topicId) < 0) {
                 return {
                     ...state,
@@ -140,24 +146,30 @@ const postSupervisor = (state = {}, action) => {
                             ...topicsRequiringUpdate,
                             topicId,
                         ],
-                        sessions: state.requiresUpdate.sessions,
+                        sessions: _.get(state, "requiresUpdate.sessions", []),
                     },
                 }
             }
+            return state;
         case UPDATE_SESSION:
-            const sessionsRequiringUpdate = state.requiresUpdate.sessions;
-            if (sessionsRequiringUpdate.indexOf(sessionId) < 0) {
+            const sessionsRequiringUpdate = _.get(state, "requiresUpdate.sessions", {});
+            const sessionsRequiringUpdateByTopic = _.get(sessionsRequiringUpdate, topicId, []);
+            if (sessionsRequiringUpdateByTopic.indexOf(sessionId) < 0) {
                 return {
                     ...state,
                     requiresUpdate: {
-                        topics: state.requiresUpdate.topics,
-                        sessions: [
+                        topics: _.get(state, "requiresUpdate.topics", []),
+                        sessions: {
                             ...sessionsRequiringUpdate,
-                            sessionId,
-                        ],
+                            [topicId]: [
+                                ...sessionsRequiringUpdateByTopic,
+                                sessionId,
+                            ],
+                        },
                     },
                 }
             }
+            return state;
         case SESSION_IS_RUNNING:
             if (!option) {
                 return {
@@ -266,18 +278,69 @@ const supervisor = (state = {}, action) => {
                 isFetching: false,
                 isloaded: true,
             }
+        case "@@reduxFirestore/DELETE_SUCCESS":
+        case "@@reduxFirestore/UPDATE_SUCCESS":
+            const topic = findFirestoreMetaSubCollection(action.meta, "topics");
+            if (!firestoreMetaHasSessions(action.meta)) {
+                if (topic) {
+                    const topicId = topic.doc;
+                    if (topicId) {
+                        const topicsRequiringUpdate = _.get(state, "requiresUpdate.topics", []);
+                        const index = topicsRequiringUpdate.indexOf(topicId);
+                        if (index >= 0) {
+                            const before = topicsRequiringUpdate.slice(0, index);
+                            const after = topicsRequiringUpdate.slice(index + 1);
+                            return {
+                                ...state,
+                                requiresUpdate: {
+                                    topics: [
+                                        ...before,
+                                        ...after,
+                                    ],
+                                    sessions: _.get(state, "requiresUpdate.sessions", []),
+                                },
+                            } 
+                        }
+                    }
+                }
+            } else {
+                const session = findFirestoreMetaSubCollection(action.meta, "sessions");
+                if (session) {
+                    const sessionId = session.doc;
+                    if (sessionId) {
+                        const sessionsRequiringUpdate = _.get(state, "requiresUpdate.sessions", {});
+                        const sessionsRequiringUpdateByTopic = _.get(sessionsRequiringUpdate, _.get(topic, "doc", -1), []);
+                        const index = sessionsRequiringUpdateByTopic.indexOf(sessionId);
+                        if (index >= 0) {
+                            const before = sessionsRequiringUpdateByTopic.slice(0, index);
+                            const after = sessionsRequiringUpdateByTopic.slice(index + 1);
+                            return {
+                                ...state,
+                                requiresUpdate: {
+                                    topics: _.get(state, "requiresUpdate.topics", []),
+                                    sessions: {
+                                        ...sessionsRequiringUpdate,
+                                        [topic.doc]: [
+                                            ...before,
+                                            ...after,
+                                        ],
+                                    },
+                                },
+                            } 
+                        }
+                    }
+                }
+            }
+        case "@@reduxFirestore/UPDATE_REQUEST":
+        case "@@reduxFirestore/UPDATE_FAILURE":
+        case "@@reduxFirestore/DELETE_REQUEST":
+        case "@@reduxFirestore/DELETE_FAILURE":
         case "@@reduxFirestore/ADD_REQUEST":
         case "@@reduxFirestore/ADD_SUCCESS":
         case "@@reduxFirestore/ADD_FAILURE":
         case "@@reduxFirestore/SET_REQUEST":
         case "@@reduxFirestore/SET_SUCCESS":
         case "@@reduxFirestore/SET_FAILURE":
-        case "@@reduxFirestore/UPDATE_REQUEST":
-        case "@@reduxFirestore/UPDATE_SUCCESS":
-        case "@@reduxFirestore/UPDATE_FAILURE":
-        case "@@reduxFirestore/DELETE_REQUEST":
-        case "@@reduxFirestore/DELETE_SUCCESS":
-        case "@@reduxFirestore/DELETE_FAILURE":
         default:
             return state;
     }

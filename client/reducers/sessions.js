@@ -2,9 +2,9 @@ import * as _ from "lodash";
 
 import { actionTypes } from "../constants";
 import {
-    getSelectedItemAndIndexFromArray,
     parseFirestoreSessions,
     findFirestoreMetaSubCollection,
+    getSelectedItemAndBeforeAndAfterArraysFromState,
 } from "../helpers";
 
 const {
@@ -24,11 +24,10 @@ const postSession = (state = [], action) => {
         newValue,
     } = action;
     const {
-        index,
-        selectedItem
-    } = getSelectedItemAndIndexFromArray(state, "code", sessionId);
-    const before = state.slice(0, index);   // before the one we are updating
-    const after = state.slice(index + 1);   // after the one we are updating
+        before,
+        selectedItem,
+        after,
+    } = getSelectedItemAndBeforeAndAfterArraysFromState(state, sessionId);
     switch(type) {
         case CREATE_SESSION:
             const now = Date.now();
@@ -47,6 +46,7 @@ const postSession = (state = [], action) => {
                     ...after
                 ];
             }
+            return state;
         case ADD_SESSION:
             if (selectedItem) {
                 return [
@@ -55,6 +55,7 @@ const postSession = (state = [], action) => {
                     ...after
                 ];
             }
+            return state;
         case REMOVE_SESSION:
             if (selectedItem) {
                 return [
@@ -62,6 +63,7 @@ const postSession = (state = [], action) => {
                     ...after
                 ];
             }
+            return state;
         default:
             return state;
     }
@@ -73,6 +75,7 @@ const sessions = (state = [], action) => {
         type,
         sessionId,
         topicId,
+        meta,
     } = action;
     if (typeof sessionId !== "undefined") {
         return {

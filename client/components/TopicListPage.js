@@ -11,19 +11,12 @@ import TopicList from "./TopicList";
 import LoadingIndicator from "./LoadingIndicator";
 import {
     getSelectedItemAndIndexFromArray,
+    createFirestoreQueryPath,
 } from "../helpers";
 
 class TopicListPage extends React.Component {
     componentWillMount() {
-        this.props.firestore.get({
-            collection: "users",
-            doc: this.props.params.uid,
-            subcollections: [
-                {
-                    collection: "topics",
-                },
-            ],
-        });
+        this.props.firestore.get(createFirestoreQueryPath(this.props.params.uid, true));
     }
     render() {
         const props = this.props;

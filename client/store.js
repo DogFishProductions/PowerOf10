@@ -44,6 +44,7 @@ const defaultState = {
         menuAnchor: null,
         openDialog: false,
         isRunning: { topicId: null, sessionId: null },
+        requiresUpdate: { topics: [], sessions: {} },
     }
 };
 

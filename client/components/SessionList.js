@@ -17,6 +17,7 @@ import {
     getTopicSessions,
     itemIsSelectedForDeletion,
     handleStartSessionOnClick,
+    handleDeleteItemCheckboxOnClick,
 } from "../helpers";
 
 const defaultTextStyle = {
@@ -62,25 +63,6 @@ export default class SessionList extends React.Component {
         const handlePrimaryOnClick = (e, session) => {
             router.push(`/user/${ uid }/topic/${ topicId }/session/${ session.code }`);
         }
-        const handleCheckboxOnClick = (e) => {
-            const target = e.target;
-            const type = "session";
-            if (target.checked) {
-                selectForDeletion(type, target.value);
-            } else {
-                deselectForDeletion(type, target.value);
-            }
-        }
-        // const handleTimerOffButtonOnClick = (e, sessionId, i) => {
-        //     const running = supervisor.isRunning;
-        //     updateItemProperty("session", running.sessionId, "to", Date.now(), running.topicId);
-        //     // don't use handler dispatchAction as session id is not in URL
-        //     sessionIsRunning(false);
-        // }
-        // const handleTimerButtonOnClick = (e, sessionId, i) => {
-        //     // don't use handler dispatchAction as session id is not in URL
-        //     sessionIsRunning(true, topicId, sessionId);
-        // }
         const renderSessionDuration = (session) => {
             return (
                 <span>{ durationToString([session], "humanized") }</span>
@@ -121,7 +103,7 @@ export default class SessionList extends React.Component {
                             <ListItemIcon>
                                 <Checkbox
                                     checked={ itemIsSelectedForDeletion(supervisor.toDelete, session.code) }
-                                    onChange={ handleCheckboxOnClick }
+                                    onChange={ (e) => handleDeleteItemCheckboxOnClick(e, props, "session") }
                                     value={ session.code }
                                 />
                             </ListItemIcon>

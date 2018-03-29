@@ -15,10 +15,10 @@ import Slide from 'material-ui/transitions/Slide';
 import Checkbox from 'material-ui/Checkbox';
 
 import {
-    randomString,
     topicDurationToString,
     itemIsSelectedForDeletion,
     handleStartSessionOnClick,
+    handleDeleteItemCheckboxOnClick,
 } from "../helpers";
 
 const styles = {
@@ -39,9 +39,6 @@ export default class TopicList extends React.Component {
         const props = this.props;
         const {
             router,
-            selectForDeletion,
-            deselectForDeletion,
-            displaySelectForDeletion,
             supervisor,
             topics,
             sessions,
@@ -52,15 +49,6 @@ export default class TopicList extends React.Component {
         } = params;
         const handlePrimaryOnClick = (e, topic) => {
             router.push(`/user/${ uid }/topic/${ topic.code }`);
-        }
-        const handleCheckboxOnClick = (e) => {
-            const target = e.target;
-            const type = "topic";
-            if (target.checked) {
-                selectForDeletion(type, target.value);
-            } else {
-                deselectForDeletion(type, target.value);
-            }
         }
         const renderTimerButton = (topic) => {
             const topicId = topic.code;
@@ -92,7 +80,7 @@ export default class TopicList extends React.Component {
                             <ListItemIcon>
                                 <Checkbox
                                     checked={ itemIsSelectedForDeletion(supervisor.toDelete, topic.code) }
-                                    onChange={ handleCheckboxOnClick }
+                                    onChange={ (e) => handleDeleteItemCheckboxOnClick(e, props, "topic") }
                                     value={ topic.code }
                                 />
                             </ListItemIcon>
