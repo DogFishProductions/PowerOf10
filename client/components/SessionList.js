@@ -11,12 +11,13 @@ import TimerOffIcon from 'material-ui-icons/TimerOff';
 import orange from 'material-ui/colors/orange';
 import Slide from 'material-ui/transitions/Slide';
 
+import { IconTimerButton } from "./TimerButton";
+
 import {
     momentToDatetimeString, 
     durationToString,
     getTopicSessions,
     itemIsSelectedForDeletion,
-    handleStartSessionOnClick,
     handleDeleteItemCheckboxOnClick,
 } from "../helpers";
 
@@ -68,28 +69,6 @@ export default class SessionList extends React.Component {
                 <span>{ durationToString([session], "humanized") }</span>
             );
         }
-        const renderTimerOffButton = (sessionId, i) => {
-            return (
-                <IconButton
-                    onClick={ (e) => handleStartSessionOnClick(e, props, topicId, sessionId)}
-                >
-                    <TimerOffIcon
-                        style={ styles.icon }
-                    />
-                </IconButton>
-            )
-        }
-        const renderTimerButton = (sessionId, i) => {
-            return (
-                <IconButton
-                    onClick={ (e) => handleStartSessionOnClick(e, props, topicId, sessionId)}
-                >
-                    <TimerIcon
-                        style={ styles.icon }
-                    />
-                </IconButton>
-            )
-        }
         const renderSession = (session, i) => {
             return (
                 <div key={i}>
@@ -113,14 +92,10 @@ export default class SessionList extends React.Component {
                             primary={ momentToDatetimeString(session, "from") }
                             secondary={ durationToString([session], "long") }
                         />
-                        { (_.get(supervisor, "isRunning.sessionId", 0) === session.code) && (
+                        { ((_.get(supervisor, "isRunning.sessionId", 0) === session.code) ||
+                            (session.to === session.from)) &&
                             <ListItemSecondaryAction>
-                                { renderTimerOffButton(session.code, i) }
-                            </ListItemSecondaryAction>
-                        ) }
-                        { (session.to === session.from) &&
-                            <ListItemSecondaryAction>
-                                { renderTimerButton(session.code, i) }
+                                <IconTimerButton { ...props } selectedSessionId={ session.code }/>
                             </ListItemSecondaryAction>
                         }
                     </ListItem>

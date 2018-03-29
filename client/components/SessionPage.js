@@ -6,11 +6,8 @@ import TimerIcon from 'material-ui-icons/Timer';
 import TimerOffIcon from 'material-ui-icons/TimerOff';
 import Grid from 'material-ui/Grid';
 
-const fabStyle = {
-    position: "absolute",
-    top: "450px",
-    left: "285px"
-};
+import { FloatingTimerButton } from "./TimerButton";
+
 const gridStyle = {
     flexGrow: "1",
     margin: "8px 16px 0px 16px",
@@ -38,7 +35,6 @@ import {
     momentIsInThePast,
     momentFromIsBeforeTo,
     selectedItemIsNew,
-    handleStartSessionOnClick,
 } from "../helpers";
 import ItemAppBar from "./ItemAppBar";
 import ItemBottomNavigation from "./ItemBottomNavigation";
@@ -266,25 +262,11 @@ export default class TopicPage extends React.Component {
                 selectedSessionIsRunning()) { 
                 return (
                     <div className="floating-button-bottom-right">
-                        <Button
-                            variant="fab"
-                            color="primary"
-                            style={ { top: "-56px" } }
-                            onClick={ (e) => handleStartSessionOnClick(e, props) }>
-                            { renderStartSessionIcon() }
-                        </Button>
+                        <FloatingTimerButton { ...props } disabled={ false } />
                     </div>
                 ) 
             }
             return;
-        }
-        if (selectedSessionIsRunning() && !calcCurrentDuration) {
-            calcCurrentDuration = setInterval(
-                () => {
-                    dispatchAction(props, "updateItemProperty", "to", Date.now());
-                },
-                900,
-            );
         }
         return (
             <div className="pseudo-phone-main outer">

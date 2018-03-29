@@ -14,10 +14,11 @@ import TimerOffIcon from 'material-ui-icons/TimerOff';
 import Slide from 'material-ui/transitions/Slide';
 import Checkbox from 'material-ui/Checkbox';
 
+import { IconTimerButton } from "./TimerButton";
+
 import {
     topicDurationToString,
     itemIsSelectedForDeletion,
-    handleStartSessionOnClick,
     handleDeleteItemCheckboxOnClick,
 } from "../helpers";
 
@@ -52,20 +53,7 @@ export default class TopicList extends React.Component {
         }
         const renderTimerButton = (topic) => {
             const topicId = topic.code;
-            return (
-                <IconButton
-                    onClick={ (e) => handleStartSessionOnClick(e, props, topicId) }
-                >
-                    { (_.get(supervisor, "isRunning.topicId", 0) === topicId)
-                    ? ( <TimerOffIcon
-                        style={ styles.icon }
-                    /> )
-                    : (<TimerIcon
-                        style={ styles.icon }
-                    />)
-                    }
-                </IconButton>
-            )
+            return <IconTimerButton { ...props } selectedTopicId={ topicId }/>
         }
         const renderTopic = (topic, i) => {
             return (

@@ -17,7 +17,6 @@ import {
     durationToString,
     getTopicSessions,
     getNewSession,
-    handleStartSessionOnClick,
 } from "../helpers";
 import ItemAppBar from "./ItemAppBar";
 import ItemBottomNavigation from "./ItemBottomNavigation";
@@ -25,12 +24,8 @@ import SessionList from "./SessionList";
 import TargetPage from "./TargetPage";
 import NotesPage from "./NotesPage";
 import LoadingIndicator from "./LoadingIndicator";
+import { FloatingTimerButton } from "./TimerButton";
 
-const fabStyle = {
-    position: "absolute",
-    top: "450px",
-    left: "285px"
-};
 const gridStyle = {
     flexGrow: "1",
     margin: "8px 16px 0px 16px",
@@ -140,12 +135,6 @@ class TopicPage extends React.Component {
                     );
             }
         }
-        const renderStartSessionIcon = () => {
-            if (_.get(supervisor, "isRunning.topicId", 0) === topicId) {
-                return (<TimerOffIcon />);
-            }
-            return (<TimerIcon />);
-        }
         const isLoaded = (supervisor.isLoaded || false);
         return (
             <div className="pseudo-phone-main outer">
@@ -173,14 +162,7 @@ class TopicPage extends React.Component {
                         </Button>
                     </div>
                     <div className="floating-button-bottom-right">
-                        <Button
-                            disabled={ !isLoaded || topicIsNew }
-                            variant="fab"
-                            color="primary"
-                            style={ { top: "-56px" } }
-                            onClick={ (e) => handleStartSessionOnClick(e, props) }>
-                            { renderStartSessionIcon() }
-                        </Button>
+                        <FloatingTimerButton { ...props } disabled={ !isLoaded || topicIsNew } />
                     </div>
                     <div className="bottom-nav" onClick={ handleDivOnClick }>
                         <ItemBottomNavigation { ...props } />
