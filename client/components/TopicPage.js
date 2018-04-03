@@ -4,10 +4,6 @@ import { withFirestore } from 'react-redux-firebase'
 import * as _ from "lodash";
 
 import TextField from 'material-ui/TextField';
-import TimerIcon from 'material-ui-icons/Timer';
-import TimerOffIcon from 'material-ui-icons/TimerOff';
-import AddIcon from "material-ui-icons/Add";
-import Button from 'material-ui/Button';
 import Grid from 'material-ui/Grid';
 
 import {
@@ -19,6 +15,7 @@ import {
     getNewSession,
     withLoadingIndicator,
 } from "../helpers";
+import AddButton from "./AddButton";
 import ItemAppBar from "./ItemAppBar";
 import ItemBottomNavigation from "./ItemBottomNavigation";
 import SessionList from "./SessionList";
@@ -148,14 +145,11 @@ class TopicPage extends React.Component {
                 </div>
                 <div className="inner">
                     <div className="floating-button-bottom-right">
-                        <Button
+                        <AddButton
                             disabled={ !isLoaded || topicIsNew }
-                            variant="fab"
-                            color="primary"
+                            onClick={ handleAddSessionOnClick }
                             style={ { top: "-128px" } }
-                            onClick={ handleAddSessionOnClick }>
-                            <AddIcon />
-                        </Button>
+                        />
                     </div>
                     <div className="floating-button-bottom-right">
                         <FloatingTimerButton { ...props } disabled={ !isLoaded || topicIsNew } />

@@ -2,9 +2,7 @@ import React from "react";
 import { compose } from 'redux'
 import { withFirestore } from 'react-redux-firebase'
 
-import AddIcon from "material-ui-icons/Add";
-import Button from 'material-ui/Button';
-
+import AddButton from "./AddButton";
 import ItemAppBar from "./ItemAppBar";
 import TopicList from "./TopicList";
 import {
@@ -51,12 +49,10 @@ const TopicListComponent = (props) => {
             </div>
             <div className="inner">
                 <div className="floating-button-bottom-right">
-                    <Button
-                        variant="fab"
-                        color="primary"
-                        onClick={ handleAddTopicOnClick }>
-                        <AddIcon />
-                    </Button>
+                    <AddButton
+                        disabled={ false }
+                        onClick={ handleAddTopicOnClick }
+                    />
                 </div>
             </div>
         </div>
