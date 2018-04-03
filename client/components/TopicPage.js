@@ -17,13 +17,13 @@ import {
     durationToString,
     getTopicSessions,
     getNewSession,
+    withLoadingIndicator,
 } from "../helpers";
 import ItemAppBar from "./ItemAppBar";
 import ItemBottomNavigation from "./ItemBottomNavigation";
 import SessionList from "./SessionList";
 import TargetPage from "./TargetPage";
 import NotesPage from "./NotesPage";
-import LoadingIndicator from "./LoadingIndicator";
 import { FloatingTimerButton } from "./TimerButton";
 
 const gridStyle = {
@@ -38,6 +38,61 @@ const bottomGridStyle = {
     width: "360px",
     maxHeight: "416px"
 }
+
+const TopicComponent = ({ topicIsNew, ...props }) => {
+    const selectedIndex = getBottomNavSelectedIndex(props);
+    const defaultSessionListText = (topicIsNew) ? "Save topic to start recording sessions" : "Start recording sessions";
+    switch(selectedIndex) {
+        case 0:
+            return (
+                <div>
+                    <Grid
+                        container
+                        spacing={ 24 }
+                        style={ gridStyle }
+                    >
+                        <Grid item xs>
+                            <TextField
+                                label="Total Time Spent"
+                                disabled={ true }
+                                fullWidth={ true }
+                                value={ durationToString(getTopicSessions(props), "long") }
+                            />
+                        </Grid>
+                    </Grid>
+                    <Grid
+                        container
+                        spacing={ 24 }
+                        style={ bottomGridStyle }
+                    >
+                        <Grid item xs>
+                            <SessionList { ...props } defaultText={ defaultSessionListText }/>
+                        </Grid>
+                    </Grid>
+                </div>
+            );
+        case 1:
+            return (
+                <div>
+                    <TargetPage { ...props }/>
+                </div>
+            );
+        case 2:
+            return (
+                <div>
+                    <NotesPage { ...props }/>
+                </div>
+            );
+        default:
+            return (
+                <div>
+                    <SessionList { ...props } defaultText={ defaultSessionListText }/>
+                </div>
+            );
+    }
+}
+
+const EnhancedTopicWithLoadingIndicator = withLoadingIndicator(TopicComponent);
 
 class TopicPage extends React.Component {
     componentWillMount() {
@@ -65,15 +120,11 @@ class TopicPage extends React.Component {
             editItemTitle,
             params,
             selectBottomNavIndex,
-            sessions,
         } = props;
         const {
             uid,
             topicId,
         } = params;
-        const getSelectedTopic = () => {
-            return getSelectedItem(props, "code") || { code: 0 };
-        }
         const topicIsNew = supervisor.isNew.topicId === topicId;
         const handleAddSessionOnClick = (e) => {
             const sessionId = _.get(getNewSession(props), "code", -1);
@@ -83,72 +134,17 @@ class TopicPage extends React.Component {
         const handleDivOnClick = (e) => {
             editItemTitle(false);
         }
-        const renderDetailView = () => {
-            const selectedIndex = getBottomNavSelectedIndex(props);
-            const defaultSessionListText = (topicIsNew) ? "Save topic to start recording sessions" : "Start recording sessions";
-            switch(selectedIndex) {
-                case 0:
-                    return (
-                        <div>
-                            <Grid
-                                container
-                                spacing={ 24 }
-                                style={ gridStyle }
-                            >
-                                <Grid item xs>
-                                    <TextField
-                                        label="Total Time Spent"
-                                        disabled={ true }
-                                        fullWidth={ true }
-                                        value={ durationToString(getTopicSessions(props), "long") }
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Grid
-                                container
-                                spacing={ 24 }
-                                style={ bottomGridStyle }
-                            >
-                                <Grid item xs>
-                                    <SessionList { ...props } defaultText={ defaultSessionListText }/>
-                                </Grid>
-                            </Grid>
-                        </div>
-                    );
-                case 1:
-                    return (
-                        <div>
-                            <TargetPage { ...props }/>
-                        </div>
-                    );
-                case 2:
-                    return (
-                        <div>
-                            <NotesPage { ...props }/>
-                        </div>
-                    );
-                default:
-                    return (
-                        <div>
-                            <SessionList { ...props } defaultText={ defaultSessionListText }/>
-                        </div>
-                    );
-            }
-        }
         const isLoaded = (supervisor.isLoaded || false);
         return (
             <div className="pseudo-phone-main outer">
                 <ItemAppBar { ...props } />
                 <div className="pseudo-phone-list-no-scroll inner" onClick={ handleDivOnClick }>
-                    { isLoaded
-                        ? renderDetailView()
-                        : <LoadingIndicator
-                            isLoaded={ isLoaded }
-                            notLoadedText="Loading Topic"
-                            isEmpty={ false }
-                            isEmptyText="Add a Topic to get started"
-                        />
-                    }
+                    <EnhancedTopicWithLoadingIndicator
+                        { ...props }
+                        topicIsNew={ topicIsNew }
+                        isLoading={ !isLoaded }
+                        loadingMessage="Loading Topic"
+                    />
                 </div>
                 <div className="inner">
                     <div className="floating-button-bottom-right">

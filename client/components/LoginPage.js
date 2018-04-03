@@ -10,7 +10,9 @@ import Grid from "material-ui/Grid";
 import Button from "material-ui/Button";
 import { CircularProgress } from 'material-ui/Progress';
 
-import LoadingIndicator from "./LoadingIndicator";
+import {
+    withLoadingIndicator,
+} from "../helpers";
 
 const styles = (theme) => ({
     root: {
@@ -22,60 +24,59 @@ const styles = (theme) => ({
     },
 });
 
-class LoginPage extends React.Component {
-    render() {
-        const props = this.props;
-        const {
-            classes,
-            supervisor,
-            router,
-            showProgress,
-            setAuthorisedUserId,
-            firebase,
-            auth,
-        } = props;
-        const authenticate = (e, provider) => {
-            firebase.login({ provider, type: "redirect" }).catch(console.log);
-        }
-        return (
-            <div
-                className={ `${ classes.root } pseudo-phone-list-no-scroll` }
+const authenticate = (e, firebase, provider) => {
+    firebase.login({ provider, type: "redirect" }).catch(console.log);
+}
+
+const LoginButton = ({ firebase, auth }) => {
+    return (
+        isEmpty(auth)
+        ? <GoogleButton
+            style={ { margin: "0 auto" } }
+            onClick={ (e) => authenticate(e, firebase, "google")}
+        />
+        : <Button
+            variant="raised"
+            color="primary"
+            onClick={ (e) => firebase.logout() }
+        >
+            Log out
+        </Button>
+    )
+}
+
+const LoginButtonWithLoadingIndicator = withLoadingIndicator(LoginButton);
+
+const LoginPage = (props) =>  {
+    const {
+        classes,
+        firebase,
+        auth,
+    } = props;
+    return (
+        <div
+            className={ `${ classes.root } pseudo-phone-list-no-scroll` }
+        >
+            <Grid
+                container
+                className={ classes.flex }
             >
                 <Grid
-                    container
-                    className={ classes.flex }
+                    item
+                    xs={ 12 }
                 >
-                    <Grid
-                        item
-                        xs={ 12 }
-                    >
-                        <h2>Experience the Power of 10</h2>
-                    </Grid>
-                    {
-                        isLoaded(auth)
-                        ? isEmpty(auth)
-                            ? <GoogleButton
-                                style={ { margin: "0 auto" } }
-                                onClick={ (e) => authenticate(e, "google")}
-                            />
-                            : <Button
-                                variant="raised"
-                                color="primary"
-                                onClick={ (e) => firebase.logout() }
-                            >
-                                Log out
-                            </Button>
-                        : <LoadingIndicator
-                            isLoaded={ isLoaded(auth) }
-                            notLoadedText=""
-                            isEmpty={ isEmpty(auth) }
-                            isEmptyText="Login failed"
-                        />
-                    }
+                    <h2>Experience the Power of 10</h2>
                 </Grid>
-            </div>
-        );
-    }
+                {
+                    <LoginButtonWithLoadingIndicator
+                        { ...props }
+                        isLoading={ !isLoaded(auth) }
+                        loadingMessage="Loading user details"
+                    />
+                }
+            </Grid>
+        </div>
+    );
 }
 
 LoginPage.propTypes = {

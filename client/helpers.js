@@ -1,5 +1,6 @@
 import React from "react";
 import moment from "moment";
+import LoadingIndicator from "./components/LoadingIndicator";
 
 const durationFromArrayOfSessions = (sessions = []) => {
     return sessions.reduce(
@@ -253,5 +254,14 @@ export const getSelectedItemAndBeforeAndAfterArraysFromState = (state, itemId) =
         before,
         selectedItem,
         after,
+    }
+}
+
+export const withLoadingIndicator = (Component) => {
+    return ({ isLoading, loadingMessage, ...props })  => {
+        if (!isLoading) {
+            return <Component { ...props } />;
+        }
+        return <LoadingIndicator  loadingMessage={ loadingMessage } />
     }
 }
