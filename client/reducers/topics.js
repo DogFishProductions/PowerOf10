@@ -83,6 +83,7 @@ const topics = (state = [], action) => {
         // case "@@reduxFirestore/GET_REQUEST":
         // case "@@reduxFirestore/GET_FAILURE":
         default:
+            return state;
     }
     return state;
 }

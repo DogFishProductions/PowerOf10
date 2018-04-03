@@ -41,6 +41,259 @@ const styles = {
     },
 };
 
+const handleOnRightCancelButtonClick = (
+    e,
+    {
+        displaySelectForDeletion,
+        deleteRequested,
+        deselectAllForDeletion,
+        openMenu,
+    },
+) => {
+    displaySelectForDeletion(false);
+    deleteRequested(false);
+    deselectAllForDeletion();
+    openMenu(false);
+}
+
+const handleOnRightIconButtonClick = (
+    e,
+    props,
+) => {
+    const {
+        firestore,
+        displaySelectForDeletion,
+        deleteRequested,
+        openMenu,
+        editItemTitle,
+        params,
+    } = props;
+    const {
+        uid,
+        topicId,
+        sessionId,
+    } = params;
+    const selectedItem = getSelectedItem(props, "code");
+    if (selectedItemIsNew(props, "code")) {
+        dispatchAction(props, "addItem");
+        firestore.set(
+            createFirestoreQueryPath(uid, true, topicId, null, sessionId),
+            _.omit(selectedItem, excludedProperties),
+        );
+    } else {
+        deleteRequested(true);
+        displaySelectForDeletion(true);
+        openMenu(false);
+    }
+    editItemTitle(false);
+}
+
+const CancelDeleteButton = ({ toDelete, ...props }) => {
+    const {
+        openDialog,
+    } = props;
+    const handleOnRightDeleteButtonClick = (e) => {
+        openDialog(true);
+    }
+    return (
+        <span>
+            <IconButton
+                onClick={ (e) => handleOnRightCancelButtonClick(e, props) }
+                color="inherit"
+            >
+                <Typography
+                    variant="button"
+                    color="inherit">
+                    Cancel
+                </Typography>
+            </IconButton>
+                |
+            <IconButton
+                onClick={ handleOnRightDeleteButtonClick }
+                color="inherit"
+                disabled={ toDelete.length <= 0 }
+            >
+                <Typography
+                    variant="button"
+                    color="inherit">
+                    Delete
+                </Typography>
+            </IconButton>
+            <TopDrawer { ...props } />
+        </span>
+    );
+}
+
+const MenuButton = (props) => {
+    const {
+        supervisor,
+        classes,
+        firebase,
+        openMenu,
+        params,
+    } = props;
+    const {
+        topicId,
+    } = params;
+    const handleMenuButtonOnClick = (e) => {
+        openMenu(true, e.currentTarget);
+    }
+    const handleLogoutOnClick = () => {
+        firebase.logout();
+    }
+    return (
+        <div>
+            <IconButton
+                className={ classes.menuButton }
+                onClick={ handleMenuButtonOnClick }
+                color="inherit">
+                <MoreVertIcon />
+            </IconButton>
+            <Menu
+                id="menu-appbar"
+                anchorEl={ supervisor.menuAnchor }
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                open={ Boolean(supervisor.menuAnchor) }
+                onClose={ (e) => handleOnRightCancelButtonClick(e, props) }
+            >
+                <MenuItem
+                    onClick={ (e) => handleOnRightIconButtonClick(e, props) }
+                >
+                    { topicId ? "Delete Sessions" : "Delete Topics" }
+                </MenuItem>
+                <MenuItem
+                    onClick={ handleLogoutOnClick }
+                >
+                    Logout
+                </MenuItem>
+            </Menu>
+        </div>
+    );
+}
+
+const DeleteConfirmationDialog = (props) => {
+    const {
+        supervisor,
+        openDialog,
+        deleteRequested,
+        displaySelectForDeletion,
+        removeItem,
+        firestore,
+        params,
+    } = props;
+    const {
+        uid,
+        topicId,
+        sessionId,
+    } = params;
+    const manageItemsMarkedForDeletion = (manager) => {
+        deleteRequested(false);
+        displaySelectForDeletion(false);
+        const toDelete = supervisor.toDelete || [];
+        toDelete.map(manager);
+    }
+    const handleDeleteConfirmedOnClick = (e) => {
+        openDialog(false);
+        manageItemsMarkedForDeletion((itemId) => {
+            if (topicId) {
+                const type = "session";
+                // don't use handler dispatchAction as session id is not in URL
+                removeItem("session", itemId, topicId);
+                firestore.deleteRef(createFirestoreQueryPath(uid, true, topicId, true, itemId));
+            } else {
+                const type = "topic";
+                // don't use handler dispatchAction as session id is not in URL
+                removeItem("topic", itemId);
+                firestore.deleteRef(createFirestoreQueryPath(uid, true, itemId));
+            }
+            dispatchAction(props, "deselectAllForDeletion");
+        });
+    }
+    const handleCancelConfirmedOnClick = (e, props) => {
+        handleOnRightCancelButtonClick(e, props);
+        openDialog(false);
+    }
+    return (
+        <Dialog
+            disableBackdropClick
+            disableEscapeKeyDown
+            maxWidth="xs"
+            open={ supervisor.openDialog }
+        >
+            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogActions>
+                <Button
+                    onClick={ (e) => handleCancelConfirmedOnClick(e, props) }
+                    color="primary"
+                >
+                    Cancel
+                </Button>
+                <Button
+                    onClick={ handleDeleteConfirmedOnClick }
+                    color="primary"
+                >
+                    Ok
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+}
+
+const TitleTextField = (props) => {
+    const {
+        classes,
+        topicId,
+        supervisor,
+    } = props;
+    const handleTitleOnChange = (e) => {
+        dispatchAction(props, "updateItemProperty", "title", e.target.value);
+    }
+    if (!topicId) {
+        return "Topics";
+    } else {
+        const {
+            type,
+            targetArray,
+            selectionValue
+        } = getLocalProperties(props);
+        const selectedItem = getSelectedItem(props, "code");
+        const itemIsNew = selectedItemIsNew(props, "code");
+        const defaultTitle = itemIsNew ? `New ${ type }` : `Edit ${ type }`;
+        const title = selectedItem.title || defaultTitle;
+        const isEditingTitle = (supervisor.isEditingTitle === selectedItem.code);
+        if (isEditingTitle) {
+            if (itemIsNew) {
+                return (
+                    <TextField
+                        className={classes.flex}
+                        fullWidth={ true }
+                        placeholder={ title }
+                        onChange={ handleTitleOnChange }
+                    />
+                )
+            } else {
+                return (
+                    <TextField
+                        className={classes.flex}
+                        fullWidth={ true }
+                        defaultValue={ title }
+                        onChange={ handleTitleOnChange }
+                    />
+                )
+            }
+        } else {
+            return title;
+        }
+    }
+}
+
 class ItemAppBar extends React.Component {
     componentWillUnmount() {
         const props = this.props;
@@ -56,8 +309,6 @@ class ItemAppBar extends React.Component {
         } = props;
         const {
             uid,
-            topicId,
-            sessionId,
         } = params;
         const updateItem = (selectedItem, tId, sId) => {
             firestore.update(
@@ -71,7 +322,10 @@ class ItemAppBar extends React.Component {
             if (selectedItemIsNew(props, "code")) {
                 dispatchAction(props, "removeItem");
             }
-            _.each(topicsRequiringUpdate, (tId) => updateItem(topics[tId], tId));
+            _.each(topicsRequiringUpdate, (tId) => updateItem(
+                topics.find((topic) => _.get(topic, "code", -1) === tId),
+                tId,
+            ));
             _.each(sessionsRequiringUpdate, (sessionIds, tId) => {
                 _.each(sessionIds, (sId) => {
                     updateItem(
@@ -93,20 +347,14 @@ class ItemAppBar extends React.Component {
             router,
             deleteRequested,
             displaySelectForDeletion,
-            deselectAllForDeletion,
             supervisor,
-            openMenu,
-            removeItem,
             params,
-            openDialog,
             classes,
             editItemTitle,
             firebase,
-            firestore,
             sessions,
         } = props;
         const {
-            uid,
             topicId,
             sessionId,
         } = params;
@@ -114,12 +362,6 @@ class ItemAppBar extends React.Component {
             router.goBack();
             deleteRequested(false);
             displaySelectForDeletion(false);
-        }
-        const manageItemsMarkedForDeletion = (manager) => {
-            deleteRequested(false);
-            displaySelectForDeletion(false);
-            const toDelete = supervisor.toDelete || [];
-            toDelete.map(manager);
         }
         const handleOnTitleClick = (e) => {
             if (topicId && !sessionId) {
@@ -129,97 +371,8 @@ class ItemAppBar extends React.Component {
         const handleOnLeftIconButtonClick = (e) => {
             redirectHome();
         }
-        const handleOnRightIconButtonClick = (e) => {
-            const selectedItem = getSelectedItem(props, "code");
-            if (selectedItemIsNew(props, "code")) {
-                dispatchAction(props, "addItem");
-                firestore.set(
-                    createFirestoreQueryPath(uid, true, topicId, null, sessionId),
-                    _.omit(selectedItem, excludedProperties),
-                );
-            } else {
-                deleteRequested(true);
-                displaySelectForDeletion(true);
-                openMenu(false);
-            }
-            editItemTitle(false);
-        }
-        const handleOnRightCancelButtonClick = (e) => {
-            displaySelectForDeletion(false);
-            deleteRequested(false);
-            deselectAllForDeletion();
-            openMenu(false);
-        }
-        const handleOnRightDeleteButtonClick = (e) => {
-            openDialog(true);
-        }
-        const handleDeleteConfirmedOnClick = (e) => {
-            openDialog(false);
-            manageItemsMarkedForDeletion((itemId) => {
-                if (topicId) {
-                    const type = "session";
-                    // don't use handler dispatchAction as session id is not in URL
-                    removeItem("session", itemId, topicId);
-                    firestore.deleteRef(createFirestoreQueryPath(uid, true, topicId, true, itemId));
-                } else {
-                    const type = "topic";
-                    // don't use handler dispatchAction as session id is not in URL
-                    removeItem("topic", itemId);
-                    firestore.deleteRef(createFirestoreQueryPath(uid, true, itemId));
-                }
-                dispatchAction(props, "deselectAllForDeletion");
-            });
-        }
-        const handleCancelConfirmedOnClick = (e) => {
-            openDialog(false);
-        }
-        const handleMenuButtonOnClick = (e) => {
-            openMenu(true, e.currentTarget);
-        }
-        const handleTitleOnChange = (e) => {
-            dispatchAction(props, "updateItemProperty", "title", e.target.value);
-        }
         const handleLogoutOnClick = () => {
             firebase.logout();
-        }
-        const renderTitle = () => {
-            if (!topicId) {
-                return "Topics";
-            } else {
-                const {
-                    type,
-                    targetArray,
-                    selectionValue
-                } = getLocalProperties(props);
-                const selectedItem = getSelectedItem(props, "code");
-                const itemIsNew = selectedItemIsNew(props, "code");
-                const defaultTitle = itemIsNew ? `New ${ type }` : `Edit ${ type }`;
-                const title = selectedItem.title || defaultTitle;
-                const isEditingTitle = (supervisor.isEditingTitle === selectedItem.code);
-                if (isEditingTitle) {
-                    if (itemIsNew) {
-                        return (
-                            <TextField
-                                className={classes.flex}
-                                fullWidth={ true }
-                                placeholder={ title }
-                                onChange={ handleTitleOnChange }
-                            />
-                        )
-                    } else {
-                        return (
-                            <TextField
-                                className={classes.flex}
-                                fullWidth={ true }
-                                defaultValue={ title }
-                                onChange={ handleTitleOnChange }
-                            />
-                        )
-                    }
-                } else {
-                    return title;
-                }
-            }
         }
         const renderIconElementLeft = () => {
             if (selectedItemIsNew(props, "code")) {
@@ -238,7 +391,7 @@ class ItemAppBar extends React.Component {
                 return (
                     <IconButton
                         className={classes.menuButton}
-                        onClick={ handleOnRightIconButtonClick }
+                        onClick={ (e) => handleOnRightIconButtonClick(e, props) }
                         color="inherit">
                         <Typography
                             variant="button"
@@ -249,69 +402,18 @@ class ItemAppBar extends React.Component {
                 );
             } else if (supervisor.deleteRequested) {
                 return (
-                    <span>
-                        <IconButton
-                            onClick={ handleOnRightCancelButtonClick }
-                            color="inherit"
-                        >
-                            <Typography
-                                variant="button"
-                                color="inherit">
-                                Cancel
-                            </Typography>
-                        </IconButton>
-                            |
-                        <IconButton
-                            onClick={ handleOnRightDeleteButtonClick }
-                            color="inherit"
-                            disabled={ toDelete.length <= 0 }
-                        >
-                            <Typography
-                                variant="button"
-                                color="inherit">
-                                Delete
-                            </Typography>
-                        </IconButton>
-                        <TopDrawer { ...props } />
-                    </span>
+                    <CancelDeleteButton
+                        { ...props }
+                        toDelete={ toDelete }
+                    />
                 );
             } else {
                 const sessions = props.sessions[topicId] || [];
                 if (!topicId || (!sessionId && (sessions.length > 0))) {
                     return (
-                        <div>
-                            <IconButton
-                                className={ classes.menuButton }
-                                onClick={ handleMenuButtonOnClick }
-                                color="inherit">
-                                <MoreVertIcon />
-                            </IconButton>
-                            <Menu
-                                id="menu-appbar"
-                                anchorEl={ supervisor.menuAnchor }
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={ Boolean(supervisor.menuAnchor) }
-                                onClose={ handleOnRightCancelButtonClick }
-                                >
-                                <MenuItem
-                                    onClick={ handleOnRightIconButtonClick }
-                                >
-                                    { topicId ? "Delete Sessions" : "Delete Topics" }
-                                </MenuItem>
-                                <MenuItem
-                                    onClick={ handleLogoutOnClick }
-                                >
-                                    Logout
-                                </MenuItem>
-                            </Menu>
-                        </div>
+                        <MenuButton
+                            { ...props }
+                        />
                     );
                 }
             }
@@ -343,33 +445,17 @@ class ItemAppBar extends React.Component {
                                 variant="title"
                                 color="inherit"
                                 className={classes.flex}>
-                                { renderTitle() }
+                                <TitleTextField
+                                    { ...props }
+                                    topicId={ topicId }
+                                />
                             </Typography>
                             { renderIconElementRight() }
                         </Toolbar>
                     </AppBar>
-                    <Dialog
-                        disableBackdropClick
-                        disableEscapeKeyDown
-                        maxWidth="xs"
-                        open={ supervisor.openDialog }
-                    >
-                        <DialogTitle>Confirm Delete</DialogTitle>
-                        <DialogActions>
-                            <Button
-                                onClick={ handleCancelConfirmedOnClick }
-                                color="primary"
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                onClick={ handleDeleteConfirmedOnClick }
-                                color="primary"
-                            >
-                                Ok
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
+                    <DeleteConfirmationDialog
+                        { ...props }
+                    />
                 </div>
             );
         }
