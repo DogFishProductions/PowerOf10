@@ -311,10 +311,14 @@ class ItemAppBar extends React.Component {
             uid,
         } = params;
         const updateItem = (selectedItem, tId, sId) => {
-            firestore.update(
-                createFirestoreQueryPath(uid, null, tId, null, sId),
-                _.omit(selectedItem, excludedProperties),
-            );
+            console.log("selected item: ", selectedItem)
+            if (selectedItem && !_.isUndefined(selectedItem)) {
+                console.log("updating")
+                firestore.update(
+                    createFirestoreQueryPath(uid, null, tId, null, sId),
+                    _.omit(selectedItem, excludedProperties),
+                );
+            }
         }
         const persistItemsRequiringUpdate = () => {
             const topicsRequiringUpdate = _.get(supervisor, "requiresUpdate.topics", []);
@@ -329,7 +333,7 @@ class ItemAppBar extends React.Component {
             _.each(sessionsRequiringUpdate, (sessionIds, tId) => {
                 _.each(sessionIds, (sId) => {
                     updateItem(
-                        sessions[tId].find((sess) => sess.code === sId),
+                        sessions[tId].find((sess) => _.get(sess, "code", -1) === sId),
                         tId,
                         sId,
                     )
@@ -351,6 +355,7 @@ class ItemAppBar extends React.Component {
             params,
             classes,
             editItemTitle,
+            removeItem,
             firebase,
             sessions,
         } = props;
@@ -374,10 +379,23 @@ class ItemAppBar extends React.Component {
         const handleLogoutOnClick = () => {
             firebase.logout();
         }
+        const handleCloseOnClick = (e) => {
+            if (topicId) {
+                const type = "session";
+                // don't use handler dispatchAction as session id is not in URL
+                removeItem("session", sessionId, topicId);
+            } else {
+                const type = "topic";
+                // don't use handler dispatchAction as session id is not in URL
+                removeItem("topic", topicId);
+            }
+        }
         const renderIconElementLeft = () => {
             if (selectedItemIsNew(props, "code")) {
                 return (
-                    <CloseIcon />
+                    <CloseIcon
+                        onClick={ handleCloseOnClick }
+                    />
                 );
             } else {
                 return (
