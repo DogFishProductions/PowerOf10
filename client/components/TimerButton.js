@@ -5,6 +5,7 @@ import Button from 'material-ui/Button';
 import IconButton from "material-ui/IconButton";
 import TimerIcon from "material-ui-icons/Timer";
 import TimerOffIcon from "material-ui-icons/TimerOff";
+import FavoriteIcon from "material-ui-icons/Favorite";
 
 import {
     getNewSession,
@@ -18,10 +19,15 @@ const styles = {
 };
 
 let calcCurrentDuration;
-const clearRunningUpdater = () => {
+export const clearRunningUpdater = () => {
     clearInterval(calcCurrentDuration);
     calcCurrentDuration = null;
+    heartbeatFlipFlop = false;
+    count = 0;
 }
+
+let heartbeatFlipFlop = false;
+let count = 0;
 
 const handleStartSessionOnClick = (
     event,
@@ -82,6 +88,10 @@ const handleStartSessionOnClick = (
                 duration += (newTo - _.get(runningSession, "from", newTo));
                 // don't use handler dispatchAction as topic id may not be in URL
                 updateItemProperty("topic", topicId, "duration", duration);
+                if ((count % 4) === 0) {
+                    heartbeatFlipFlop = !heartbeatFlipFlop;
+                }
+                count++;
             },
             200,
         );
@@ -124,3 +134,8 @@ export const FloatingTimerButton = (props) =>
         { renderTimerIcon(props) }
     </Button>
 
+export const TimerRunningIcon = (props) =>
+    <FavoriteIcon
+        style={ { margin: "0px 5px" } }
+        color={ heartbeatFlipFlop ? "secondary" : "disabled" }
+    />

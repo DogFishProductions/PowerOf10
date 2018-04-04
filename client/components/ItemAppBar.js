@@ -28,6 +28,10 @@ import {
     excludedProperties,
 } from "../helpers";
 import TopDrawer from "./TopDrawer";
+import {
+    clearRunningUpdater,
+    TimerRunningIcon,
+} from "./TimerButton";
 
 const styles = {
     root: {
@@ -187,6 +191,7 @@ const DeleteConfirmationDialog = (props) => {
         removeItem,
         firestore,
         params,
+        sessionIsRunning,
     } = props;
     const {
         uid,
@@ -206,6 +211,11 @@ const DeleteConfirmationDialog = (props) => {
                 const type = "session";
                 // don't use handler dispatchAction as session id is not in URL
                 removeItem("session", itemId, topicId);
+                // if we're removing the running session then clean up...
+                if (_.get(supervisor, "isRunning.sessionId", -1) === itemId) {
+                    sessionIsRunning(false);
+                    clearRunningUpdater();
+                }
                 firestore.deleteRef(createFirestoreQueryPath(uid, true, topicId, true, itemId));
             } else {
                 const type = "topic";
@@ -311,9 +321,7 @@ class ItemAppBar extends React.Component {
             uid,
         } = params;
         const updateItem = (selectedItem, tId, sId) => {
-            console.log("selected item: ", selectedItem)
             if (selectedItem && !_.isUndefined(selectedItem)) {
-                console.log("updating")
                 firestore.update(
                     createFirestoreQueryPath(uid, null, tId, null, sId),
                     _.omit(selectedItem, excludedProperties),
@@ -358,6 +366,7 @@ class ItemAppBar extends React.Component {
             removeItem,
             firebase,
             sessions,
+            sessionIsRunning,
         } = props;
         const {
             topicId,
@@ -384,6 +393,9 @@ class ItemAppBar extends React.Component {
                 const type = "session";
                 // don't use handler dispatchAction as session id is not in URL
                 removeItem("session", sessionId, topicId);
+                // if we're removing the running session then clean up...
+                sessionIsRunning(false);
+                clearRunningUpdater();
             } else {
                 const type = "topic";
                 // don't use handler dispatchAction as session id is not in URL
@@ -468,6 +480,9 @@ class ItemAppBar extends React.Component {
                                     topicId={ topicId }
                                 />
                             </Typography>
+                            <TimerRunningIcon
+                                { ...props }
+                            />
                             { renderIconElementRight() }
                         </Toolbar>
                     </AppBar>
