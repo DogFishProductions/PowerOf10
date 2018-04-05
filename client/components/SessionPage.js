@@ -47,7 +47,10 @@ const clearRunningUpdater = () => {
     calcCurrentDuration = null;
 }
 
-export default class TopicPage extends React.Component {
+export default class SessionPage extends React.Component {
+    componentWillMount() {
+        this.props.selectBottomNavIndex(2);
+    }
     componentWillUnmount() {
         clearRunningUpdater();
         resetErrorState();

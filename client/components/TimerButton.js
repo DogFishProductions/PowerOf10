@@ -33,7 +33,6 @@ const handleStartSessionOnClick = (
     event,
     {
         updateItemProperty,
-        selectBottomNavIndex,
         createItem,
         supervisor,
         sessionIsRunning,
@@ -97,7 +96,6 @@ const handleStartSessionOnClick = (
         );
         if (supervisor.isNew) {
             router.push(`/user/${ uid }/topic/${ topicId }/session/${ newSessionId }`);
-            selectBottomNavIndex(0);
         }
     }
 }

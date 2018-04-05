@@ -24,7 +24,11 @@ export default class NotesPage extends React.Component {
             <div style={ notesStyle }>
                 <TextField
                     style={ notesStyle }
-                    placeholder="Describe your new topic"
+                    placeholder={
+                        this.props.params.sessionId
+                        ? "Describe your session"
+                        : "Describe your topic"
+                    }
                     label="Description"
                     multiline
                     rows="2"

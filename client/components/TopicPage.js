@@ -106,9 +106,6 @@ class TopicPage extends React.Component {
             firestore.get(createFirestoreQueryPath(uid, true, topicId, true));
         }
     }
-    componentWillUnmount() {
-        this.props.selectBottomNavIndex(0);
-    }
     render() {
         const props = this.props;
         const {
@@ -125,7 +122,6 @@ class TopicPage extends React.Component {
         const topicIsNew = supervisor.isNew.topicId === topicId;
         const handleAddSessionOnClick = (e) => {
             const sessionId = _.get(getNewSession(props), "code", -1);
-            selectBottomNavIndex(0);
             router.push(`/user/${ uid }/topic/${ topicId }/session/${ sessionId }`);
         }
         const handleDivOnClick = (e) => {

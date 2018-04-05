@@ -26,7 +26,7 @@ const styles = {
     orangeAvatar: {
         textAlign: "center",
         fontSize: 10,
-        margin: 10,
+        margin: 5,
         color: "#fff",
         backgroundColor: deepOrange[500],
     },
@@ -58,7 +58,15 @@ export default class TopicList extends React.Component {
         const renderTopic = (topic, i) => {
             return (
                 <div key={i}>
-                    <ListItem>
+                    <ListItem
+                        divider={ true }
+                        dense={ true }
+                        style={
+                            _.get(supervisor, "isRunning.topicId", -1) === _.get(topic, "code", 0)
+                            ? { backgroundColor: "#eee" }
+                            : {}
+                        }
+                    >
                         <Slide
                             direction="right"
                             in={ supervisor.displaySelectForDeletion }
@@ -87,7 +95,6 @@ export default class TopicList extends React.Component {
                             { renderTimerButton(topic) }
                         </ListItemSecondaryAction>
                     </ListItem>
-                    <Divider />
                 </div>
             )
         }

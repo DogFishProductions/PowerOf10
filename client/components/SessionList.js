@@ -72,7 +72,15 @@ export default class SessionList extends React.Component {
         const renderSession = (session, i) => {
             return (
                 <div key={i}>
-                    <ListItem>
+                    <ListItem
+                        divider={ true }
+                        dense={ true }
+                        style={
+                            _.get(supervisor, "isRunning.sessionId", -1) === _.get(session, "code", 0)
+                            ? { backgroundColor: "#eee" }
+                            : {}
+                        }
+                    >
                         <Slide
                             direction="right"
                             in={ supervisor.displaySelectForDeletion }
@@ -92,14 +100,13 @@ export default class SessionList extends React.Component {
                             primary={ momentToDatetimeString(session, "from") }
                             secondary={ durationToString([session], "long") }
                         />
-                        { ((_.get(supervisor, "isRunning.sessionId", 0) === session.code) ||
+                        { ((_.get(supervisor, "isRunning.sessionId", 0) === _.get(session, "code", 0)) ||
                             (session.to === session.from)) &&
                             <ListItemSecondaryAction>
                                 <IconTimerButton { ...props } selectedSessionId={ session.code }/>
                             </ListItemSecondaryAction>
                         }
                     </ListItem>
-                    <Divider />
                 </div>
             );
         }
