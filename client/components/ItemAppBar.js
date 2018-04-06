@@ -48,16 +48,18 @@ const styles = {
 const handleOnRightCancelButtonClick = (
     e,
     {
-        displaySelectForDeletion,
-        deleteRequested,
-        deselectAllForDeletion,
-        openMenu,
+        // displaySelectForDeletion,
+        // deleteRequested,
+        // deselectAllForDeletion,
+        // openMenu,
+        cancelPageMenu,
     },
 ) => {
-    displaySelectForDeletion(false);
-    deleteRequested(false);
-    deselectAllForDeletion();
-    openMenu(false);
+    // displaySelectForDeletion(false);
+    // deleteRequested(false);
+    // deselectAllForDeletion();
+    // openMenu(false);
+    cancelPageMenu();
 }
 
 const handleOnRightIconButtonClick = (
@@ -331,6 +333,8 @@ class ItemAppBar extends React.Component {
         const persistItemsRequiringUpdate = () => {
             const topicsRequiringUpdate = _.get(supervisor, "requiresUpdate.topics", []);
             const sessionsRequiringUpdate = _.get(supervisor, "requiresUpdate.sessions", {});
+            console.log("topics: ", topicsRequiringUpdate);
+            console.log("sessions: ", sessionsRequiringUpdate);
             if (selectedItemIsNew(props, "code")) {
                 dispatchAction(props, "removeItem");
             }

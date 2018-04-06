@@ -1,6 +1,8 @@
-import { createStore, combineReducers, compose } from "redux";
+import { createStore, applyMiddleware, combineReducers, compose } from "redux";
 import { syncHistoryWithStore, routerReducer } from "react-router-redux";
 import { browserHistory } from "react-router";
+import reduxMulti from 'redux-multi'
+import { batchedSubscribe } from 'redux-batched-subscribe'
 import firebase from "firebase";
 import 'firebase/firestore' // add this to use Firestore
 import { reactReduxFirebase } from "react-redux-firebase";
@@ -49,7 +51,11 @@ const defaultState = {
 };
 
 const enhancers = compose(
-    window.devToolsExtension ? window.devToolsExtension() : f => f
+    applyMiddleware(reduxMulti),
+    window.devToolsExtension ? window.devToolsExtension() : f => f,
+    batchedSubscribe((notify) => {
+        notify();
+    }),
 )
 
 const createStoreWithFirebase = compose(
