@@ -48,29 +48,17 @@ const styles = {
 const handleOnRightCancelButtonClick = (
     e,
     {
-        // displaySelectForDeletion,
-        // deleteRequested,
-        // deselectAllForDeletion,
-        // openMenu,
         cancelPageMenu,
     },
-) => {
-    // displaySelectForDeletion(false);
-    // deleteRequested(false);
-    // deselectAllForDeletion();
-    // openMenu(false);
-    cancelPageMenu();
-}
+) => cancelPageMenu();
 
-const handleOnRightIconButtonClick = (
+const handleMenuItemDeleteOnClick = (
     e,
     props,
 ) => {
     const {
         firestore,
-        displaySelectForDeletion,
-        deleteRequested,
-        openMenu,
+        closeMenuAndShowDeleteSelector,
         editItemTitle,
         params,
     } = props;
@@ -87,9 +75,7 @@ const handleOnRightIconButtonClick = (
             _.omit(selectedItem, excludedProperties),
         );
     } else {
-        deleteRequested(true);
-        displaySelectForDeletion(true);
-        openMenu(false);
+        closeMenuAndShowDeleteSelector();
     }
     editItemTitle(false);
 }
@@ -144,7 +130,7 @@ const MenuButton = (props) => {
     const handleMenuButtonOnClick = (e) => {
         openMenu(true, e.currentTarget);
     }
-    const handleLogoutOnClick = () => {
+    const handleMenuItemLogoutOnClick = () => {
         firebase.logout();
     }
     return (
@@ -170,12 +156,12 @@ const MenuButton = (props) => {
                 onClose={ (e) => handleOnRightCancelButtonClick(e, props) }
             >
                 <MenuItem
-                    onClick={ (e) => handleOnRightIconButtonClick(e, props) }
+                    onClick={ (e) => handleMenuItemDeleteOnClick(e, props) }
                 >
                     { topicId ? "Delete Sessions" : "Delete Topics" }
                 </MenuItem>
                 <MenuItem
-                    onClick={ handleLogoutOnClick }
+                    onClick={ handleMenuItemLogoutOnClick }
                 >
                     Logout
                 </MenuItem>
@@ -188,8 +174,7 @@ const DeleteConfirmationDialog = (props) => {
     const {
         supervisor,
         openDialog,
-        deleteRequested,
-        displaySelectForDeletion,
+        closeDeleteDialogAndCancelPageMenu,
         removeItem,
         firestore,
         params,
@@ -201,13 +186,11 @@ const DeleteConfirmationDialog = (props) => {
         sessionId,
     } = params;
     const manageItemsMarkedForDeletion = (manager) => {
-        deleteRequested(false);
-        displaySelectForDeletion(false);
-        const toDelete = supervisor.toDelete || [];
+        const toDelete = _.get(supervisor, "toDelete", []).slice();
+        closeDeleteDialogAndCancelPageMenu();
         toDelete.map(manager);
     }
     const handleDeleteConfirmedOnClick = (e) => {
-        openDialog(false);
         manageItemsMarkedForDeletion((itemId) => {
             if (topicId) {
                 const type = "session";
@@ -225,7 +208,6 @@ const DeleteConfirmationDialog = (props) => {
                 removeItem("topic", itemId);
                 firestore.deleteRef(createFirestoreQueryPath(uid, true, itemId));
             }
-            dispatchAction(props, "deselectAllForDeletion");
         });
     }
     const handleCancelConfirmedOnClick = (e, props) => {
@@ -310,8 +292,7 @@ class ItemAppBar extends React.Component {
     componentWillUnmount() {
         const props = this.props;
         const {
-            deleteRequested,
-            displaySelectForDeletion,
+            displayDeleteSelectorAndMenu,
             firestore,
             params,
             editItemTitle,
@@ -333,8 +314,6 @@ class ItemAppBar extends React.Component {
         const persistItemsRequiringUpdate = () => {
             const topicsRequiringUpdate = _.get(supervisor, "requiresUpdate.topics", []);
             const sessionsRequiringUpdate = _.get(supervisor, "requiresUpdate.sessions", {});
-            console.log("topics: ", topicsRequiringUpdate);
-            console.log("sessions: ", sessionsRequiringUpdate);
             if (selectedItemIsNew(props, "code")) {
                 dispatchAction(props, "removeItem");
             }
@@ -353,16 +332,14 @@ class ItemAppBar extends React.Component {
             });
         }
         persistItemsRequiringUpdate();
-        deleteRequested(false);
-        displaySelectForDeletion(false);
+        displayDeleteSelectorAndMenu(false);
         editItemTitle(false);
     }
     render() {
         const props = this.props;
         const {
             router,
-            deleteRequested,
-            displaySelectForDeletion,
+            displayDeleteSelectorAndMenu,
             supervisor,
             params,
             classes,
@@ -378,8 +355,7 @@ class ItemAppBar extends React.Component {
         } = params;
         const redirectHome = () => {
             router.goBack();
-            deleteRequested(false);
-            displaySelectForDeletion(false);
+            displayDeleteSelectorAndMenu(false);
         }
         const handleOnTitleClick = (e) => {
             if (topicId && !sessionId) {
@@ -389,7 +365,7 @@ class ItemAppBar extends React.Component {
         const handleOnLeftIconButtonClick = (e) => {
             redirectHome();
         }
-        const handleLogoutOnClick = () => {
+        const handleMenuItemLogoutOnClick = () => {
             firebase.logout();
         }
         const handleCloseOnClick = (e) => {
@@ -425,7 +401,7 @@ class ItemAppBar extends React.Component {
                 return (
                     <IconButton
                         className={classes.menuButton}
-                        onClick={ (e) => handleOnRightIconButtonClick(e, props) }
+                        onClick={ (e) => handleMenuItemDeleteOnClick(e, props) }
                         color="inherit">
                         <Typography
                             variant="button"
