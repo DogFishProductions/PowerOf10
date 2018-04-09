@@ -19,6 +19,7 @@ const {
     CREATE_SESSION,
     ADD_TOPIC,
     ADD_SESSION,
+    INCREMENT_DURATION,
     UPDATE_TOPIC,
     UPDATE_SESSION,
     EDIT_ITEM_TITLE,
@@ -136,6 +137,7 @@ const postSupervisor = (state = {}, action) => {
                 }
             }
             return state;
+        case INCREMENT_DURATION:
         case UPDATE_TOPIC:
             const topicsRequiringUpdate = _.get(state, "requiresUpdate.topics", []);
             if (topicsRequiringUpdate.indexOf(topicId) < 0) {

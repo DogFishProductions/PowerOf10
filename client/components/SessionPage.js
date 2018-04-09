@@ -60,6 +60,8 @@ export default class SessionPage extends React.Component {
         const props = this.props;
         const {
             supervisor,
+            updateSessionToFrom,
+            params,
         } = props;
         const getSelectedSession = () => {
             return getSelectedItem(props, "code") || { };
@@ -116,9 +118,9 @@ export default class SessionPage extends React.Component {
         const handleDateTimeOnChange = (e) => {
             const target = e.target;
             const prop = target.id;
-            const newValue = target.value
             const arg = {};
-            arg[prop] = newValue;
+            arg[prop] = target.value;;
+            arg[prop + "Old"] = target.defaultValue;
             const {
                 fromDate = getFromDate(),
                 fromTime = getFromTime(),
@@ -132,10 +134,22 @@ export default class SessionPage extends React.Component {
                 switch(prop) {
                     case "fromDate":
                     case "fromTime":
-                        return dispatchAction(props, "updateItemProperty", "from", Date.parse(fromDateTimeString));
+                        const {
+                            fromDateOld = getFromDate(),
+                            fromTimeOld = getFromTime(),
+                        } = arg;
+                        const newFrom = Date.parse(fromDateTimeString);
+                        const oldFrom = Date.parse(`${fromDateOld}, ${fromTimeOld}`);
+                        return updateSessionToFrom(_.get(params, "sessionId", -1), _.get(params, "topicId", -1), "from", newFrom, (oldFrom - newFrom));
                     case "toDate":
                     case "toTime":
-                        return dispatchAction(props, "updateItemProperty", "to", Date.parse(toDateTimeString));
+                        const {
+                            toDateOld = getToDate(),
+                            toTimeOld = getToTime(),
+                        } = arg;
+                        const newTo = Date.parse(toDateTimeString)
+                        const oldTo = Date.parse(`${toDateOld}, ${toTimeOld}`)
+                        return updateSessionToFrom(_.get(params, "sessionId", -1), _.get(params, "topicId", -1), "to", newTo, (newTo - oldTo));
                     default:
                         return;
                 }

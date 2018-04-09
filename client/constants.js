@@ -1,6 +1,7 @@
 export const actionsPrefix = "@@powerOf10";
 
 export const actionTypes = {
+    INCREMENT_DURATION: `${actionsPrefix}/INCREMENT_DURATION`,
     UPDATE_TOPIC: `${actionsPrefix}/UPDATE_TOPIC`,
     UPDATE_SESSION: `${actionsPrefix}/UPDATE_SESSION`,
     CREATE_TOPIC: `${actionsPrefix}/CREATE_TOPIC`,

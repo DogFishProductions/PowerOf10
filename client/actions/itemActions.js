@@ -1,5 +1,13 @@
 import { actionTypes } from "../constants";
 
+export const incrementDuration = (type, newValue, topicId) => {
+    return {
+        type: actionTypes.INCREMENT_DURATION,
+        topicId,
+        newValue,
+    }
+}
+
 export const updateItemProperty = (type, itemId, propName, newValue, topicId) => {
     switch(type) {
         case "topic":

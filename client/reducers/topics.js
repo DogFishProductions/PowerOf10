@@ -8,6 +8,7 @@ import {
 } from "../helpers";
 
 const {
+    INCREMENT_DURATION,
     CREATE_TOPIC,
     UPDATE_TOPIC,
     ADD_TOPIC,
@@ -58,6 +59,19 @@ const postTopic = (state = [], action) => {
             if (selectedItem) {
                 return [
                     ...before,
+                    ...after
+                ];
+            }
+            return state;
+        case INCREMENT_DURATION:
+            if (selectedItem) {
+                console.log("updating duration: ", newValue)
+                return [
+                    ...before,
+                    {
+                        ...selectedItem,
+                        duration: _.get(selectedItem, "duration", 0) + newValue,
+                    },
                     ...after
                 ];
             }

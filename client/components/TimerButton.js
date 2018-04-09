@@ -24,15 +24,17 @@ export const clearRunningUpdater = () => {
     calcCurrentDuration = null;
     heartbeatFlipFlop = false;
     count = 0;
+    currentTo = null;
 }
 
 let heartbeatFlipFlop = false;
 let count = 0;
+let currentTo;
 
 const handleStartSessionOnClick = (
     event,
     {
-        updateItemProperty,
+        updateSessionToFrom,
         createItem,
         supervisor,
         sessionIsRunning,
@@ -51,19 +53,21 @@ const handleStartSessionOnClick = (
         topicId = selectedTopicId,
         sessionId = selectedSessionId,
     } = params;
-    if ((!sessionId && (runningTopicId === topicId)) || (runningSessionId === sessionId)) {
-        updateItemProperty("session", runningSessionId, "to", Date.now(), topicId);
+    const stopRunningSession = () => {
+        const newTo = Date.now();
+        updateSessionToFrom(runningSessionId, topicId, "to", newTo, (newTo - currentTo));
         sessionIsRunning(false);
         clearRunningUpdater();
+    }
+    if ((!sessionId && (runningTopicId === topicId)) || (runningSessionId === sessionId)) {
+        stopRunningSession();
     } else {
         const {
             uid,
         } = params;
         // stop currently running session if one exists
         if (runningTopicId) {
-            updateItemProperty("session", runningSessionId, "to", Date.now(), topicId);
-            sessionIsRunning(false);
-            clearRunningUpdater();
+            stopRunningSession();
         }
         // if we've got this far then the sessionId doesn't match the running sessionId which means
         // it is either a session we've created but not yet started or a new session
@@ -78,18 +82,16 @@ const handleStartSessionOnClick = (
         const topicSessions = sessions[topicId] || [];
         const runningSession = newSession || topicSessions.find((sess) => sess.code === newSessionId);
         const { selectedItem } = getSelectedItemAndIndexFromArray(topics, "code", topicId);
+        currentTo = _.get(runningSession, "to", null);
         calcCurrentDuration = setInterval(
             () => {
                 const newTo = Date.now();
-                // don't use handler dispatchAction as session id is not in URL
-                updateItemProperty("session", newSessionId, "to", newTo, topicId);
-                let duration = _.get(selectedItem, "duration", 0);
-                duration += (newTo - _.get(runningSession, "from", newTo));
-                // don't use handler dispatchAction as topic id may not be in URL
-                updateItemProperty("topic", topicId, "duration", duration);
+                const oldTo = currentTo || newTo;
+                updateSessionToFrom(newSessionId, topicId, "to", newTo, (newTo - oldTo))
                 if ((count % 4) === 0) {
                     heartbeatFlipFlop = !heartbeatFlipFlop;
                 }
+                currentTo = newTo;
                 count++;
             },
             200,
