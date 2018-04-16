@@ -30,15 +30,17 @@ const closeDeleteDialogAndCancelPageMenu = () => {
     ];
 };
 
-const updateSessionToFrom = (sessionId, topicId, propName, newValue, change) => {
-    console.log(change)
-    return [
+const updateSessionToFrom = (sessionId, topicId, propName, newValue, change, isNew) => {
+    const actions = [
         itemActions.updateItemProperty("session", sessionId, propName, newValue, topicId),
-        itemActions.incrementDuration("topic", change, topicId),
     ];
+    if (!isNew) {
+        actions.push(itemActions.incrementDuration("topic", change, topicId));
+    }
+    return actions;
 };
 
-const addSession = (item, topicId) => {
+const addSession = (item, sessionId, topicId) => {
     const duration = _.get(item, "to", 0) - _.get(item, "from", 0);
     return [
         itemActions.addItem("session", sessionId, topicId),
@@ -46,12 +48,16 @@ const addSession = (item, topicId) => {
     ];
 };
 
-const deleteSession = (item, sessionId, topicId) => {
+const deleteSession = (item, sessionId, topicId, isNew) => {
+    console.log(item);
     const duration = _.get(item, "from", 0) - _.get(item, "to", 0);
-    return [
+    const actions = [
         itemActions.removeItem("session", sessionId, topicId),
-        itemActions.incrementDuration("topic", duration, topicId),
     ];
+    if (!isNew) {
+        actions.push(itemActions.incrementDuration("topic", duration, topicId));
+    }
+    return actions;
 };
 
 const actionCreators = {

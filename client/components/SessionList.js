@@ -48,10 +48,7 @@ export default class SessionList extends React.Component {
         const {
             supervisor,
             params,
-            selectForDeletion,
-            deselectForDeletion,
             router,
-            addItem,
             sessions,
             topics,
             sessionIsRunning,

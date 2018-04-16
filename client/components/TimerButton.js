@@ -30,6 +30,7 @@ export const clearRunningUpdater = () => {
 let heartbeatFlipFlop = false;
 let count = 0;
 let currentTo;
+let isNew = false;
 
 const handleStartSessionOnClick = (
     event,
@@ -55,7 +56,7 @@ const handleStartSessionOnClick = (
     } = params;
     const stopRunningSession = () => {
         const newTo = Date.now();
-        updateSessionToFrom(runningSessionId, topicId, "to", newTo, (newTo - currentTo));
+        updateSessionToFrom(runningSessionId, topicId, "to", newTo, (newTo - currentTo), false);
         sessionIsRunning(false);
         clearRunningUpdater();
     }
@@ -86,8 +87,8 @@ const handleStartSessionOnClick = (
         calcCurrentDuration = setInterval(
             () => {
                 const newTo = Date.now();
-                const oldTo = currentTo || newTo;
-                updateSessionToFrom(newSessionId, topicId, "to", newTo, (newTo - oldTo))
+                const oldTo = currentTo || newTo;   
+                updateSessionToFrom(newSessionId, topicId, "to", newTo, (newTo - oldTo), isNew);
                 if ((count % 4) === 0) {
                     heartbeatFlipFlop = !heartbeatFlipFlop;
                 }
@@ -103,6 +104,7 @@ const handleStartSessionOnClick = (
 }
 
 const renderTimerIcon = ({ params, supervisor, selectedTopicId, selectedSessionId }) => {
+    isNew = (_.get(supervisor, "isNew.sessionId", -1) === _.get(supervisor, "isRunning.sessionId", -2));
     const {
         topicId = selectedTopicId,
         sessionId = selectedSessionId,

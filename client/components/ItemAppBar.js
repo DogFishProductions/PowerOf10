@@ -2,8 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { compose } from "redux";
 import { connect } from "react-redux";
-import { firebaseConnect } from "react-redux-firebase";
-import { withFirestore } from 'react-redux-firebase'
+import { firebaseConnect, withFirestore } from "react-redux-firebase";
 
 import { withStyles } from "material-ui/styles";
 import AppBar from "material-ui/AppBar";
@@ -58,6 +57,7 @@ const handleMenuItemDeleteOnClick = (
 ) => {
     const {
         firestore,
+        addSession,
         closeMenuAndShowDeleteSelector,
         editItemTitle,
         params,
@@ -69,7 +69,11 @@ const handleMenuItemDeleteOnClick = (
     } = params;
     const selectedItem = getSelectedItem(props, "code");
     if (selectedItemIsNew(props, "code")) {
-        dispatchAction(props, "addItem");
+        if (sessionId) {
+            addSession(selectedItem, sessionId, topicId);
+        } else {
+            dispatchAction(props, "addItem");
+        }
         firestore.set(
             createFirestoreQueryPath(uid, true, topicId, null, sessionId),
             _.omit(selectedItem, excludedProperties),
@@ -176,8 +180,10 @@ const DeleteConfirmationDialog = (props) => {
         openDialog,
         closeDeleteDialogAndCancelPageMenu,
         removeItem,
+        deleteSession,
         firestore,
         params,
+        sessions,
         sessionIsRunning,
     } = props;
     const {
@@ -191,21 +197,26 @@ const DeleteConfirmationDialog = (props) => {
         toDelete.map(manager);
     }
     const handleDeleteConfirmedOnClick = (e) => {
+        const removeSession = (session, sessionId, topicId) => {
+            const type = "session";
+            // if we're removing the running session then clean up...
+            if (_.get(supervisor, "isRunning.sessionId", -1) === sessionId) {
+                sessionIsRunning(false);
+                clearRunningUpdater();
+            }
+            deleteSession(session, sessionId, topicId, false);
+            firestore.deleteRef(createFirestoreQueryPath(uid, true, topicId, true, sessionId));
+        }
         manageItemsMarkedForDeletion((itemId) => {
             if (topicId) {
-                const type = "session";
-                // don't use handler dispatchAction as session id is not in URL
-                removeItem("session", itemId, topicId);
-                // if we're removing the running session then clean up...
-                if (_.get(supervisor, "isRunning.sessionId", -1) === itemId) {
-                    sessionIsRunning(false);
-                    clearRunningUpdater();
-                }
-                firestore.deleteRef(createFirestoreQueryPath(uid, true, topicId, true, itemId));
+                const selectedSession = sessions[topicId].find((sess) => _.get(sess, "code", -1) === itemId);
+                removeSession(selectedSession, itemId, topicId);
             } else {
                 const type = "topic";
                 // don't use handler dispatchAction as session id is not in URL
                 removeItem("topic", itemId);
+                // Remove the sessions belonging to the topic or they'll remain in the datastore
+                sessions[itemId].map((sess) => removeSession(sess, _.get(sess, "code", -1), itemId));
                 firestore.deleteRef(createFirestoreQueryPath(uid, true, itemId));
             }
         });

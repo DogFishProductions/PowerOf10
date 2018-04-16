@@ -218,7 +218,7 @@ export const createFirestoreQueryPath = (userId, topics = false, topicId, sessio
     }
     if (sessions || sessionId) {
         const ssc = { collection: "sessions" };
-        if (topicId) {
+        if (sessionId) {
             ssc.doc = sessionId; 
         }
         query.subcollections.push(ssc);
